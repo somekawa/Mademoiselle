@@ -1,11 +1,10 @@
+#include <math.h>
+#include <vector>
 #include "Dxlib.h"	//DxLibﾗｲﾌﾞﾗﾘを使用する　独自で準備したﾍｯﾀﾞｰﾌｧｲﾙは""で指定する
 #include"keycheck.h"
 #include"main.h"
-#include"player.h"
-#include"shot.h"
-#include"stage.h"
 
-
+#define PI 3.141592
 
 // ----------変数定義----------
 typedef enum 
@@ -26,9 +25,6 @@ int fadeCnt;
 bool fadeIn;
 bool fadeOut;
 
-XY mapPos;
-int maiImage;
-
 int SystmInit(void);
 void GameInit(void);
 void GameTitle(void);
@@ -40,11 +36,57 @@ void GameMainDraw(void);
 void GameOver(void);
 void GameOverDraw(void);
 void HitCheck(void);
+void OnMove(float& x, float& y, float vx, float vy);
+void OnAdjust();
+
 
 bool FadeInScreen(int fadeStep);
 bool FadeOutScreen(int fadeStep);
 
- 
+struct Position {
+	Position(float ix, float iy) { x = ix; y = iy; }
+	Position() {
+		x = 0;
+		y = 0;
+	}
+	float x;
+	float y;
+	float Length() {
+		return hypotf(x, y);
+	}
+	Position normalized() {
+		return Position(x / Length(), y / Length());
+	}
+	Position operator+(const Position& in) {
+		return Position(x + in.x, y + in.y);
+	}
+
+	Position operator-(const Position& in) {
+		return Position(x - in.x, y - in.y);
+	}
+
+	Position operator*(float s) {
+		return Position(x*s, y*s);
+	}
+
+};
+
+Position _pos;
+Position _endPoint;
+float _g;
+float _v;
+float _length;
+
+
+typedef Position Vec2;
+
+inline float Dot(const Vec2& a, const Vec2& b) {
+	return a.x*b.x + a.y*b.y;
+}
+
+inline float Cross(const Vec2& a, const Vec2& b) {
+	return a.x*b.y - b.x*a.y;
+}
 
 
 // ==========WinMain関数
@@ -144,11 +186,15 @@ int SystmInit(void)
 	gameCnt = 0;
 	fadeCnt = 0;
 	//----------グラフィックの登録----------
-	maiImage = LoadGraph("image/player2.png");
-	PlayerSystmInit();
-	ShotSystmInit();
-	StageSystmInit();
 
+	//ひもの支点を定義する
+	_endPoint.x = 320;
+	_endPoint.y = 0;
+	_v = 0;
+	
+
+	_g = 1.f;//重力の定義
+	_length = 320;//紐の長さの計算
 	
 	return 1;
 
@@ -159,9 +205,6 @@ void GameInit(void)
 	fadeIn = true;
 	fadeOut = false;
 	pauseFlag = 0;
-	PlayerGameInit();
-	ShotGameInit();
-	StageGameInit();
 	gameMode = GMODE_TITLE;
 
 }
@@ -175,23 +218,52 @@ void GameTitle(void)
 
 void GameTitleDraw(void)
 {
-	int y = 500;
+	
 
-	DrawGraph(100, 656, maiImage, true);
-	DrawString(0, 0, "GameTitle", 0xffffff);
 
-	if (CheckHitKey(KEY_INPUT_W) == true)
-	{
-		while (!ScreenFlip() && !ClearDrawScreen() && !CheckHitKey(KEY_INPUT_SPACE)) {		// ←ちょっと不安なwhile文
-			DrawLine(320, y, 320, y - 500, GetColor(255, 255, 255), true);    // 線を描画
-			DrawBox(300, y + 30, 300 + 40, y, GetColor(255, 255, 255), true);
-			y -= 10;
-			if (y < 0) y = 500;
-			DrawGraph(100, 656, maiImage, true);
-			DrawString(0, 0, "GameTitle", 0xffffff);
-		}
+	Vec2 v = (_pos - _endPoint);//振り子の支点から振り子の錘までのベクトル
+	v = v.normalized();//正規化する
+	//外積と内積を利用して角度を計算
+	float cost = Dot(v, Vec2(-1, 0));
+	float sint = Cross(v, Vec2(-1, 0));
+	float theta = atan2f(cost, sint);
+
+	// 加速度→速度→それぞれのベクトルへ
+
+
+	_v += _g * cost;
+	//ヒントはここまで。
+	//あとは振り子の角度に従って、その時々の加速度を求め、
+	//速度(_v)に加算しよう
+	//それをX成分、Y成分に分けて
+	//OnMoveの第3第4引数に代入してください
+
+	OnMove(_pos.x, _pos.y, _v * sint, _v * cost);//第3引数、第4引数をきちんと設定しよう
+
+	//補正処理
+	OnAdjust();			// ここの補正処理がないと、ひもが伸びていくから注意!!
+
+	DrawLine(_pos.x + 1, _pos.y, 320, 0, 0x808080, 1);//ひも描画
+	DrawLine(_pos.x, _pos.y, 320, 0, 0xffffffff, 2);//ひも描画
+	DrawCircle(_pos.x + 1, _pos.y + 1, 20, 0x000000);//おもり描画
+	DrawCircle(_pos.x, _pos.y, 20, 0x008000);//おもり描画
+
+
+	
+	
+}
+
+void OnMove(float& x, float& y, float vx, float vy) {
+	//①ここに移動のための処理を描いてください。
+	x += vx;
+	y += vy;
+}
+
+void OnAdjust() {
+	Vec2 v = (_pos - _endPoint);
+	if (v.Length() > _length) {
+		_pos = _endPoint + v.normalized()*_length;
 	}
-
 }
 
 void GameCharasere(void)
@@ -201,7 +273,6 @@ void GameCharasere(void)
 
 void GameCharasereDraw(void)
 {
-
 	DrawString(0, 0, "Charasere", 0xffffff);
 }
 
@@ -216,27 +287,30 @@ void GameMain(void)
 	}
 	else {
 		gameCnt++;
-		PlayerControl();
-		ShotControl();
-		StageControl();
 		HitCheck();
 	}
+
 	GameMainDraw();
+
 	if (pauseFlag) {
 		SetDrawBright(255, 255, 255);
-		DrawString(SCREEN_SIZE_X / 2 - 40, SCREEN_SIZE_Y / 2-5, "P A U S E", 0xffffff);
+		DrawString(360, 292, "P A U S E", 0xffffff);
 	}
+
 }
 
 void GameMainDraw(void)
 {
-	StageDraw();
-	PlayerDraw();
-	ShotDraw();
-	
 	DrawFormatString(0, 0, 0xffffff, "GameMain : %d", gameCnt);
-	DrawLine(SCREEN_SIZE_X / 2, 0, SCREEN_SIZE_X / 2, SCREEN_SIZE_Y, 0xffffff, true);
-	DrawLine(0, SCREEN_SIZE_Y / 2, SCREEN_SIZE_X, SCREEN_SIZE_Y / 2, 0xffffff, true);
+	DrawBox(150, 300, 200, 350, 0xffffff,true);
+	if (CheckHitKey(KEY_INPUT_W) == true)
+	{
+		
+		//DrawLine(300, y + 30, 300 + 40, y, 0xffffff);    // 線を描画
+
+		
+	}
+
 }
 
 void GameOver(void)
