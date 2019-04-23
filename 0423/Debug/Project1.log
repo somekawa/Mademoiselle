@@ -1,2 +1,12 @@
 ﻿  main.cpp
-  Project1.vcxproj -> C:\Users\1816026\Desktop\ゲーム作成\Project1\Debug\Project1.exe
+c:\users\1816044\desktop\0423\main.cpp(258): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+c:\users\1816044\desktop\0423\main.cpp(259): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+c:\users\1816044\desktop\0423\main.cpp(260): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+c:\users\1816044\desktop\0423\main.cpp(261): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+  player.cpp
+c:\users\1816044\desktop\0423\player.cpp(76): warning C4244: '-=': 'double' から 'int' への変換です。データが失われる可能性があります。
+c:\users\1816044\desktop\0423\player.cpp(77): warning C4244: '-=': 'double' から 'int' への変換です。データが失われる可能性があります。
+  shot.cpp
+  stage.cpp
+  コードを生成中...
+  Project1.vcxproj -> C:\Users\1816044\Desktop\0423\Debug\Project1.exe

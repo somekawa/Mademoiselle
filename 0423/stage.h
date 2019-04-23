@@ -4,8 +4,8 @@
 #define CHIP_SIZE_Y 32
 
 #define MAP_X 50
-//#define MAP_Y 14
-#define MAP_Y 30
+#define MAP_Y 14
+//#define MAP_Y 30
 
 
 void StageSystmInit(void);

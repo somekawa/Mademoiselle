@@ -3,6 +3,9 @@
 #include "Dxlib.h"	//DxLibﾗｲﾌﾞﾗﾘを使用する　独自で準備したﾍｯﾀﾞｰﾌｧｲﾙは""で指定する
 #include"keycheck.h"
 #include"main.h"
+#include"player.h"
+#include"shot.h"
+#include"stage.h"
 
 #define PI 3.141592
 
@@ -24,6 +27,8 @@ int gameCnt;
 int fadeCnt;
 bool fadeIn;
 bool fadeOut;
+
+XY mapPos;
 
 int SystmInit(void);
 void GameInit(void);
@@ -186,6 +191,10 @@ int SystmInit(void)
 	gameCnt = 0;
 	fadeCnt = 0;
 	//----------グラフィックの登録----------
+	PlayerSystmInit();
+	ShotSystmInit();
+	StageSystmInit();
+
 
 	//ひもの支点を定義する
 	_endPoint.x = 320;
@@ -206,6 +215,9 @@ void GameInit(void)
 	fadeOut = false;
 	pauseFlag = 0;
 	gameMode = GMODE_TITLE;
+	PlayerGameInit();
+	ShotGameInit();
+	StageGameInit();
 
 }
 
@@ -287,6 +299,10 @@ void GameMain(void)
 	}
 	else {
 		gameCnt++;
+		PlayerControl();
+		ShotControl();
+		StageControl();
+
 		HitCheck();
 	}
 
@@ -301,15 +317,12 @@ void GameMain(void)
 
 void GameMainDraw(void)
 {
-	DrawFormatString(0, 0, 0xffffff, "GameMain : %d", gameCnt);
-	DrawBox(150, 300, 200, 350, 0xffffff,true);
-	if (CheckHitKey(KEY_INPUT_W) == true)
-	{
-		
-		//DrawLine(300, y + 30, 300 + 40, y, 0xffffff);    // 線を描画
+	StageDraw();
+	PlayerDraw();
+	ShotDraw();
 
-		
-	}
+	DrawFormatString(0, 0, 0xffffff, "GameMain : %d", gameCnt);
+	
 
 }
 
