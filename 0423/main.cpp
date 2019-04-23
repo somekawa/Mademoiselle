@@ -175,8 +175,23 @@ void GameTitle(void)
 
 void GameTitleDraw(void)
 {
+	int y = 500;
+
 	DrawGraph(100, 656, maiImage, true);
 	DrawString(0, 0, "GameTitle", 0xffffff);
+
+	if (CheckHitKey(KEY_INPUT_W) == true)
+	{
+		while (!ScreenFlip() && !ClearDrawScreen() && !CheckHitKey(KEY_INPUT_SPACE)) {		// Å©ÇøÇÂÇ¡Ç∆ïsà¿Ç»whileï∂
+			DrawLine(320, y, 320, y - 500, GetColor(255, 255, 255), true);    // ê¸Çï`âÊ
+			DrawBox(300, y + 30, 300 + 40, y, GetColor(255, 255, 255), true);
+			y -= 10;
+			if (y < 0) y = 500;
+			DrawGraph(100, 656, maiImage, true);
+			DrawString(0, 0, "GameTitle", 0xffffff);
+		}
+	}
+
 }
 
 void GameCharasere(void)
