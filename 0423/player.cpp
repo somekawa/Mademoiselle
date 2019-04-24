@@ -56,6 +56,8 @@ float _g;
 float _v;
 float _length;
 
+float KeepPos;
+
 
 typedef Position Vec2;
 
@@ -84,6 +86,8 @@ void PlayerSystmInit(void)
 
 	_g = 1.f;//重力の定義
 	_length = 200;//紐の長さの計算
+
+	KeepPos = 0;
 }
 
 void PlayerGameInit(void)
@@ -138,6 +142,7 @@ void PlayerControl(void)
 
 			if (CheckHitKey(KEY_INPUT_W))
 			{
+				KeepPos = player.pos.x - mapPos.x;
 				player.wireFlag = true;
 			}
 
@@ -278,9 +283,7 @@ void PlayerDraw(void)
 void WireDraw(void)
 {
 
-	// ワイヤーアクションをはじめたら、中心座標を固定しないといけない
-
-	
+	// ワイヤーアクションをはじめたら、中心座標を固定
 
 	if (player.wireFlag == true)
 	{
@@ -321,7 +324,7 @@ void WireDraw(void)
 
 		// この下のDrawLineの320と、ひもの支点の320は共通にすべき?
 
-		DrawLine(_pos.x , _pos.y, player.pos.x - mapPos.x, 0, 0xffffffff, 1);//ひも描画
+		DrawLine(_pos.x , _pos.y, KeepPos, 0, 0xffffffff, 1);//ひも描画
 
 		//DrawLine(_pos.x, _pos.y, player.pos.x - mapPos.x, 0, 0xffffffff, 2);//ひも描画
 
