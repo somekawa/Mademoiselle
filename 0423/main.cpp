@@ -10,7 +10,7 @@
 #define PI 3.141592
 
 // ----------•Ï”’è‹`----------
-typedef enum 
+typedef enum
 {
 	GMODE_INIT,
 	GMODE_TITLE,
@@ -41,57 +41,57 @@ void GameMainDraw(void);
 void GameOver(void);
 void GameOverDraw(void);
 void HitCheck(void);
-void OnMove(float& x, float& y, float vx, float vy);
-void OnAdjust();
+//void OnMove(float& x, float& y, float vx, float vy);
+//void OnAdjust();
 
 
 bool FadeInScreen(int fadeStep);
 bool FadeOutScreen(int fadeStep);
 
-struct Position {
-	Position(float ix, float iy) { x = ix; y = iy; }
-	Position() {
-		x = 0;
-		y = 0;
-	}
-	float x;
-	float y;
-	float Length() {
-		return hypotf(x, y);
-	}
-	Position normalized() {
-		return Position(x / Length(), y / Length());
-	}
-	Position operator+(const Position& in) {
-		return Position(x + in.x, y + in.y);
-	}
-
-	Position operator-(const Position& in) {
-		return Position(x - in.x, y - in.y);
-	}
-
-	Position operator*(float s) {
-		return Position(x*s, y*s);
-	}
-
-};
-
-Position _pos;
-Position _endPoint;
-float _g;
-float _v;
-float _length;
-
-
-typedef Position Vec2;
-
-inline float Dot(const Vec2& a, const Vec2& b) {
-	return a.x*b.x + a.y*b.y;
-}
-
-inline float Cross(const Vec2& a, const Vec2& b) {
-	return a.x*b.y - b.x*a.y;
-}
+//struct Position {
+//	Position(float ix, float iy) { x = ix; y = iy; }
+//	Position() {
+//		x = 0;
+//		y = 0;
+//	}
+//	float x;
+//	float y;
+//	float Length() {
+//		return hypotf(x, y);
+//	}
+//	Position normalized() {
+//		return Position(x / Length(), y / Length());
+//	}
+//	Position operator+(const Position& in) {
+//		return Position(x + in.x, y + in.y);
+//	}
+//
+//	Position operator-(const Position& in) {
+//		return Position(x - in.x, y - in.y);
+//	}
+//
+//	Position operator*(float s) {
+//		return Position(x*s, y*s);
+//	}
+//
+//};
+//
+//Position _pos;
+//Position _endPoint;
+//float _g;
+//float _v;
+//float _length;
+//
+//
+//typedef Position Vec2;
+//
+//inline float Dot(const Vec2& a, const Vec2& b) {
+//	return a.x*b.x + a.y*b.y;
+//}
+//
+//inline float Cross(const Vec2& a, const Vec2& b) {
+//	return a.x*b.y - b.x*a.y;
+//}
 
 
 // ==========WinMainŠÖ”
@@ -117,25 +117,25 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 				if (!FadeInScreen(5))fadeIn = false;
 			}
 			else if (fadeOut) {
-					if (!FadeOutScreen(5)) {
-						//gameMode = GMODE_GAME;
-						gameMode = GMODE_CHARASERE;
-						fadeOut = false;
-						fadeIn = true;
-					}
+				if (!FadeOutScreen(5)) {
+					//gameMode = GMODE_GAME;
+					gameMode = GMODE_CHARASERE;
+					fadeOut = false;
+					fadeIn = true;
+				}
 			}
 			else if (trgKey[START]) fadeOut = true;
 
 			GameTitle();
 			break;
-		// ·¬×¾Ú¸Ä
+			// ·¬×¾Ú¸Ä
 		case GMODE_CHARASERE:
 			if (fadeIn) {
 				if (!FadeInScreen(5))fadeIn = false;
 			}
 			else if (fadeOut) {
 				if (!FadeOutScreen(5)) {
-					
+
 					gameMode = GMODE_GAME;
 					fadeOut = false;
 					fadeIn = true;
@@ -148,7 +148,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		case GMODE_GAME:	// ¹Þ°Ñ’†
 			if (fadeIn) {
 				if (!FadeInScreen(5))fadeIn = false;
-			} else if (trgKey[START]) gameMode = GMODE_OVER;
+			}
+			else if (trgKey[START]) gameMode = GMODE_OVER;
 			GameMain();
 			break;
 		case GMODE_OVER:	// ¹Þ°Ñµ°ÊÞ°
@@ -196,15 +197,15 @@ int SystmInit(void)
 	StageSystmInit();
 
 
-	//‚Ð‚à‚ÌŽx“_‚ð’è‹`‚·‚é
-	_endPoint.x = 320;
-	_endPoint.y = 0;
-	_v = 0;
-	
+	////‚Ð‚à‚ÌŽx“_‚ð’è‹`‚·‚é
+	//_endPoint.x = 320;
+	//_endPoint.y = 0;
+	//_v = 0;
+	//
 
-	_g = 1.f;//d—Í‚Ì’è‹`
-	_length = 320;//•R‚Ì’·‚³‚ÌŒvŽZ
-	
+	//_g = 1.f;//d—Í‚Ì’è‹`
+	//_length = 320;//•R‚Ì’·‚³‚ÌŒvŽZ
+
 	return 1;
 
 }
@@ -230,53 +231,53 @@ void GameTitle(void)
 
 void GameTitleDraw(void)
 {
-	
 
 
-	Vec2 v = (_pos - _endPoint);//U‚èŽq‚ÌŽx“_‚©‚çU‚èŽq‚ÌŽ‚Ü‚Å‚ÌƒxƒNƒgƒ‹
-	v = v.normalized();//³‹K‰»‚·‚é
-	//ŠOÏ‚Æ“àÏ‚ð—˜—p‚µ‚ÄŠp“x‚ðŒvŽZ
-	float cost = Dot(v, Vec2(-1, 0));
-	float sint = Cross(v, Vec2(-1, 0));
-	float theta = atan2f(cost, sint);
 
-	// ‰Á‘¬“x¨‘¬“x¨‚»‚ê‚¼‚ê‚ÌƒxƒNƒgƒ‹‚Ö
+	//Vec2 v = (_pos - _endPoint);//U‚èŽq‚ÌŽx“_‚©‚çU‚èŽq‚ÌŽ‚Ü‚Å‚ÌƒxƒNƒgƒ‹
+	//v = v.normalized();//³‹K‰»‚·‚é
+	////ŠOÏ‚Æ“àÏ‚ð—˜—p‚µ‚ÄŠp“x‚ðŒvŽZ
+	//float cost = Dot(v, Vec2(-1, 0));
+	//float sint = Cross(v, Vec2(-1, 0));
+	//float theta = atan2f(cost, sint);
 
-
-	_v += _g * cost;
-	//ƒqƒ“ƒg‚Í‚±‚±‚Ü‚ÅB
-	//‚ ‚Æ‚ÍU‚èŽq‚ÌŠp“x‚É]‚Á‚ÄA‚»‚ÌŽžX‚Ì‰Á‘¬“x‚ð‹‚ßA
-	//‘¬“x(_v)‚É‰ÁŽZ‚µ‚æ‚¤
-	//‚»‚ê‚ðX¬•ªAY¬•ª‚É•ª‚¯‚Ä
-	//OnMove‚Ì‘æ3‘æ4ˆø”‚É‘ã“ü‚µ‚Ä‚­‚¾‚³‚¢
-
-	OnMove(_pos.x, _pos.y, _v * sint, _v * cost);//‘æ3ˆø”A‘æ4ˆø”‚ð‚«‚¿‚ñ‚ÆÝ’è‚µ‚æ‚¤
-
-	//•â³ˆ—
-	OnAdjust();			// ‚±‚±‚Ì•â³ˆ—‚ª‚È‚¢‚ÆA‚Ð‚à‚ªL‚Ñ‚Ä‚¢‚­‚©‚ç’ˆÓ!!
-
-	DrawLine(_pos.x + 1, _pos.y, 320, 0, 0x808080, 1);//‚Ð‚à•`‰æ
-	DrawLine(_pos.x, _pos.y, 320, 0, 0xffffffff, 2);//‚Ð‚à•`‰æ
-	DrawCircle(_pos.x + 1, _pos.y + 1, 20, 0x000000);//‚¨‚à‚è•`‰æ
-	DrawCircle(_pos.x, _pos.y, 20, 0x008000);//‚¨‚à‚è•`‰æ
+	//// ‰Á‘¬“x¨‘¬“x¨‚»‚ê‚¼‚ê‚ÌƒxƒNƒgƒ‹‚Ö
 
 
-	
-	
+	//_v += _g * cost;
+	////ƒqƒ“ƒg‚Í‚±‚±‚Ü‚ÅB
+	////‚ ‚Æ‚ÍU‚èŽq‚ÌŠp“x‚É]‚Á‚ÄA‚»‚ÌŽžX‚Ì‰Á‘¬“x‚ð‹‚ßA
+	////‘¬“x(_v)‚É‰ÁŽZ‚µ‚æ‚¤
+	////‚»‚ê‚ðX¬•ªAY¬•ª‚É•ª‚¯‚Ä
+	////OnMove‚Ì‘æ3‘æ4ˆø”‚É‘ã“ü‚µ‚Ä‚­‚¾‚³‚¢
+
+	//OnMove(_pos.x, _pos.y, _v * sint, _v * cost);//‘æ3ˆø”A‘æ4ˆø”‚ð‚«‚¿‚ñ‚ÆÝ’è‚µ‚æ‚¤
+
+	////•â³ˆ—
+	//OnAdjust();			// ‚±‚±‚Ì•â³ˆ—‚ª‚È‚¢‚ÆA‚Ð‚à‚ªL‚Ñ‚Ä‚¢‚­‚©‚ç’ˆÓ!!
+
+	//DrawLine(_pos.x + 1, _pos.y, 320, 0, 0x808080, 1);//‚Ð‚à•`‰æ
+	//DrawLine(_pos.x, _pos.y, 320, 0, 0xffffffff, 2);//‚Ð‚à•`‰æ
+	//DrawCircle(_pos.x + 1, _pos.y + 1, 20, 0x000000);//‚¨‚à‚è•`‰æ
+	//DrawCircle(_pos.x, _pos.y, 20, 0x008000);//‚¨‚à‚è•`‰æ
+
+
+
+
 }
 
-void OnMove(float& x, float& y, float vx, float vy) {
-	//‡@‚±‚±‚ÉˆÚ“®‚Ì‚½‚ß‚Ìˆ—‚ð•`‚¢‚Ä‚­‚¾‚³‚¢B
-	x += vx;
-	y += vy;
-}
-
-void OnAdjust() {
-	Vec2 v = (_pos - _endPoint);
-	if (v.Length() > _length) {
-		_pos = _endPoint + v.normalized()*_length;
-	}
-}
+//void OnMove(float& x, float& y, float vx, float vy) {
+//	//‡@‚±‚±‚ÉˆÚ“®‚Ì‚½‚ß‚Ìˆ—‚ð•`‚¢‚Ä‚­‚¾‚³‚¢B
+//	x += vx;
+//	y += vy;
+//}
+//
+//void OnAdjust() {
+//	Vec2 v = (_pos - _endPoint);
+//	if (v.Length() > _length) {
+//		_pos = _endPoint + v.normalized()*_length;
+//	}
+//}
 
 void GameCharasere(void)
 {
@@ -320,9 +321,10 @@ void GameMainDraw(void)
 	StageDraw();
 	PlayerDraw();
 	ShotDraw();
+	WireDraw();
 
 	DrawFormatString(0, 0, 0xffffff, "GameMain : %d", gameCnt);
-	
+
 
 }
 
@@ -348,7 +350,7 @@ bool FadeInScreen(int fadeStep)
 	}
 	else
 	{
-		SetDrawBright(255, 255 ,255);
+		SetDrawBright(255, 255, 255);
 		fadeCnt = 0;
 		return false;
 	}

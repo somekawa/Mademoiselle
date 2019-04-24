@@ -47,6 +47,7 @@ typedef struct {
 	bool jumpFlag;
 	bool shotFlag;
 	bool downFlag;
+	bool wireFlag;
 	int imgLocCnt;
 	XY velocity;
 	int cnt;
