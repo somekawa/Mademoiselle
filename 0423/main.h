@@ -1,8 +1,8 @@
 #pragma once
 
 // íËêî
-#define SCREEN_SIZE_X 800
-#define SCREEN_SIZE_Y 600
+#define SCREEN_SIZE_X 1200
+#define SCREEN_SIZE_Y 800
 
 #define PI 3.141592
 
@@ -53,4 +53,4 @@ typedef struct {
 	DWORD linkCnt;
 }CHARACTER;
 
-
+extern XY mapPos;
