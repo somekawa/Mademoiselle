@@ -21,6 +21,8 @@ typedef enum
 }GAME_MODE;
 
 
+
+
 GAME_MODE  gameMode;
 int pauseFlag;
 int gameCnt;
@@ -196,6 +198,7 @@ int SystmInit(void)
 	ShotSystmInit();
 	StageSystmInit();
 
+	
 
 	////‚Ð‚à‚ÌŽx“_‚ð’è‹`‚·‚é
 	//_endPoint.x = 320;
@@ -325,6 +328,7 @@ void GameMainDraw(void)
 
 	DrawFormatString(0, 0, 0xffffff, "GameMain : %d", gameCnt);
 
+	
 
 }
 

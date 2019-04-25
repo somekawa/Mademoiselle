@@ -7,6 +7,8 @@
 #define MAP_Y 14
 //#define MAP_Y 30
 
+//#define lpstage stage::GetInstance()
+
 
 void StageSystmInit(void);
 void StageGameInit(void);
@@ -18,3 +20,18 @@ bool IsPass(XY pos);
 
 XY MapIndexToPos(XY index);
 XY MapPos(XY pos, MOVE_DIR der);
+
+
+
+//class stage
+//{
+//public:
+//	static stage &GetInstance(void)
+//	{
+//		static stage  s_Instance;
+//		return (s_Instance);
+//	}
+//
+//	bool ret = true;
+//
+//};

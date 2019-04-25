@@ -8,8 +8,8 @@
 #include"shot.h"
 
 #define INIT_VELOCITY 50	// 初期速度
-#define SECOND_PER_FRAME 0.2	// 1ﾌﾚｰﾑの秒数
-#define SPEED 10
+#define SECOND_PER_FRAME 0.3	// 1ﾌﾚｰﾑの秒数
+#define SPEED 8
 
 
 int playerImage;
@@ -48,6 +48,8 @@ struct Position {
 		return Position(x * s, y * s);
 	}
 
+
+
 };
 
 Position _pos;
@@ -56,7 +58,7 @@ float _g;
 float _v;
 float _length;
 
-float KeepPos;
+float KeepPos;		// 座標の保存用
 
 
 typedef Position Vec2;
@@ -84,10 +86,12 @@ void PlayerSystmInit(void)
 	_v = 0;
 
 
-	_g = 1.f;//重力の定義
-	_length = 200;//紐の長さの計算
+	_g = 1.2f;		//重力の定義
+	_length = 200;	//紐の長さの計算
 
-	KeepPos = 0;
+	KeepPos = 0;	// 座標の保存用
+
+	
 }
 
 void PlayerGameInit(void)
@@ -113,6 +117,10 @@ void PlayerGameInit(void)
 
 void PlayerControl(void)
 {
+	int Pad1;
+	Pad1 = GetJoypadInputState(DX_INPUT_PAD1);
+
+
 	player.runFlag = false;
 	player.jumpFlag = true;
 	player.downFlag = false;
@@ -126,12 +134,12 @@ void PlayerControl(void)
 
 	// 移動
 	if (player.visible) {
-		if (oldKey[P1_RIGHT]) {
+		if (oldKey[P1_RIGHT] || (Pad1 & PAD_INPUT_RIGHT)) {
 			player.runFlag = true;
 			player.moveSpeed = SPEED;
 			player.moveDir = DIR_RIGHT;
 		}
-		else if (oldKey[P1_LEFT]) {
+		else if (oldKey[P1_LEFT] || (Pad1 & PAD_INPUT_LEFT)) {
 			player.runFlag = true;
 			player.moveSpeed = -SPEED;
 			player.moveDir = DIR_LEFT;
@@ -140,7 +148,7 @@ void PlayerControl(void)
 		// ｼﾞｬﾝﾌﾟ
 		if (player.jumpFlag) {
 
-			if (CheckHitKey(KEY_INPUT_W))
+			if (newKey[P2_UP] )
 			{
 				KeepPos = player.pos.x - mapPos.x;
 				player.wireFlag = true;
@@ -183,7 +191,7 @@ void PlayerControl(void)
 
 
 		}
-		if ((!player.jumpFlag) && (trgKey[P1_UP])) {
+		if ((!player.jumpFlag) && (trgKey[P1_UP]) || (Pad1 & PAD_INPUT_UP)) {
 			player.jumpFlag = true;
 			player.velocity.y = INIT_VELOCITY;
 		}
@@ -230,7 +238,7 @@ void PlayerControl(void)
 		}
 	}
 
-	if ((!player.jumpFlag) && (!player.runFlag) && (oldKey[P1_DOWN])) {
+	if ((!player.jumpFlag) && (!player.runFlag) && (oldKey[P1_DOWN]) || (Pad1 & PAD_INPUT_DOWN)) {
 		player.downFlag = true;
 		downPos = 8;
 	}
@@ -256,32 +264,33 @@ void PlayerControl(void)
 
 void PlayerDraw(void)
 {
-	int img = playerImage;
-	if ((player.runFlag) && (!player.jumpFlag)) img = runImage[(player.animCnt / 6) % 4];
-	if (player.downFlag) img = downImage;
-	if ((!player.runFlag) && (oldKey[P1_A])) img = shotImage[0];
-	if ((!player.runFlag) && (oldKey[P1_A]) && (player.downFlag)) img = shotImage[1];
-	if (player.moveDir == DIR_RIGHT) {
-		DrawGraph(player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y - player.offsetSize.y - mapPos.y, img, true);
-	}
-	else if (player.moveDir == DIR_LEFT) {
-		DrawTurnGraph(player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y - player.offsetSize.y - mapPos.y, img, true);
-	}
-	if (player.downFlag) {
-		DrawString(780, 0, "PLAYERDOWN OK", 0xffffff);
-	}
-	DrawBox(player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y - player.offsetSize.y - mapPos.y,
-		player.pos.x + player.offsetSize.x - mapPos.x, player.pos.y + player.offsetSize.y - mapPos.y, 0xff0000, false);
-	DrawBox(player.pos.x - player.hitPos - mapPos.x, player.pos.y - player.hitPos - mapPos.y + downPos,
-		player.pos.x + player.hitPos - mapPos.x, player.pos.y + player.hitPos - mapPos.y + downPos, 0x00ffff, false);
-	DrawLine(player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y - mapPos.y,
-		player.pos.x + player.offsetSize.x - mapPos.x, player.pos.y - mapPos.y, 0x00ffff, true);
-	DrawLine(player.pos.x - mapPos.x, player.pos.y - player.offsetSize.y - mapPos.y,
-		player.pos.x - mapPos.x, player.pos.y + player.offsetSize.y - mapPos.y, 0x00ffff, true);
+		int img = playerImage;
+		if ((player.runFlag) && (!player.jumpFlag)) img = runImage[(player.animCnt / 6) % 4];
+		if (player.downFlag) img = downImage;
+		if ((!player.runFlag) && (oldKey[P1_A])) img = shotImage[0];
+		if ((!player.runFlag) && (oldKey[P1_A]) && (player.downFlag)) img = shotImage[1];
+		if (player.moveDir == DIR_RIGHT) {
+			DrawGraph(player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y - player.offsetSize.y - mapPos.y, img, true);
+		}
+		else if (player.moveDir == DIR_LEFT) {
+			DrawTurnGraph(player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y - player.offsetSize.y - mapPos.y, img, true);
+		}
+		if (player.downFlag) {
+			DrawString(780, 0, "PLAYERDOWN OK", 0xffffff);
+		}
+		DrawBox(player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y - player.offsetSize.y - mapPos.y,
+			player.pos.x + player.offsetSize.x - mapPos.x, player.pos.y + player.offsetSize.y - mapPos.y, 0xff0000, false);
+		DrawBox(player.pos.x - player.hitPos - mapPos.x, player.pos.y - player.hitPos - mapPos.y + downPos,
+			player.pos.x + player.hitPos - mapPos.x, player.pos.y + player.hitPos - mapPos.y + downPos, 0x00ffff, false);
+		DrawLine(player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y - mapPos.y,
+			player.pos.x + player.offsetSize.x - mapPos.x, player.pos.y - mapPos.y, 0x00ffff, true);
+		DrawLine(player.pos.x - mapPos.x, player.pos.y - player.offsetSize.y - mapPos.y,
+			player.pos.x - mapPos.x, player.pos.y + player.offsetSize.y - mapPos.y, 0x00ffff, true);
 }
 
 void WireDraw(void)
 {
+	// 現状は座標管理の仕方がplayer.posと_posで違うから作れなさそう
 
 	// ワイヤーアクションをはじめたら、中心座標を固定
 
@@ -289,7 +298,7 @@ void WireDraw(void)
 	{
 
 		//ひもの支点を定義する
-		_endPoint.x = player.pos.x - mapPos.x;
+		_endPoint.x = KeepPos + 100;
 		_endPoint.y = 0;
 		//_v = 0;					// これをここに書くとスローモーションになる
 
@@ -304,13 +313,13 @@ void WireDraw(void)
 
 
 		_v += _g * cost;
-		//ヒントはここまで。
+		
 		//あとは振り子の角度に従って、その時々の加速度を求め、
 		//速度(_v)に加算しよう
 		//それをX成分、Y成分に分けて
 		//OnMoveの第3第4引数に代入してください
 
-		OnMove(_pos.x , _pos.y, _v * sint, _v * cost);//第3引数、第4引数をきちんと設定しよう
+		OnMove(_pos.x, _pos.y, _v * sint, _v * cost);//第3引数、第4引数をきちんと設定しよう
 
 		//補正処理
 		OnAdjust();			// ここの補正処理がないと、ひもが伸びていくから注意!!
@@ -322,15 +331,12 @@ void WireDraw(void)
 		//DrawCircle(_pos.x, _pos.y, 20, 0x008000);//おもり描画
 	    //DrawGraph(player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y - player.offsetSize.y - mapPos.y, playerImage, true);				// キャラクタをおもりとして描画
 
-		// この下のDrawLineの320と、ひもの支点の320は共通にすべき?
 
-		DrawLine(_pos.x , _pos.y, KeepPos, 0, 0xffffffff, 1);//ひも描画
+		DrawLine(KeepPos, player.pos.y, KeepPos+100, 0, 0xffffffff, 1);		// 動かないけどキャラに固定されるひも
 
-		//DrawLine(_pos.x, _pos.y, player.pos.x - mapPos.x, 0, 0xffffffff, 2);//ひも描画
+		
 
-
-		DrawGraph(_pos.x, _pos.y, playerImage, true);				// キャラクタをおもりとして描画
-
+		DrawLine(_pos.x, _pos.y, KeepPos + 100, 0, 0xffffffff, 2);			// 動くけどキャラに固定されないひも
 
 		player.wireFlag = false;
 

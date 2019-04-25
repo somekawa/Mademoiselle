@@ -9,6 +9,8 @@
 #define PI 3.141592
 #define ACC_G 9.8
 
+
+
 // ’è‹`
 typedef struct {
 	float x;
@@ -29,6 +31,9 @@ enum MOVE_DIR {
 	DIR_MAX
 };
 
+
+
+
 typedef struct {
 	int blockType;
 	bool visible;
@@ -45,6 +50,7 @@ typedef struct {
 	int outCnt;
 	bool runFlag;
 	bool jumpFlag;
+	bool jumpFlag2;
 	bool shotFlag;
 	bool downFlag;
 	bool wireFlag;
@@ -55,3 +61,4 @@ typedef struct {
 }CHARACTER;
 
 extern XY mapPos;
+

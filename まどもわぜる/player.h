@@ -7,3 +7,4 @@ void PlayerControl(void);
 void PlayerDraw(void);
 
 void WireDraw(void);
+

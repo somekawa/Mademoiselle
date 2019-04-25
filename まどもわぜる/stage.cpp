@@ -2,9 +2,11 @@
 #include "Dxlib.h"	//DxLibﾗｲﾌﾞﾗﾘを使用する　独自で準備したﾍｯﾀﾞｰﾌｧｲﾙは""で指定する
 #include <math.h>	// 標準ﾍｯﾀﾞｰﾌｧｲﾙは<>で指定する
 #include"main.h"
+#include "player.h"
 #include"stage.h"
 
 int mapImage[5];
+
 
 int mapData[MAP_Y][MAP_X] = {
 	{ 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 },
@@ -100,6 +102,7 @@ bool IsPass(XY pos)
 	case 1:
 	case 2:
 	case 3:
+		//lpmain.jumpFlag == true;
 		ret = false;
 		break;
 	}
