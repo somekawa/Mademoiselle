@@ -1,0 +1,18 @@
+player.cppの変更点
+PlayerGameInit(void)にて
+player.size = { 72,72 };
+player.offsetSize = { player.size.x / 2,player.size.y / 2 };
+player.hitPosE = { 20,36 };
+player.hitPosS = { 20,26 };
+に変更。
+
+※main.hのCHARACTERに
+XY hitPosS;		//当たり判定用の左上
+XY hitPosE;		//当たり判定用の右下
+の追加をお願いします。
+
+PlayerControl(void)、PlayerDraw(void)にて
+player.hitPosの前が-の時はplayer.hitPosS、+の時はplayer.hitPosEに置き換える。
+(例)前　movedHitCheck2.y = movedPos.y - player.hitPos;
+　　後　movedHitCheck2.y = movedPos.y - player.hitPosS.y;
+
