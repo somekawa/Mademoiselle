@@ -1,4 +1,10 @@
 player.cppの変更点
+PlayerSystmInit(void)にて
+playerImage = LoadGraph("image/playerR_stop.png");
+jumpImage = LoadGraph("image/playerR_jump.png");
+stopJumpImage = LoadGraph("image/playerR_stop_jump.png");
+LoadDivGraph("image/playerR_run.png", 10, 5, 2, 72, 72, runImage, true);
+
 PlayerGameInit(void)にて
 player.size = { 72,72 };
 player.offsetSize = { player.size.x / 2,player.size.y / 2 };
@@ -16,3 +22,5 @@ player.hitPosの前が-の時はplayer.hitPosS、+の時はplayer.hitPosEに置き換える。
 (例)前　movedHitCheck2.y = movedPos.y - player.hitPos;
 　　後　movedHitCheck2.y = movedPos.y - player.hitPosS.y;
 
+if ((player.runFlag)&&(!player.jumpFlag)) img = runImage[(player.animCnt / 3) % 10];
+if ((player.jumpFlag) && (!player.runFlag)) img = stopJumpImage;
