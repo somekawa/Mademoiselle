@@ -1,0 +1,7 @@
+stage.cpp‚ÌStageControl(void)‚É‚Ä
+if (mapPos.y < 0) mapPos.y = 0;
+if (mapPos.y > MAP_Y*CHIP_SIZE_Y - SCREEN_SIZE_Y) mapPos.y = MAP_Y * CHIP_SIZE_Y - SCREEN_SIZE_Y;
+
+player.cpp‚ÌPlayerControl(void)‚É‚Ä
+if (player.pos.y > SCREEN_SIZE_Y - CHIP_SIZE_Y*5) mapPos.y+= ACC_G;
+if (player.pos.y < CHIP_SIZE_Y * MAP_Y - SCREEN_SIZE_Y + CHIP_SIZE_Y * 5) mapPos.y -= ACC_G * SECOND_PER_FRAME;
