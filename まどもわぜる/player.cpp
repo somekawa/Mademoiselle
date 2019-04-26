@@ -13,7 +13,9 @@
 
 
 int playerImage;
-int runImage[4];
+int runImage[10];
+int jumpImage;
+int stopJumpImage;
 int downImage;
 int shotImage[2];
 CHARACTER player;
@@ -74,11 +76,13 @@ inline float Cross(const Vec2 & a, const Vec2 & b) {
 
 void PlayerSystmInit(void)
 {
-	playerImage = LoadGraph("image/red_stop.png");
+	playerImage = LoadGraph("image/playerR_stop.png");
+	jumpImage = LoadGraph("image/playerR_jump.png");
+	stopJumpImage = LoadGraph("image/playerR_stop_jump.png");
 	downImage = LoadGraph("image/red_down.png");
 	shotImage[0] = LoadGraph("image/red_stop_shot.png");
 	shotImage[1] = LoadGraph("image/red_down_shot.png");
-	LoadDivGraph("image/red_run.png", 4, 4, 1, 50, 50, runImage, true);
+	LoadDivGraph("image/playerR_run.png", 10, 5, 2, 72, 72, runImage, true);
 
 	//ひもの支点の初期化
 	_endPoint.x = 0;
@@ -96,9 +100,10 @@ void PlayerSystmInit(void)
 
 void PlayerGameInit(void)
 {
-	player.size = { 50,50 };
+	player.size = { 72,72 };
 	player.offsetSize = { player.size.x / 2,player.size.y / 2 };
-	player.hitPos = 16;
+	player.hitPosE = { 20,36 };
+	player.hitPosS = { 20,26 };
 	player.pos = { CHIP_SIZE_X * 4,CHIP_SIZE_Y * 13 - 25 };
 	player.moveSpeed = 4;
 	player.animCnt = 0;
@@ -158,17 +163,17 @@ void PlayerControl(void)
 			player.velocity.y -= ACC_G * SECOND_PER_FRAME;			// 速度の更新	定数＊定数なら最初から一緒にする
 
 																	// 頭の上
-			movedHitCheck.y = movedPos.y - player.hitPos;
+			movedHitCheck.y = movedPos.y - player.hitPosS.y;
 			movedHitCheck2 = movedHitCheck;
-			movedHitCheck2.x = movedPos.x - player.hitPos;
+			movedHitCheck2.x = movedPos.x - player.hitPosS.x;
 			movedHitCheck3 = movedHitCheck;
-			movedHitCheck3.x = movedPos.x + player.hitPos - 1;
+			movedHitCheck3.x = movedPos.x + player.hitPosE.x - 1;
 
 			if ((IsPass(movedHitCheck)) && (IsPass(movedHitCheck2)) && (IsPass(movedHitCheck3))) {
 				player.pos.y = movedPos.y;
 			}
 			else {
-				player.pos.y = MapPos(movedHitCheck, DIR_DOWN).y + player.hitPos;
+				player.pos.y = MapPos(movedHitCheck, DIR_DOWN).y + player.hitPosE.y;
 				player.velocity.y *= -1;
 			}
 
@@ -177,9 +182,9 @@ void PlayerControl(void)
 			movedPos = player.pos;
 			movedHitCheck.y = movedPos.y + player.offsetSize.y;
 			movedHitCheck2 = movedHitCheck;
-			movedHitCheck2.x = movedPos.x - player.hitPos;
+			movedHitCheck2.x = movedPos.x - player.hitPosS.x;
 			movedHitCheck3 = movedHitCheck;
-			movedHitCheck3.x = movedPos.x + player.hitPos - 1;
+			movedHitCheck3.x = movedPos.x + player.hitPosE.x - 1;
 			if ((IsPass(movedHitCheck)) && (IsPass(movedHitCheck2)) && (IsPass(movedHitCheck3))) {
 				player.pos.y = movedPos.y;
 			}
@@ -205,15 +210,15 @@ void PlayerControl(void)
 			switch (player.moveDir)
 			{
 			case DIR_RIGHT:
-				movedHitCheck.x = movedPos.x + player.hitPos;
+				movedHitCheck.x = movedPos.x + player.hitPosE.x;
 				break;
 			case DIR_LEFT:
-				movedHitCheck.x = movedPos.x - player.hitPos - 1;
+				movedHitCheck.x = movedPos.x - player.hitPosS.x - 1;
 				break;
 			}
 
 			movedHitCheck2 = movedHitCheck;
-			movedHitCheck2.y = movedPos.y - player.hitPos;
+			movedHitCheck2.y = movedPos.y - player.hitPosS.y;
 			movedHitCheck3 = movedHitCheck;
 			movedHitCheck3.y = movedPos.y + player.offsetSize.y - 1;
 			if ((IsPass(movedHitCheck)) && (IsPass(movedHitCheck2)) && (IsPass(movedHitCheck3))) {
@@ -222,10 +227,10 @@ void PlayerControl(void)
 			else {
 				// 壁にぴったりくっつける
 				if (player.moveDir == DIR_RIGHT) {
-					player.pos.x = MapPos(movedHitCheck, DIR_LEFT).x - player.hitPos;
+					player.pos.x = MapPos(movedHitCheck, DIR_LEFT).x - player.hitPosS.x;
 				}
 				else if (player.moveDir == DIR_LEFT) {
-					player.pos.x = MapPos(movedHitCheck, DIR_RIGHT).x + player.hitPos;
+					player.pos.x = MapPos(movedHitCheck, DIR_RIGHT).x + player.hitPosE.x;
 				}
 			}
 		}
@@ -264,28 +269,30 @@ void PlayerControl(void)
 
 void PlayerDraw(void)
 {
-		int img = playerImage;
-		if ((player.runFlag) && (!player.jumpFlag)) img = runImage[(player.animCnt / 6) % 4];
-		if (player.downFlag) img = downImage;
-		if ((!player.runFlag) && (oldKey[P1_A])) img = shotImage[0];
-		if ((!player.runFlag) && (oldKey[P1_A]) && (player.downFlag)) img = shotImage[1];
-		if (player.moveDir == DIR_RIGHT) {
-			DrawGraph(player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y - player.offsetSize.y - mapPos.y, img, true);
-		}
-		else if (player.moveDir == DIR_LEFT) {
-			DrawTurnGraph(player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y - player.offsetSize.y - mapPos.y, img, true);
-		}
-		if (player.downFlag) {
-			DrawString(780, 0, "PLAYERDOWN OK", 0xffffff);
-		}
-		DrawBox(player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y - player.offsetSize.y - mapPos.y,
-			player.pos.x + player.offsetSize.x - mapPos.x, player.pos.y + player.offsetSize.y - mapPos.y, 0xff0000, false);
-		DrawBox(player.pos.x - player.hitPos - mapPos.x, player.pos.y - player.hitPos - mapPos.y + downPos,
-			player.pos.x + player.hitPos - mapPos.x, player.pos.y + player.hitPos - mapPos.y + downPos, 0x00ffff, false);
-		DrawLine(player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y - mapPos.y,
-			player.pos.x + player.offsetSize.x - mapPos.x, player.pos.y - mapPos.y, 0x00ffff, true);
-		DrawLine(player.pos.x - mapPos.x, player.pos.y - player.offsetSize.y - mapPos.y,
-			player.pos.x - mapPos.x, player.pos.y + player.offsetSize.y - mapPos.y, 0x00ffff, true);
+	int img = playerImage;
+	if ((player.runFlag) && (!player.jumpFlag)) img = runImage[(player.animCnt / 3) % 10];
+	if ((player.jumpFlag) && (player.runFlag)) img = jumpImage;
+	if ((player.jumpFlag) && (!player.runFlag)) img = stopJumpImage;
+	if (player.downFlag) img = downImage;
+	if ((!player.runFlag) && (oldKey[P1_A])) img = shotImage[0];
+	if ((!player.runFlag) && (oldKey[P1_A]) && (player.downFlag)) img = shotImage[1];
+	if (player.moveDir == DIR_RIGHT) {
+		DrawGraph(player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y - player.offsetSize.y - mapPos.y, img, true);
+	}
+	else if (player.moveDir == DIR_LEFT) {
+		DrawTurnGraph(player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y - player.offsetSize.y - mapPos.y, img, true);
+	}
+	if (player.downFlag) {
+		DrawString(780, 0, "PLAYERDOWN OK", 0xffffff);
+	}
+	DrawBox(player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y - player.offsetSize.y - mapPos.y,
+		player.pos.x + player.offsetSize.x - mapPos.x, player.pos.y + player.offsetSize.y - mapPos.y, 0xff0000, false);
+	DrawBox(player.pos.x - player.hitPosS.x - mapPos.x, player.pos.y - player.hitPosS.y - mapPos.y + downPos,
+		player.pos.x + player.hitPosE.x - mapPos.x, player.pos.y + player.hitPosE.y - mapPos.y + downPos, 0x00ffff, false);
+	DrawLine(player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y - mapPos.y,
+		player.pos.x + player.offsetSize.x - mapPos.x, player.pos.y - mapPos.y, 0x00ffff, true);
+	DrawLine(player.pos.x - mapPos.x, player.pos.y - player.offsetSize.y - mapPos.y,
+		player.pos.x - mapPos.x, player.pos.y + player.offsetSize.y - mapPos.y, 0x00ffff, true);
 }
 
 void WireDraw(void)

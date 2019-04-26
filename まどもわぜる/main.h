@@ -40,7 +40,8 @@ typedef struct {
 	int point;
 	MOVE_DIR moveDir;
 	XY pos;
-	int hitPos;	//　中心からﾌﾞﾛｯｸまで
+	XY hitPosS;		//当たり判定用の左上
+	XY hitPosE;		//当たり判定用の右下
 	XY offsetSize;
 	XY size;
 	int moveSpeed;
