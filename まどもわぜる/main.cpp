@@ -1,10 +1,13 @@
+#include <math.h>
+#include <vector>
 #include "Dxlib.h"	//DxLib×²ÌÞ×Ø‚ðŽg—p‚·‚é@“ÆŽ©‚Å€”õ‚µ‚½Í¯ÀÞ°Ì§²Ù‚Í""‚ÅŽw’è‚·‚é
 #include"keycheck.h"
 #include"main.h"
 #include"player.h"
+#include"shot.h"
 #include"stage.h"
 
-
+#define PI 3.141592
 
 // ----------•Ï”’è‹`----------
 typedef enum
@@ -18,6 +21,8 @@ typedef enum
 }GAME_MODE;
 
 
+
+
 GAME_MODE  gameMode;
 int pauseFlag;
 int gameCnt;
@@ -25,9 +30,11 @@ int fadeCnt;
 bool fadeIn;
 bool fadeOut;
 
+int selectImage1;
+int selectImage2;
+int titleImage;
+
 XY mapPos;
-int maiImage;
-int cnt;
 
 int SystmInit(void);
 void GameInit(void);
@@ -40,11 +47,57 @@ void GameMainDraw(void);
 void GameOver(void);
 void GameOverDraw(void);
 void HitCheck(void);
+//void OnMove(float& x, float& y, float vx, float vy);
+//void OnAdjust();
+
 
 bool FadeInScreen(int fadeStep);
 bool FadeOutScreen(int fadeStep);
 
-
+//struct Position {
+//	Position(float ix, float iy) { x = ix; y = iy; }
+//	Position() {
+//		x = 0;
+//		y = 0;
+//	}
+//	float x;
+//	float y;
+//	float Length() {
+//		return hypotf(x, y);
+//	}
+//	Position normalized() {
+//		return Position(x / Length(), y / Length());
+//	}
+//	Position operator+(const Position& in) {
+//		return Position(x + in.x, y + in.y);
+//	}
+//
+//	Position operator-(const Position& in) {
+//		return Position(x - in.x, y - in.y);
+//	}
+//
+//	Position operator*(float s) {
+//		return Position(x*s, y*s);
+//	}
+//
+//};
+//
+//Position _pos;
+//Position _endPoint;
+//float _g;
+//float _v;
+//float _length;
+//
+//
+//typedef Position Vec2;
+//
+//inline float Dot(const Vec2& a, const Vec2& b) {
+//	return a.x*b.x + a.y*b.y;
+//}
+//
+//inline float Cross(const Vec2& a, const Vec2& b) {
+//	return a.x*b.y - b.x*a.y;
+//}
 
 
 // ==========WinMainŠÖ”
@@ -145,10 +198,23 @@ int SystmInit(void)
 	gameCnt = 0;
 	fadeCnt = 0;
 	//----------ƒOƒ‰ƒtƒBƒbƒN‚Ì“o˜^----------
-	maiImage = LoadGraph("image/bollI.png");
 	PlayerSystmInit();
+	ShotSystmInit();
 	StageSystmInit();
 
+	selectImage1 = LoadGraph("image/1player.png");
+	selectImage2 = LoadGraph("image/4player.png");
+	titleImage = LoadGraph("image/title2.png");
+	
+
+	////‚Ð‚à‚ÌŽx“_‚ð’è‹`‚·‚é
+	//_endPoint.x = 320;
+	//_endPoint.y = 0;
+	//_v = 0;
+	//
+
+	//_g = 1.f;//d—Í‚Ì’è‹`
+	//_length = 320;//•R‚Ì’·‚³‚ÌŒvŽZ
 
 	return 1;
 
@@ -159,33 +225,72 @@ void GameInit(void)
 	fadeIn = true;
 	fadeOut = false;
 	pauseFlag = 0;
-	cnt = 0;
-	PlayerGameInit();
-	StageGameInit();
 	gameMode = GMODE_TITLE;
+	PlayerGameInit();
+	ShotGameInit();
+	StageGameInit();
 
 }
 
 void GameTitle(void)
 {
-	if (cnt > 2500) {
-		cnt = 2500;
-	}
-	else {
-		cnt++;
-	}
+
 
 	GameTitleDraw();
 }
 
 void GameTitleDraw(void)
 {
-	DrawLine(0, 0, 0, SCREEN_SIZE_Y, 0xffffff, cnt / 4);
-	DrawLine(0, 0, SCREEN_SIZE_X, 0, 0xffffff, cnt / 6);
-	DrawLine(SCREEN_SIZE_X, 0, SCREEN_SIZE_X, SCREEN_SIZE_Y, 0xffffff, cnt / 4);
-	DrawLine(0, SCREEN_SIZE_Y, SCREEN_SIZE_X, SCREEN_SIZE_Y, 0xffffff, cnt / 6);
-	DrawString(0, 0, "GameTitle", 0xffffff);
+	// ‚Å‚©‚·‚¬
+	DrawGraph(0, 0, titleImage, false);
+	DrawGraph(100,0,selectImage1, true);
+	DrawGraph(0, 100, selectImage2, true);
+
+
+	//Vec2 v = (_pos - _endPoint);//U‚èŽq‚ÌŽx“_‚©‚çU‚èŽq‚ÌŽ‚Ü‚Å‚ÌƒxƒNƒgƒ‹
+	//v = v.normalized();//³‹K‰»‚·‚é
+	////ŠOÏ‚Æ“àÏ‚ð—˜—p‚µ‚ÄŠp“x‚ðŒvŽZ
+	//float cost = Dot(v, Vec2(-1, 0));
+	//float sint = Cross(v, Vec2(-1, 0));
+	//float theta = atan2f(cost, sint);
+
+	//// ‰Á‘¬“x¨‘¬“x¨‚»‚ê‚¼‚ê‚ÌƒxƒNƒgƒ‹‚Ö
+
+
+	//_v += _g * cost;
+	////ƒqƒ“ƒg‚Í‚±‚±‚Ü‚ÅB
+	////‚ ‚Æ‚ÍU‚èŽq‚ÌŠp“x‚É]‚Á‚ÄA‚»‚ÌŽžX‚Ì‰Á‘¬“x‚ð‹‚ßA
+	////‘¬“x(_v)‚É‰ÁŽZ‚µ‚æ‚¤
+	////‚»‚ê‚ðX¬•ªAY¬•ª‚É•ª‚¯‚Ä
+	////OnMove‚Ì‘æ3‘æ4ˆø”‚É‘ã“ü‚µ‚Ä‚­‚¾‚³‚¢
+
+	//OnMove(_pos.x, _pos.y, _v * sint, _v * cost);//‘æ3ˆø”A‘æ4ˆø”‚ð‚«‚¿‚ñ‚ÆÝ’è‚µ‚æ‚¤
+
+	////•â³ˆ—
+	//OnAdjust();			// ‚±‚±‚Ì•â³ˆ—‚ª‚È‚¢‚ÆA‚Ð‚à‚ªL‚Ñ‚Ä‚¢‚­‚©‚ç’ˆÓ!!
+
+	//DrawLine(_pos.x + 1, _pos.y, 320, 0, 0x808080, 1);//‚Ð‚à•`‰æ
+	//DrawLine(_pos.x, _pos.y, 320, 0, 0xffffffff, 2);//‚Ð‚à•`‰æ
+	//DrawCircle(_pos.x + 1, _pos.y + 1, 20, 0x000000);//‚¨‚à‚è•`‰æ
+	//DrawCircle(_pos.x, _pos.y, 20, 0x008000);//‚¨‚à‚è•`‰æ
+
+
+
+
 }
+
+//void OnMove(float& x, float& y, float vx, float vy) {
+//	//‡@‚±‚±‚ÉˆÚ“®‚Ì‚½‚ß‚Ìˆ—‚ð•`‚¢‚Ä‚­‚¾‚³‚¢B
+//	x += vx;
+//	y += vy;
+//}
+//
+//void OnAdjust() {
+//	Vec2 v = (_pos - _endPoint);
+//	if (v.Length() > _length) {
+//		_pos = _endPoint + v.normalized()*_length;
+//	}
+//}
 
 void GameCharasere(void)
 {
@@ -194,18 +299,11 @@ void GameCharasere(void)
 
 void GameCharasereDraw(void)
 {
-
 	DrawString(0, 0, "Charasere", 0xffffff);
 }
 
 void GameMain(void)
 {
-	/*if (cnt > 2500) {
-		cnt = 2500;
-	}
-	else {
-		cnt++;
-	}*/
 
 	if (trgKey[P1_PAUSE]) {
 		pauseFlag = !pauseFlag;
@@ -216,29 +314,32 @@ void GameMain(void)
 	else {
 		gameCnt++;
 		PlayerControl();
+		ShotControl();
 		StageControl();
+
 		HitCheck();
 	}
+
 	GameMainDraw();
+
 	if (pauseFlag) {
 		SetDrawBright(255, 255, 255);
-		DrawString(SCREEN_SIZE_X / 2 - 40, SCREEN_SIZE_Y / 2 - 5, "P A U S E", 0xffffff);
+		DrawString(360, 292, "P A U S E", 0xffffff);
 	}
+
 }
 
 void GameMainDraw(void)
 {
 	StageDraw();
 	PlayerDraw();
+	ShotDraw();
 	WireDraw();
-	DrawGraph(CHIP_SIZE_X * 5 - mapPos.x, CHIP_SIZE_Y * 23 - mapPos.y, maiImage, true);
+
 	DrawFormatString(0, 0, 0xffffff, "GameMain : %d", gameCnt);
-	//DrawLine(0, 0, 0, SCREEN_SIZE_Y, 0xffffff, cnt / 4);
-	//DrawLine(0, 0, SCREEN_SIZE_X, 0, 0xffffff, cnt / 6);
-	//DrawLine(SCREEN_SIZE_X, 0, SCREEN_SIZE_X, SCREEN_SIZE_Y, 0xffffff, cnt / 4);
-	//DrawLine(0, SCREEN_SIZE_Y, SCREEN_SIZE_X, SCREEN_SIZE_Y, 0xffffff, cnt / 6);
-	//DrawLine(SCREEN_SIZE_X / 2, 0, SCREEN_SIZE_X / 2, SCREEN_SIZE_Y, 0xffffff, true);
-	//DrawLine(0, SCREEN_SIZE_Y / 2, SCREEN_SIZE_X, SCREEN_SIZE_Y / 2, 0xffffff, true);
+
+	
+
 }
 
 void GameOver(void)

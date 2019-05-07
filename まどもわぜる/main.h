@@ -11,7 +11,6 @@
 
 
 
-
 // ’è‹`
 typedef struct {
 	float x;
@@ -38,7 +37,6 @@ enum MOVE_DIR {
 typedef struct {
 	int blockType;
 	bool visible;
-	bool visible2;
 	int point;
 	MOVE_DIR moveDir;
 	XY pos;
@@ -54,11 +52,9 @@ typedef struct {
 	bool runFlag;
 	bool jumpFlag;
 	bool jumpFlag2;
-	int jumpCnt;	// ¼Ş¬İÌß‚Å‚«‚é‰ñ”
 	bool shotFlag;
 	bool downFlag;
 	bool wireFlag;
-	bool segweyFlag;	// ¾¸Ş³ª²
 	int imgLocCnt;
 	XY velocity;
 	int cnt;
@@ -66,3 +62,4 @@ typedef struct {
 }CHARACTER;
 
 extern XY mapPos;
+
