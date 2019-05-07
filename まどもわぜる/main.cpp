@@ -25,6 +25,12 @@ int fadeCnt;
 bool fadeIn;
 bool fadeOut;
 
+int selectImage1;
+int selectImage2;
+int titleImage;
+
+
+
 XY mapPos;
 int maiImage;
 int cnt;
@@ -149,6 +155,10 @@ int SystmInit(void)
 	PlayerSystmInit();
 	StageSystmInit();
 
+	selectImage1 = LoadGraph("image/1player.png");
+	selectImage2 = LoadGraph("image/4player.png");
+	titleImage = LoadGraph("image/title2.png");
+
 
 	return 1;
 
@@ -185,6 +195,12 @@ void GameTitleDraw(void)
 	DrawLine(SCREEN_SIZE_X, 0, SCREEN_SIZE_X, SCREEN_SIZE_Y, 0xffffff, cnt / 4);
 	DrawLine(0, SCREEN_SIZE_Y, SCREEN_SIZE_X, SCREEN_SIZE_Y, 0xffffff, cnt / 6);
 	DrawString(0, 0, "GameTitle", 0xffffff);
+	// ‚Å‚©‚·‚¬
+	DrawGraph(0, 0, titleImage, false);
+	DrawGraph(100, 0, selectImage1, true);
+	DrawGraph(0, 100, selectImage2, true);
+
+
 }
 
 void GameCharasere(void)

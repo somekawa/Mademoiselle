@@ -324,6 +324,16 @@ void PlayerControl(void)
 			player.shotFlag = false;
 		}
 	}
+
+	// player‚ð’Ç‚¤ƒJƒƒ‰
+	if (player.pos.y > SCREEN_SIZE_Y - CHIP_SIZE_Y * 5) mapPos.y += ACC_G / 2;
+	if (player.pos.y < CHIP_SIZE_Y * MAP_Y - SCREEN_SIZE_Y + CHIP_SIZE_Y * 5) mapPos.y -= ACC_G * SECOND_PER_FRAME;
+
+
+	//// ¶‰E‚É‚¶‚í‚¶‚í“®‚­
+	//if (player.pos.x > SCREEN_SIZE_X - CHIP_SIZE_X * 5) mapPos.x += 1;
+	//if (player.pos.x < CHIP_SIZE_X * MAP_X - SCREEN_SIZE_X + CHIP_SIZE_X * 5) mapPos.x -= SECOND_PER_FRAME;
+
 }
 
 void PlayerDraw(void)
