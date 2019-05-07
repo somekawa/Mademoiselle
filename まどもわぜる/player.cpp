@@ -9,10 +9,14 @@
 
 #define INIT_VELOCITY 50		// 初期速度
 #define SECOND_PER_FRAME 0.3	// 1ﾌﾚｰﾑの秒数
-#define SPEED 8
 
 #define CORRECTION	  100		// ワイヤーの長さ補正用数値(特にy座標)
 
+// ﾌﾟﾚｲﾔｰｽﾋﾟｰﾄﾞ
+enum PLAYER_SPEED {
+	PLAYER_SPEED_NORMAL = 8,
+	PLAYER_SPEED_SEGWEY = 10
+};
 
 int playerImage;
 int runImage[10];
@@ -20,6 +24,7 @@ int jumpImage;
 int stopJumpImage;
 int downImage;
 int shotImage[2];
+int segweyImage[2];
 CHARACTER player;
 int downPos;
 int TimeCnt;					// ワイヤーの表示時間
@@ -94,6 +99,7 @@ void PlayerSystmInit(void)
 	shotImage[0] = LoadGraph("image/red_stop_shot.png");
 	shotImage[1] = LoadGraph("image/red_down_shot.png");
 	LoadDivGraph("image/playerR_run.png", 10, 5, 2, 72, 72, runImage, true);
+	LoadDivGraph("image/playerR_segway.png", 2, 2, 1, 72, 72, segweyImage, true);
 
 	//ひもの支点の初期化
 	_endPoint.x = 0;
@@ -122,13 +128,15 @@ void PlayerGameInit(void)
 	player.hitPosE = { 20,36 };
 	player.hitPosS = { 20,26 };
 	player.pos = { CHIP_SIZE_X * 4,CHIP_SIZE_Y * 13 - 25 };
-	player.moveSpeed = 4;
+	player.moveSpeed = PLAYER_SPEED_NORMAL;
 	player.animCnt = 0;
 	player.moveDir = DIR_RIGHT;
 	player.runFlag = false;
 	player.jumpFlag = false;
+	player.jumpCnt = 0;	// ｼﾞｬﾝﾌﾟできる回数
 	player.shotFlag = false;
 	player.downFlag = false;
+	player.segweyFlag = false;	// ｾｸﾞｳｪｲ
 
 	player.wireFlag = false;
 
@@ -148,6 +156,7 @@ void PlayerControl(void)
 	player.runFlag = false;
 	player.jumpFlag = true;
 	player.downFlag = false;
+	player.moveSpeed = PLAYER_SPEED_NORMAL;
 	player.imgLocCnt++;
 	downPos = 0;
 
@@ -170,17 +179,20 @@ void PlayerControl(void)
 
 	}
 
+	// ｾｸﾞｳｪｲ
+	if (trgKey[P2_A]) player.segweyFlag = !player.segweyFlag;
+	if (player.segweyFlag) player.moveSpeed = PLAYER_SPEED_SEGWEY;
 
 	// 移動
 	if (player.visible && !player.visible2) {
 		if (oldKey[P1_RIGHT] || (Pad1 & PAD_INPUT_RIGHT)) {
 			player.runFlag = true;
-			player.moveSpeed = SPEED;
+			player.moveSpeed = player.moveSpeed;
 			player.moveDir = DIR_RIGHT;
 		}
 		else if (oldKey[P1_LEFT] || (Pad1 & PAD_INPUT_LEFT)) {
 			player.runFlag = true;
-			player.moveSpeed = -SPEED;
+			player.moveSpeed = -player.moveSpeed;
 			player.moveDir = DIR_LEFT;
 		}
 
@@ -214,10 +226,15 @@ void PlayerControl(void)
 			movedHitCheck3.x = movedPos.x + player.hitPosE.x - 1;
 			if ((IsPass(movedHitCheck)) && (IsPass(movedHitCheck2)) && (IsPass(movedHitCheck3))) {
 				player.pos.y = movedPos.y;
+				if (player.jumpCnt < 2) {
+
+					player.jumpFlag = false;
+				}
 			}
 			else {
 				player.pos.y = MapPos(movedHitCheck, DIR_UP).y - player.offsetSize.y;		// 足元から中心
 				player.velocity.y = 0;
+				player.jumpCnt = 0;
 				player.jumpFlag = false;
 			}
 
@@ -225,6 +242,7 @@ void PlayerControl(void)
 		}
 		if ((!player.jumpFlag) && (trgKey[P1_UP]) || (Pad1 & PAD_INPUT_UP)) {
 			player.jumpFlag = true;
+			player.jumpCnt++;
 			player.velocity.y = INIT_VELOCITY;
 		}
 
@@ -306,6 +324,7 @@ void PlayerDraw(void)
 		if (player.downFlag) img = downImage;
 		if ((!player.runFlag) && (oldKey[P1_A])) img = shotImage[0];
 		if ((!player.runFlag) && (oldKey[P1_A]) && (player.downFlag)) img = shotImage[1];
+		if (player.segweyFlag) img = segweyImage[(player.animCnt / 5) % 2];
 		if (player.moveDir == DIR_RIGHT) {
 
 			DrawGraph(player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y - player.offsetSize.y - mapPos.y, img, true);
