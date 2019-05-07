@@ -12,10 +12,15 @@
 
 #define CORRECTION	  100		// ワイヤーの長さ補正用数値(特にy座標)
 
+#define KEEPPOSX_CORRECTION  120	// posの値の補正用数値
+
+//#define PAI 3.141592
+//#define JUMPSPEED 2
+
 // ﾌﾟﾚｲﾔｰｽﾋﾟｰﾄﾞ
 enum PLAYER_SPEED {
 	PLAYER_SPEED_NORMAL = 8,
-	PLAYER_SPEED_SEGWEY = 10
+	PLAYER_SPEED_SEGWEY = 12
 };
 
 int playerImage;
@@ -77,7 +82,7 @@ float KeepPosY;		// 座標の保存用
 float _vx;
 float _vy;
 
-
+//float rot;
 
 typedef Position Vec2;
 
@@ -106,7 +111,7 @@ void PlayerSystmInit(void)
 	_endPoint.y = 0;
 	_v = 0;			// 振り子のふり幅
 
-	_g = 1.2f;		//重力の定義
+	_g = 2.0f;		//重力の定義
 	_length = 0;	//紐の長さの計算
 
 	KeepPosX = 0;	// 座標の保存用
@@ -118,7 +123,7 @@ void PlayerSystmInit(void)
 	_isPushJump = false;
 	_isJumped = false;
 
-
+	//rot = -rand() % 90;
 }
 
 void PlayerGameInit(void)
@@ -169,7 +174,15 @@ void PlayerControl(void)
 	if (newKey[P2_UP])
 	{
 		_length = player.pos.y - mapPos.y - player.offsetSize.y;	//紐の長さの計算
-		KeepPosX = player.pos.x - mapPos.x;
+		// KeepPosXの補正
+		if (player.pos.x - mapPos.x < KEEPPOSX_CORRECTION)
+		{
+			KeepPosX = KEEPPOSX_CORRECTION;
+		}
+		else
+		{
+			KeepPosX = player.pos.x - mapPos.x;
+		}
 		KeepPosY = 0;
 		player.wireFlag = true;
 		player.visible = false;
@@ -369,15 +382,36 @@ void WireDraw(void)
 	{
 		if (TimeCnt < 150)
 		{
+			//ひもの支点を定義する
+			_endPoint.x = KeepPosX + CHIP_SIZE_X;
+			_endPoint.y = KeepPosY + CHIP_SIZE_Y;
+
+			Vec2 v = (_pos - _endPoint);//振り子の支点から振り子の錘までのベクトル
+			v = v.normalized();//正規化する
+			//外積と内積を利用して角度を計算
+			float cost = Dot(v, Vec2(-1, 0));
+			float sint = Cross(v, Vec2(-1, 0));
+			float theta = atan2f(cost, sint);
+
+			_v += _g * cost;
+
 
 			if (CheckHitKey(KEY_INPUT_F))		// Fキーを押したら
 			{
+				float playerX = 0;
+
 				player.visible = true;			// アニメーションするキャラが表示される
 				player.visible2 = false;		// ワイヤー中の静止画キャラが非表示になる
 				player.wireFlag = false;		// ワイヤーが非表示になる
 
+				//playerX = cos(rot*PAI / 180)*JUMPSPEED;
+				//player.pos.x += playerX;
 				player.pos.x = _pos.x;
 				player.pos.y = _pos.y;
+
+
+
+				// ここに二段ジャンプ用処理の追加が必要かも
 
 				//if (!_isPushJump)
 				//{
@@ -399,18 +433,7 @@ void WireDraw(void)
 
 
 
-			//ひもの支点を定義する
-			_endPoint.x = KeepPosX + CHIP_SIZE_X;
-			_endPoint.y = KeepPosY + CHIP_SIZE_Y;
 
-			Vec2 v = (_pos - _endPoint);//振り子の支点から振り子の錘までのベクトル
-			v = v.normalized();//正規化する
-			//外積と内積を利用して角度を計算
-			float cost = Dot(v, Vec2(-1, 0));
-			float sint = Cross(v, Vec2(-1, 0));
-			float theta = atan2f(cost, sint);
-
-			_v += _g * cost;
 
 			//あとは振り子の角度に従って、その時々の加速度を求め、
 			//速度(_v)に加算しよう
