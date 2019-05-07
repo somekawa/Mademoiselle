@@ -1,15 +1,17 @@
 
-#include "Dxlib.h"	//DxLibﾗｲﾌﾞﾗﾘを使用する　独自で準備したﾍｯﾀﾞｰﾌｧｲﾙは""で指定する
-#include <math.h>	// 標準ﾍｯﾀﾞｰﾌｧｲﾙは<>で指定する
+#include "Dxlib.h"				// DxLibﾗｲﾌﾞﾗﾘを使用する　独自で準備したﾍｯﾀﾞｰﾌｧｲﾙは""で指定する
+#include <math.h>				// 標準ﾍｯﾀﾞｰﾌｧｲﾙは<>で指定する
 #include"keycheck.h"
 #include"main.h"
 #include"stage.h"
 #include"player.h"
 #include"shot.h"
 
-#define INIT_VELOCITY 50	// 初期速度
+#define INIT_VELOCITY 50		// 初期速度
 #define SECOND_PER_FRAME 0.3	// 1ﾌﾚｰﾑの秒数
 #define SPEED 8
+
+#define CORRECTION	  100		// ワイヤーの長さ補正用数値(特にy座標)
 
 
 int playerImage;
@@ -20,6 +22,10 @@ int downImage;
 int shotImage[2];
 CHARACTER player;
 int downPos;
+int TimeCnt;					// ワイヤーの表示時間
+
+bool _isPushJump;
+bool _isJumped;
 
 void OnMove(float& x, float& y, float vx, float vy);
 void OnAdjust();
@@ -60,7 +66,12 @@ float _g;
 float _v;
 float _length;
 
-float KeepPos;		// 座標の保存用
+float KeepPosX;		// 座標の保存用
+float KeepPosY;		// 座標の保存用
+
+float _vx;
+float _vy;
+
 
 
 typedef Position Vec2;
@@ -87,15 +98,21 @@ void PlayerSystmInit(void)
 	//ひもの支点の初期化
 	_endPoint.x = 0;
 	_endPoint.y = 0;
-	_v = 0;
-
+	_v = 0;			// 振り子のふり幅
 
 	_g = 1.2f;		//重力の定義
-	_length = 200;	//紐の長さの計算
+	_length = 0;	//紐の長さの計算
 
-	KeepPos = 0;	// 座標の保存用
+	KeepPosX = 0;	// 座標の保存用
+	KeepPosY = 0;	// 座標の保存用
 
-	
+	_vx = 0;
+	_vy = 0;
+
+	_isPushJump = false;
+	_isJumped = false;
+
+
 }
 
 void PlayerGameInit(void)
@@ -116,6 +133,7 @@ void PlayerGameInit(void)
 	player.wireFlag = false;
 
 	player.visible = true;
+	player.visible2 = false;
 	player.imgLocCnt = 0;
 	downPos = 0;
 }
@@ -124,6 +142,7 @@ void PlayerControl(void)
 {
 	int Pad1;
 	Pad1 = GetJoypadInputState(DX_INPUT_PAD1);
+
 
 
 	player.runFlag = false;
@@ -137,8 +156,23 @@ void PlayerControl(void)
 	XY movedHitCheck2;
 	XY movedHitCheck3;
 
+	// ワイヤー処理
+	if (newKey[P2_UP])
+	{
+		_length = player.pos.y - mapPos.y - player.offsetSize.y;	//紐の長さの計算
+		KeepPosX = player.pos.x - mapPos.x;
+		KeepPosY = 0;
+		player.wireFlag = true;
+		player.visible = false;
+		player.visible2 = true;
+
+		TimeCnt = 0;
+
+	}
+
+
 	// 移動
-	if (player.visible) {
+	if (player.visible && !player.visible2) {
 		if (oldKey[P1_RIGHT] || (Pad1 & PAD_INPUT_RIGHT)) {
 			player.runFlag = true;
 			player.moveSpeed = SPEED;
@@ -152,14 +186,7 @@ void PlayerControl(void)
 
 		// ｼﾞｬﾝﾌﾟ
 		if (player.jumpFlag) {
-
-			if (newKey[P2_UP] )
-			{
-				KeepPos = player.pos.x - mapPos.x;
-				player.wireFlag = true;
-			}
-
-			movedPos.y -= player.velocity.y * SECOND_PER_FRAME;	// 距離の更新
+			movedPos.y -= player.velocity.y * SECOND_PER_FRAME;		// 距離の更新
 			player.velocity.y -= ACC_G * SECOND_PER_FRAME;			// 速度の更新	定数＊定数なら最初から一緒にする
 
 																	// 頭の上
@@ -243,6 +270,7 @@ void PlayerControl(void)
 		}
 	}
 
+
 	if ((!player.jumpFlag) && (!player.runFlag) && (oldKey[P1_DOWN]) || (Pad1 & PAD_INPUT_DOWN)) {
 		player.downFlag = true;
 		downPos = 8;
@@ -269,86 +297,152 @@ void PlayerControl(void)
 
 void PlayerDraw(void)
 {
-	int img = playerImage;
-	if ((player.runFlag) && (!player.jumpFlag)) img = runImage[(player.animCnt / 3) % 10];
-	if ((player.jumpFlag) && (player.runFlag)) img = jumpImage;
-	if ((player.jumpFlag) && (!player.runFlag)) img = stopJumpImage;
-	if (player.downFlag) img = downImage;
-	if ((!player.runFlag) && (oldKey[P1_A])) img = shotImage[0];
-	if ((!player.runFlag) && (oldKey[P1_A]) && (player.downFlag)) img = shotImage[1];
-	if (player.moveDir == DIR_RIGHT) {
-		DrawGraph(player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y - player.offsetSize.y - mapPos.y, img, true);
+	if (player.visible && !player.visible2)
+	{
+		int img = playerImage;
+		if ((player.runFlag) && (!player.jumpFlag)) img = runImage[(player.animCnt / 3) % 10];
+		if ((player.jumpFlag) && (player.runFlag)) img = jumpImage;
+		if ((player.jumpFlag) && (!player.runFlag)) img = stopJumpImage;
+		if (player.downFlag) img = downImage;
+		if ((!player.runFlag) && (oldKey[P1_A])) img = shotImage[0];
+		if ((!player.runFlag) && (oldKey[P1_A]) && (player.downFlag)) img = shotImage[1];
+		if (player.moveDir == DIR_RIGHT) {
+
+			DrawGraph(player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y - player.offsetSize.y - mapPos.y, img, true);
+		}
+		else if (player.moveDir == DIR_LEFT) {
+			DrawTurnGraph(player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y - player.offsetSize.y - mapPos.y, img, true);
+		}
+		if (player.downFlag) {
+			DrawString(780, 0, "PLAYERDOWN OK", 0xffffff);
+		}
+		DrawBox(player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y - player.offsetSize.y - mapPos.y,
+			player.pos.x + player.offsetSize.x - mapPos.x, player.pos.y + player.offsetSize.y - mapPos.y, 0xff0000, false);
+		DrawBox(player.pos.x - player.hitPosS.x - mapPos.x, player.pos.y - player.hitPosS.y - mapPos.y + downPos,
+			player.pos.x + player.hitPosE.x - mapPos.x, player.pos.y + player.hitPosE.y - mapPos.y + downPos, 0x00ffff, false);
+		DrawLine(player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y - mapPos.y,
+			player.pos.x + player.offsetSize.x - mapPos.x, player.pos.y - mapPos.y, 0x00ffff, true);
+		DrawLine(player.pos.x - mapPos.x, player.pos.y - player.offsetSize.y - mapPos.y,
+			player.pos.x - mapPos.x, player.pos.y + player.offsetSize.y - mapPos.y, 0x00ffff, true);
 	}
-	else if (player.moveDir == DIR_LEFT) {
-		DrawTurnGraph(player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y - player.offsetSize.y - mapPos.y, img, true);
+
+	if (!player.visible && player.visible2)
+	{
+		// ワイヤーがあまりにも短すぎたときの対処
+		if (_pos.y < CORRECTION)
+		{
+			_pos.y = CORRECTION;
+		}
+		DrawLine(_pos.x, _pos.y, KeepPosX + CHIP_SIZE_X, KeepPosY + CHIP_SIZE_Y, 0xffffffff, 2);			// 動くけどキャラに固定されないひも
+
+		DrawGraph(_pos.x, _pos.y, playerImage, true);														// キャラクタをおもりとして描画
 	}
-	if (player.downFlag) {
-		DrawString(780, 0, "PLAYERDOWN OK", 0xffffff);
-	}
-	DrawBox(player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y - player.offsetSize.y - mapPos.y,
-		player.pos.x + player.offsetSize.x - mapPos.x, player.pos.y + player.offsetSize.y - mapPos.y, 0xff0000, false);
-	DrawBox(player.pos.x - player.hitPosS.x - mapPos.x, player.pos.y - player.hitPosS.y - mapPos.y + downPos,
-		player.pos.x + player.hitPosE.x - mapPos.x, player.pos.y + player.hitPosE.y - mapPos.y + downPos, 0x00ffff, false);
-	DrawLine(player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y - mapPos.y,
-		player.pos.x + player.offsetSize.x - mapPos.x, player.pos.y - mapPos.y, 0x00ffff, true);
-	DrawLine(player.pos.x - mapPos.x, player.pos.y - player.offsetSize.y - mapPos.y,
-		player.pos.x - mapPos.x, player.pos.y + player.offsetSize.y - mapPos.y, 0x00ffff, true);
+
 }
 
 void WireDraw(void)
 {
-	// 現状は座標管理の仕方がplayer.posと_posで違うから作れなさそう
-
 	// ワイヤーアクションをはじめたら、中心座標を固定
 
-	if (player.wireFlag == true)
+	// WとFを同時に押したときのバグがえぐい
+
+	if (player.wireFlag)
 	{
+		if (TimeCnt < 150)
+		{
 
-		//ひもの支点を定義する
-		_endPoint.x = KeepPos + 100;
-		_endPoint.y = 0;
-		//_v = 0;					// これをここに書くとスローモーションになる
+			if (CheckHitKey(KEY_INPUT_F))		// Fキーを押したら
+			{
+				player.visible = true;			// アニメーションするキャラが表示される
+				player.visible2 = false;		// ワイヤー中の静止画キャラが非表示になる
+				player.wireFlag = false;		// ワイヤーが非表示になる
 
-		Vec2 v = (_pos - _endPoint);//振り子の支点から振り子の錘までのベクトル
-		v = v.normalized();//正規化する
-		//外積と内積を利用して角度を計算
-		float cost = Dot(v, Vec2(-1, 0));
-		float sint = Cross(v, Vec2(-1, 0));
-		float theta = atan2f(cost, sint);
+				player.pos.x = _pos.x;
+				player.pos.y = _pos.y;
 
-		// 加速度→速度→それぞれのベクトルへ
-
-
-		_v += _g * cost;
-		
-		//あとは振り子の角度に従って、その時々の加速度を求め、
-		//速度(_v)に加算しよう
-		//それをX成分、Y成分に分けて
-		//OnMoveの第3第4引数に代入してください
-
-		OnMove(_pos.x, _pos.y, _v * sint, _v * cost);//第3引数、第4引数をきちんと設定しよう
-
-		//補正処理
-		OnAdjust();			// ここの補正処理がないと、ひもが伸びていくから注意!!
-
-		// ひもとおもりの描画が2つずつあるのは陰影をつけるため。
-		//DrawLine(player.pos.x - player.offsetSize.x - mapPos.x + 1, player.pos.y - player.offsetSize.y - mapPos.y, 320, 0, 0x808080, 1);//ひも描画
-		//DrawLine(player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y - player.offsetSize.y - mapPos.y, 320, 0, 0xffffffff, 2);//ひも描画
-		//DrawCircle(_pos.x + 1, _pos.y + 1, 20, 0x000000);//おもり描画
-		//DrawCircle(_pos.x, _pos.y, 20, 0x008000);//おもり描画
-	    //DrawGraph(player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y - player.offsetSize.y - mapPos.y, playerImage, true);				// キャラクタをおもりとして描画
+				//if (!_isPushJump)
+				//{
+				//	OnPushJumpKey(_vx, _vy);
+				//}
+				//_isPushJump = true;
+				//if (_pos.y >= CHIP_SIZE_Y * 12) {//地面に当たったら…
+				//	OnGround(_pos.x, _pos.y, _vx, _vy);
+				//}
+				PlayerDraw();
+			}
+			else
+			{
+				player.visible = false;
+				player.visible2 = true;
+				player.wireFlag = true;
+				_isPushJump = false;
+			}
 
 
-		DrawLine(KeepPos, player.pos.y, KeepPos+100, 0, 0xffffffff, 1);		// 動かないけどキャラに固定されるひも
 
-		
+			//ひもの支点を定義する
+			_endPoint.x = KeepPosX + CHIP_SIZE_X;
+			_endPoint.y = KeepPosY + CHIP_SIZE_Y;
 
-		DrawLine(_pos.x, _pos.y, KeepPos + 100, 0, 0xffffffff, 2);			// 動くけどキャラに固定されないひも
+			Vec2 v = (_pos - _endPoint);//振り子の支点から振り子の錘までのベクトル
+			v = v.normalized();//正規化する
+			//外積と内積を利用して角度を計算
+			float cost = Dot(v, Vec2(-1, 0));
+			float sint = Cross(v, Vec2(-1, 0));
+			float theta = atan2f(cost, sint);
 
-		player.wireFlag = false;
+			_v += _g * cost;
+
+			//あとは振り子の角度に従って、その時々の加速度を求め、
+			//速度(_v)に加算しよう
+			//それをX成分、Y成分に分けて
+			//OnMoveの第3第4引数に代入してください
+
+			/*if (_isJumped) {
+				OnMove(_pos.x, _pos.y, _vx, _vy);
+				_vy += _g;
+			}
+			else {*/
+			OnMove(_pos.x, _pos.y, _v * sint, _v * cost);
+			OnAdjust();		// これがないとひもが伸びていく
+		//}
+
+		//DrawLine(KeepPos, player.pos.y, KeepPos+100, 0, 0xffffffff, 1);		// 動かないけどキャラに固定されるひも
+
+		//DrawLine(_pos.x, _pos.y, KeepPosX + CHIP_SIZE_X, KeepPosY + CHIP_SIZE_Y, 0xffffffff, 2);			// 動くけどキャラに固定されないひも
+
+		//DrawGraph(_pos.x, _pos.y, playerImage, true);						// キャラクタをおもりとして描画
+
+			TimeCnt++;
+		}
+		else
+		{
+			player.wireFlag = false;
+			player.visible = true;
+			player.visible2 = false;
+		}
 
 	}
 }
+
+//void OnPushJumpKey(float& vx, float& vy)
+//{
+//	Vec2 v = (_pos - _endPoint);
+//	v = v.normalized();
+//	_isJumped = true;
+//	float theta = atan2f(Cross(v, Vec2(-1, 0)), Dot(v, Vec2(-1, 0)));
+//	float cost = Dot(v, Vec2(-1, 0));
+//	float sint = Cross(v, Vec2(-1, 0));
+//	vx = _v * sint;
+//	vy = _v * cost;
+//	
+//
+//}
+//
+//void OnGround(float& x, float& y, float& vx, float& vy)
+//{
+//	
+//}
 
 void OnMove(float& x, float& y, float vx, float vy) {
 	//①ここに移動のための処理を描いてください。

@@ -7,7 +7,7 @@
 
 
 // ----------•Ï”’è‹`----------
-typedef enum 
+typedef enum
 {
 	GMODE_INIT,
 	GMODE_TITLE,
@@ -44,7 +44,7 @@ void HitCheck(void);
 bool FadeInScreen(int fadeStep);
 bool FadeOutScreen(int fadeStep);
 
- 
+
 
 
 // ==========WinMainŠÖ”
@@ -70,25 +70,25 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 				if (!FadeInScreen(5))fadeIn = false;
 			}
 			else if (fadeOut) {
-					if (!FadeOutScreen(5)) {
-						//gameMode = GMODE_GAME;
-						gameMode = GMODE_CHARASERE;
-						fadeOut = false;
-						fadeIn = true;
-					}
+				if (!FadeOutScreen(5)) {
+					//gameMode = GMODE_GAME;
+					gameMode = GMODE_CHARASERE;
+					fadeOut = false;
+					fadeIn = true;
+				}
 			}
 			else if (trgKey[START]) fadeOut = true;
 
 			GameTitle();
 			break;
-		// ·¬×¾Ú¸Ä
+			// ·¬×¾Ú¸Ä
 		case GMODE_CHARASERE:
 			if (fadeIn) {
 				if (!FadeInScreen(5))fadeIn = false;
 			}
 			else if (fadeOut) {
 				if (!FadeOutScreen(5)) {
-					
+
 					gameMode = GMODE_GAME;
 					fadeOut = false;
 					fadeIn = true;
@@ -101,7 +101,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		case GMODE_GAME:	// ¹Þ°Ñ’†
 			if (fadeIn) {
 				if (!FadeInScreen(5))fadeIn = false;
-			} else if (trgKey[START]) gameMode = GMODE_OVER;
+			}
+			else if (trgKey[START]) gameMode = GMODE_OVER;
 			GameMain();
 			break;
 		case GMODE_OVER:	// ¹Þ°Ñµ°ÊÞ°
@@ -148,7 +149,7 @@ int SystmInit(void)
 	PlayerSystmInit();
 	StageSystmInit();
 
-	
+
 	return 1;
 
 }
@@ -173,16 +174,16 @@ void GameTitle(void)
 	else {
 		cnt++;
 	}
-	
+
 	GameTitleDraw();
 }
 
 void GameTitleDraw(void)
 {
-	DrawLine(0, 0, 0, SCREEN_SIZE_Y, 0xffffff, cnt/4);
-	DrawLine(0, 0, SCREEN_SIZE_X, 0, 0xffffff, cnt/6);
-	DrawLine(SCREEN_SIZE_X, 0, SCREEN_SIZE_X, SCREEN_SIZE_Y, 0xffffff, cnt/4);
-	DrawLine(0, SCREEN_SIZE_Y, SCREEN_SIZE_X, SCREEN_SIZE_Y, 0xffffff, cnt/6);
+	DrawLine(0, 0, 0, SCREEN_SIZE_Y, 0xffffff, cnt / 4);
+	DrawLine(0, 0, SCREEN_SIZE_X, 0, 0xffffff, cnt / 6);
+	DrawLine(SCREEN_SIZE_X, 0, SCREEN_SIZE_X, SCREEN_SIZE_Y, 0xffffff, cnt / 4);
+	DrawLine(0, SCREEN_SIZE_Y, SCREEN_SIZE_X, SCREEN_SIZE_Y, 0xffffff, cnt / 6);
 	DrawString(0, 0, "GameTitle", 0xffffff);
 }
 
@@ -199,6 +200,12 @@ void GameCharasereDraw(void)
 
 void GameMain(void)
 {
+	/*if (cnt > 2500) {
+		cnt = 2500;
+	}
+	else {
+		cnt++;
+	}*/
 
 	if (trgKey[P1_PAUSE]) {
 		pauseFlag = !pauseFlag;
@@ -215,7 +222,7 @@ void GameMain(void)
 	GameMainDraw();
 	if (pauseFlag) {
 		SetDrawBright(255, 255, 255);
-		DrawString(SCREEN_SIZE_X / 2 - 40, SCREEN_SIZE_Y / 2-5, "P A U S E", 0xffffff);
+		DrawString(SCREEN_SIZE_X / 2 - 40, SCREEN_SIZE_Y / 2 - 5, "P A U S E", 0xffffff);
 	}
 }
 
@@ -223,8 +230,13 @@ void GameMainDraw(void)
 {
 	StageDraw();
 	PlayerDraw();
-	DrawGraph(CHIP_SIZE_X*5-mapPos.x, CHIP_SIZE_Y*23-mapPos.y, maiImage, true);
+	WireDraw();
+	DrawGraph(CHIP_SIZE_X * 5 - mapPos.x, CHIP_SIZE_Y * 23 - mapPos.y, maiImage, true);
 	DrawFormatString(0, 0, 0xffffff, "GameMain : %d", gameCnt);
+	//DrawLine(0, 0, 0, SCREEN_SIZE_Y, 0xffffff, cnt / 4);
+	//DrawLine(0, 0, SCREEN_SIZE_X, 0, 0xffffff, cnt / 6);
+	//DrawLine(SCREEN_SIZE_X, 0, SCREEN_SIZE_X, SCREEN_SIZE_Y, 0xffffff, cnt / 4);
+	//DrawLine(0, SCREEN_SIZE_Y, SCREEN_SIZE_X, SCREEN_SIZE_Y, 0xffffff, cnt / 6);
 	//DrawLine(SCREEN_SIZE_X / 2, 0, SCREEN_SIZE_X / 2, SCREEN_SIZE_Y, 0xffffff, true);
 	//DrawLine(0, SCREEN_SIZE_Y / 2, SCREEN_SIZE_X, SCREEN_SIZE_Y / 2, 0xffffff, true);
 }
@@ -251,7 +263,7 @@ bool FadeInScreen(int fadeStep)
 	}
 	else
 	{
-		SetDrawBright(255, 255 ,255);
+		SetDrawBright(255, 255, 255);
 		fadeCnt = 0;
 		return false;
 	}

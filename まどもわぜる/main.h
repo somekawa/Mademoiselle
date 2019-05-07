@@ -11,6 +11,7 @@
 
 
 
+
 // ’è‹`
 typedef struct {
 	float x;
@@ -37,6 +38,7 @@ enum MOVE_DIR {
 typedef struct {
 	int blockType;
 	bool visible;
+	bool visible2;
 	int point;
 	MOVE_DIR moveDir;
 	XY pos;
@@ -62,4 +64,3 @@ typedef struct {
 }CHARACTER;
 
 extern XY mapPos;
-
