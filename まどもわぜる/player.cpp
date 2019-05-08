@@ -173,22 +173,46 @@ void PlayerControl(void)
 	// ワイヤー処理
 	if (newKey[P2_UP])
 	{
-		_length = player.pos.y - mapPos.y - player.offsetSize.y;	//紐の長さの計算
-		// KeepPosXの補正
-		if (player.pos.x - mapPos.x < KEEPPOSX_CORRECTION)
+		movedPos = player.pos;
+
+		// 5マス以内の頭上にブロックがあったら、ワイヤーが出せるようにしたいはず…
+		for (int i = 0; i <= 5; i++)
 		{
-			KeepPosX = KEEPPOSX_CORRECTION;
+			movedHitCheck.y = movedPos.y - player.offsetSize.y - (CHIP_SIZE_Y * i);	// 高さ
+		}
+
+		movedHitCheck2 = movedHitCheck;												// 2 = 左
+		movedHitCheck2.x = movedPos.x - player.hitPosS.x/* - CHIP_SIZE_X*/;
+
+		movedHitCheck3 = movedHitCheck;												// 3 = 右
+		movedHitCheck3.x = movedPos.x + player.hitPosE.x - 1/* + CHIP_SIZE_X*/;
+
+		if ((IsPass(movedHitCheck)) && (IsPass(movedHitCheck2)) && (IsPass(movedHitCheck3)))
+		{
+			player.wireFlag = false;
+
 		}
 		else
 		{
-			KeepPosX = player.pos.x - mapPos.x;
-		}
-		KeepPosY = 0;
-		player.wireFlag = true;
-		player.visible = false;
-		player.visible2 = true;
+			_length = player.pos.y - mapPos.y - player.offsetSize.y;	//紐の長さの計算
+			// KeepPosXの補正
+			if (player.pos.x - mapPos.x < KEEPPOSX_CORRECTION)
+			{
+				KeepPosX = KEEPPOSX_CORRECTION;
+			}
+			else
+			{
+				KeepPosX = player.pos.x - mapPos.x;
+			}
+			KeepPosY = 0;
+			player.wireFlag = true;
+			player.visible = false;
+			player.visible2 = true;
 
-		TimeCnt = 0;
+			TimeCnt = 0;
+		}
+
+
 
 	}
 
@@ -233,9 +257,9 @@ void PlayerControl(void)
 			// 足元にﾌﾞﾛｯｸがあるか
 			movedPos = player.pos;
 			movedHitCheck.y = movedPos.y + player.offsetSize.y;
-			movedHitCheck2 = movedHitCheck;
+			movedHitCheck2 = movedHitCheck;													// 左
 			movedHitCheck2.x = movedPos.x - player.hitPosS.x;
-			movedHitCheck3 = movedHitCheck;
+			movedHitCheck3 = movedHitCheck;													// 右
 			movedHitCheck3.x = movedPos.x + player.hitPosE.x - 1;
 			if ((IsPass(movedHitCheck)) && (IsPass(movedHitCheck2)) && (IsPass(movedHitCheck3))) {
 				player.pos.y = movedPos.y;
@@ -343,7 +367,7 @@ void PlayerDraw(void)
 		int img = playerImage;
 		if ((player.runFlag) && (!player.jumpFlag)) img = runImage[(player.animCnt / 3) % 10];
 		if ((player.jumpFlag) && (player.runFlag)) img = jumpImage;
-		if ((player.jumpFlag) && (!player.runFlag)) img = stopJumpImage;
+		if ((player.jumpCnt>0) && (!player.runFlag)) img = stopJumpImage;
 		if (player.downFlag) img = downImage;
 		if ((!player.runFlag) && (oldKey[P1_A])) img = shotImage[0];
 		if ((!player.runFlag) && (oldKey[P1_A]) && (player.downFlag)) img = shotImage[1];
@@ -416,59 +440,13 @@ void WireDraw(void)
 
 				//playerX = cos(rot*PAI / 180)*JUMPSPEED;
 				//player.pos.x += playerX;
-				player.pos.x = _pos.x + mapPos.x + player.size.x/2;
+
+				// 着地地点の描画位置
+				player.pos.x = _pos.x + mapPos.x + player.offsetSize.x;
 				player.pos.y = _pos.y + mapPos.y;
 
 				
-			
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-				//--------------------------------------------------------------
-
-				// 右上
-				//if (player.pos.x >=  SCREEN_SIZE_X)
-				//{
-				//	player.pos.x = _pos.x + SCREEN_SIZE_X;
-				//	player.pos.y = _pos.y;
-				//}
-				////else
-				////{
-				////	// 左上
-				////	player.pos.x = _pos.x;
-				////}
-				////--------------------------------------------------------------
-
-				////
-				//if ((player.pos.y = _pos.y + SCREEN_SIZE_Y)&& (player.pos.x >= SCREEN_SIZE_X))
-				//{
-				//	//_pos.y = _pos.y + SCREEN_SIZE_Y;
-				//	player.pos.y = _pos.y + SCREEN_SIZE_Y;
-				//	player.pos.x = _pos.x + SCREEN_SIZE_X;
-				//}
-				////else
-				//{
-				//	// 左上
-				//	player.pos.y = _pos.y;
-				//}
-
-
+		
 				// ここに二段ジャンプ用処理の追加が必要かも
 
 				//if (!_isPushJump)
