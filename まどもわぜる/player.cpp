@@ -408,7 +408,7 @@ void WireDraw(void)
 
 			if (CheckHitKey(KEY_INPUT_F))		// Fキーを押したら
 			{
-				float playerX = 0;
+				//float playerX = 0;
 
 				player.visible = true;			// アニメーションするキャラが表示される
 				player.visible2 = false;		// ワイヤー中の静止画キャラが非表示になる
@@ -416,9 +416,57 @@ void WireDraw(void)
 
 				//playerX = cos(rot*PAI / 180)*JUMPSPEED;
 				//player.pos.x += playerX;
-				player.pos.x = _pos.x;
-				player.pos.y = _pos.y;
+				player.pos.x = _pos.x + mapPos.x + player.size.x/2;
+				player.pos.y = _pos.y + mapPos.y;
 
+				
+			
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+				//--------------------------------------------------------------
+
+				// 右上
+				//if (player.pos.x >=  SCREEN_SIZE_X)
+				//{
+				//	player.pos.x = _pos.x + SCREEN_SIZE_X;
+				//	player.pos.y = _pos.y;
+				//}
+				////else
+				////{
+				////	// 左上
+				////	player.pos.x = _pos.x;
+				////}
+				////--------------------------------------------------------------
+
+				////
+				//if ((player.pos.y = _pos.y + SCREEN_SIZE_Y)&& (player.pos.x >= SCREEN_SIZE_X))
+				//{
+				//	//_pos.y = _pos.y + SCREEN_SIZE_Y;
+				//	player.pos.y = _pos.y + SCREEN_SIZE_Y;
+				//	player.pos.x = _pos.x + SCREEN_SIZE_X;
+				//}
+				////else
+				//{
+				//	// 左上
+				//	player.pos.y = _pos.y;
+				//}
 
 
 				// ここに二段ジャンプ用処理の追加が必要かも
