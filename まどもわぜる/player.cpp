@@ -203,42 +203,51 @@ void PlayerControl(void)
 		{
 			movedPos = player.pos;
 
-			// 5マス以内の頭上にブロックがあったら、ワイヤーが出せるようにしたいはず…
-			for (int i = 0; i <= 5; i++)
+			// 5~10マス以内の頭上にブロックがあったら、ワイヤーが出せるようにしたい
+			for (int i = 5; i <= 10; )
 			{
 				movedHitCheck.y = movedPos.y - player.offsetSize.y - (CHIP_SIZE_Y * i);	// 高さ
-			}
 
-			movedHitCheck2 = movedHitCheck;												// 2 = 左
-			movedHitCheck2.x = movedPos.x - player.hitPosS.x/* - CHIP_SIZE_X*/;
+				movedHitCheck2 = movedHitCheck;												// 2 = 左
+				movedHitCheck2.x = movedPos.x - player.hitPosS.x - CHIP_SIZE_X;
 
-			movedHitCheck3 = movedHitCheck;												// 3 = 右
-			movedHitCheck3.x = movedPos.x + player.hitPosE.x - 1/* + CHIP_SIZE_X*/;
-
-			if ((IsPass(movedHitCheck)) && (IsPass(movedHitCheck2)) && (IsPass(movedHitCheck3)))
-			{
-				player.wireFlag = false;
-
-			}
-			else
-			{
-				_length = player.pos.y - mapPos.y - player.offsetSize.y;	//紐の長さの計算
-				// KeepPosXの補正
-				if (player.pos.x - mapPos.x < KEEPPOSX_CORRECTION)
+				movedHitCheck3 = movedHitCheck;												// 3 = 右
+				movedHitCheck3.x = movedPos.x + player.hitPosE.x - 1 + CHIP_SIZE_X;
+				if ((WireBlockPass(movedHitCheck)) && (WireBlockPass(movedHitCheck2)) && (WireBlockPass(movedHitCheck3)))		// 一定範囲内にブロックが存在しないことになる
 				{
-					KeepPosX = KEEPPOSX_CORRECTION;
+					player.wireFlag = false;			// 範囲内に存在しないのでfalseが正しい
+					i++;
 				}
 				else
 				{
-					KeepPosX = player.pos.x - mapPos.x;
-				}
-				KeepPosY = 0;
-				player.wireFlag = true;
-				player.visible = false;
-				player.visible2 = true;
+					// ブロックが存在するとき
 
-				TimeCnt = 0;
+					_length = player.pos.y - mapPos.y - player.offsetSize.y;	//紐の長さの計算
+					// KeepPosXの補正
+					if (player.pos.x - mapPos.x < KEEPPOSX_CORRECTION)
+					{
+						KeepPosX = KEEPPOSX_CORRECTION;
+					}
+					else
+					{
+						KeepPosX = player.pos.x - mapPos.x;
+					}
+					// KeepPosYを指定ブロックの高さに合わせればいけそうな気がする
+					KeepPosY = movedHitCheck.y - CHIP_SIZE_Y / 4 - mapPos.y;
+					player.wireFlag = true;
+					player.visible = false;
+					player.visible2 = true;
+
+					TimeCnt = 0;
+					return;
+				}
+				
 			}
+
+			
+
+			
+			
 
 
 
@@ -443,9 +452,9 @@ void PlayerDraw(void)
 			{
 				_pos.y = CORRECTION;
 			}
-			DrawLine(_pos.x, _pos.y, KeepPosX + CHIP_SIZE_X, KeepPosY + CHIP_SIZE_Y, 0xffffffff, 2);			// 動くけどキャラに固定されないひも
+			DrawLine(_pos.x, _pos.y, KeepPosX + CHIP_SIZE_X, KeepPosY /*+ CHIP_SIZE_Y*/, 0xffffffff, 2);			// 動くけどキャラに固定されないひも(だったもの)
 
-			DrawGraph(_pos.x, _pos.y, playerImage[player.type], true);														// キャラクタをおもりとして描画
+			DrawGraph(_pos.x, _pos.y, playerImage[player.type], true);												// キャラクタをおもりとして描画
 		}
 		break;
 	}
@@ -464,7 +473,7 @@ void WireDraw(void)
 		{
 			//ひもの支点を定義する
 			_endPoint.x = KeepPosX + CHIP_SIZE_X;
-			_endPoint.y = KeepPosY + CHIP_SIZE_Y;
+			_endPoint.y = KeepPosY /*+ CHIP_SIZE_Y*/;
 
 			Vec2 v = (_pos - _endPoint);//振り子の支点から振り子の錘までのベクトル
 			v = v.normalized();//正規化する

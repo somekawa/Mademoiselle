@@ -19,6 +19,7 @@ void StageDraw(void);
 
 XY MapPosToIndex(XY pos);
 bool IsPass(XY pos);
+bool WireBlockPass(XY pos);
 
 XY MapIndexToPos(XY index);
 XY MapPos(XY pos, MOVE_DIR der);
