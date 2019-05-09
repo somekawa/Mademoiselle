@@ -13,3 +13,4 @@ void WireDraw(void);
 //着地イベント
 //void OnGround(float& x, float& y, float& vx, float& vy);
 
+bool GetPlayerV(void);	// ﾌﾟﾚｲﾔｰ生存確認

@@ -23,6 +23,17 @@ typedef struct {
 	int y;
 }XY;
 
+// ¹Ş°ÑÓ°ÄŞ
+typedef enum
+{
+	GMODE_INIT,
+	GMODE_TITLE,
+	GMODE_CHARASERE,
+	GMODE_GAME,
+	GMODE_OVER,
+	GMODE_MAX
+}GAME_MODE;
+
 // •ûŒü
 enum MOVE_DIR {
 	DIR_UP,
@@ -32,11 +43,15 @@ enum MOVE_DIR {
 	DIR_MAX
 };
 
-
-
+// ÌßÚ²Ô°¶×°
+enum PLAYER_TYPE {
+	PLAYER_RED,
+	PLAYER_BLUE,
+	PLAYER_MAX
+};
 
 typedef struct {
-	int blockType;
+	int type;	//ÌßÚ²Ô°¶×°
 	bool visible;
 	bool visible2;
 	int point;
@@ -66,3 +81,4 @@ typedef struct {
 }CHARACTER;
 
 extern XY mapPos;
+GAME_MODE GetGameMode(void);	// ¡‚Ì¹Ş°ÑÓ°ÄŞ

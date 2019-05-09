@@ -7,15 +7,6 @@
 
 
 // ----------•Ï”’è‹`----------
-typedef enum
-{
-	GMODE_INIT,
-	GMODE_TITLE,
-	GMODE_CHARASERE,
-	GMODE_GAME,
-	GMODE_OVER,
-	GMODE_MAX
-}GAME_MODE;
 
 
 GAME_MODE  gameMode;
@@ -25,11 +16,15 @@ int fadeCnt;
 bool fadeIn;
 bool fadeOut;
 
+// À²ÄÙ
 int selectImage1;
 int selectImage2;
 int titleImage;
 
-
+// ·¬×¸À°¾Ú¸Ä
+int charaSeleTitle;
+int wakImage[2];
+int yazirusiImage[2];
 
 XY mapPos;
 int maiImage;
@@ -100,7 +95,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 					fadeIn = true;
 				}
 			}
-			else if (trgKey[START]) fadeOut = true;
+			else if ((trgKey[START]) && (GetPlayerV())) fadeOut = true;
 
 			GameCharasere();
 			break;
@@ -159,6 +154,13 @@ int SystmInit(void)
 	selectImage2 = LoadGraph("image/4player.png");
 	titleImage = LoadGraph("image/title2.png");
 
+	// ·¬×¾Ú¸Ä
+	charaSeleTitle = LoadGraph("image/CharacterSelect.png");
+	wakImage[0] = LoadGraph("image/wak.png");
+	wakImage[1] = LoadGraph("image/wak0.png");
+	for (int i = 0; i < 2; i++) {
+		yazirusiImage[i] = LoadGraph("image/yazirusi.png");
+	}
 
 	return 1;
 
@@ -205,12 +207,26 @@ void GameTitleDraw(void)
 
 void GameCharasere(void)
 {
+	PlayerControl();
 	GameCharasereDraw();
 }
 
 void GameCharasereDraw(void)
 {
-
+	DrawBox(150, 20, SCREEN_SIZE_X - 150, 120, 0xffffff, false);
+	DrawLine(0, SCREEN_SIZE_Y / 2 + 60, SCREEN_SIZE_X, SCREEN_SIZE_Y / 2 + 60, 0xffffff, true);
+	DrawLine(SCREEN_SIZE_X / 2, 120, SCREEN_SIZE_X / 2, SCREEN_SIZE_Y, 0xffffff, true);
+	DrawGraph(150, 20, charaSeleTitle, true);
+	for (int x = 0; x < 2; x++) {
+		for (int y = 0; y < 2; y++) {
+			DrawGraph((SCREEN_SIZE_X / 2 + 1)*x, 120 + (341 * y), wakImage[1], true);
+		}
+	}
+	DrawGraph(0, 120, wakImage[0], true);
+	DrawBox(40, 120 + 40, 40 + 260, 160 + 260, 0xffffff, true);
+	PlayerDraw();
+	DrawTurnGraph(0, 240, yazirusiImage[0], true);
+	DrawGraph(260, 240, yazirusiImage[1], true);
 	DrawString(0, 0, "Charasere", 0xffffff);
 }
 
@@ -305,4 +321,10 @@ bool FadeOutScreen(int fadeStep)
 void HitCheck(void)
 {
 
+}
+
+// ¡‚Ì¹Ş°ÑÓ°ÄŞ
+GAME_MODE GetGameMode(void)
+{
+	return gameMode;
 }
