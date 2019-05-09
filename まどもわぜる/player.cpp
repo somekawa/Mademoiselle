@@ -220,9 +220,25 @@ void PlayerControl(void)
 				}
 				else
 				{
-					// ブロックが存在するとき
+					// ブロックが存在するときの処理
 
-					_length = player.pos.y - mapPos.y - player.offsetSize.y;	//紐の長さの計算
+					//紐の長さの計算
+					_length = player.pos.y - mapPos.y - player.offsetSize.y;
+
+					if (_length >= 250)
+					{
+						_length = 250;
+					}
+					else
+					{
+						_length = player.pos.y - mapPos.y - player.offsetSize.y;
+
+					}
+
+
+
+
+
 					// KeepPosXの補正
 					if (player.pos.x - mapPos.x < KEEPPOSX_CORRECTION)
 					{
@@ -243,13 +259,6 @@ void PlayerControl(void)
 				}
 				
 			}
-
-			
-
-			
-			
-
-
 
 		}
 
