@@ -14,3 +14,4 @@ void WireDraw(void);
 //void OnGround(float& x, float& y, float& vx, float& vy);
 
 bool GetPlayerV(void);	// ÌßÚ²Ô°¶‘¶Šm”F
+

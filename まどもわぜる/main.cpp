@@ -196,11 +196,13 @@ void GameTitleDraw(void)
 	DrawLine(0, 0, SCREEN_SIZE_X, 0, 0xffffff, cnt / 6);
 	DrawLine(SCREEN_SIZE_X, 0, SCREEN_SIZE_X, SCREEN_SIZE_Y, 0xffffff, cnt / 4);
 	DrawLine(0, SCREEN_SIZE_Y, SCREEN_SIZE_X, SCREEN_SIZE_Y, 0xffffff, cnt / 6);
+	DrawLine(0, 0, cnt * 3, cnt * 3, 0xffffff, 3);
 	DrawString(0, 0, "GameTitle", 0xffffff);
 	// ‚Å‚©‚·‚¬
 	DrawGraph(0, 0, titleImage, false);
 	DrawGraph(100, 0, selectImage1, true);
 	DrawGraph(0, 100, selectImage2, true);
+	
 
 
 }

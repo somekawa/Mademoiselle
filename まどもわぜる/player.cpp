@@ -34,6 +34,7 @@ CHARACTER player;
 int downPos;
 int TimeCnt;					// ワイヤーの表示時間
 
+
 bool _isPushJump;
 bool _isJumped;
 
@@ -115,24 +116,8 @@ void PlayerSystmInit(void)
 	shotImage[0] = LoadGraph("image/red_stop_shot.png");
 	shotImage[1] = LoadGraph("image/red_down_shot.png");
 
-	//ひもの支点の初期化
-	_endPoint.x = 0;
-	_endPoint.y = 0;
-	_v = 0;			// 振り子のふり幅
 
-	_g = 2.0f;		//重力の定義
-	_length = 0;	//紐の長さの計算
-
-	KeepPosX = 0;	// 座標の保存用
-	KeepPosY = 0;	// 座標の保存用
-
-	_vx = 0;
-	_vy = 0;
-
-	_isPushJump = false;
-	_isJumped = false;
-
-	//rot = -rand() % 90;
+	
 }
 
 void PlayerGameInit(void)
@@ -159,6 +144,25 @@ void PlayerGameInit(void)
 	player.visible2 = false;
 	player.imgLocCnt = 0;
 	downPos = 0;
+
+	//ひもの支点の初期化
+	_endPoint.x = 0;
+	_endPoint.y = 0;
+	_v = 0;			// 振り子のふり幅
+
+	_g = 2.0f;		//重力の定義
+	_length = 0;	//紐の長さの計算
+
+	KeepPosX = 0;	// 座標の保存用
+	KeepPosY = 0;	// 座標の保存用
+
+	_vx = 0;
+	_vy = 0;
+
+	_isPushJump = false;
+	_isJumped = false;
+
+	//rot = -rand() % 90;
 }
 
 void PlayerControl(void)
@@ -201,12 +205,13 @@ void PlayerControl(void)
 		// ワイヤー処理
 		if (newKey[P2_UP])
 		{
+			
 			movedPos = player.pos;
 
 			// 5~10マス以内の頭上にブロックがあったら、ワイヤーが出せるようにしたい
 			for (int i = 5; i <= 10; )
 			{
-				movedHitCheck.y = movedPos.y - player.offsetSize.y - (CHIP_SIZE_Y * i);	// 高さ
+				movedHitCheck.y = movedPos.y - player.offsetSize.y - (CHIP_SIZE_Y * i);		// 高さ
 
 				movedHitCheck2 = movedHitCheck;												// 2 = 左
 				movedHitCheck2.x = movedPos.x - player.hitPosS.x - CHIP_SIZE_X;
@@ -225,6 +230,7 @@ void PlayerControl(void)
 					//紐の長さの計算
 					_length = player.pos.y - mapPos.y - player.offsetSize.y;
 
+					// 紐の長さの補正
 					if (_length >= 250)
 					{
 						_length = 250;
@@ -235,10 +241,6 @@ void PlayerControl(void)
 
 					}
 
-
-
-
-
 					// KeepPosXの補正
 					if (player.pos.x - mapPos.x < KEEPPOSX_CORRECTION)
 					{
@@ -248,7 +250,8 @@ void PlayerControl(void)
 					{
 						KeepPosX = player.pos.x - mapPos.x;
 					}
-					// KeepPosYを指定ブロックの高さに合わせればいけそうな気がする
+
+					// KeepPosYを指定ブロックの高さに合わせる
 					KeepPosY = movedHitCheck.y - CHIP_SIZE_Y / 4 - mapPos.y;
 					player.wireFlag = true;
 					player.visible = false;
@@ -463,7 +466,7 @@ void PlayerDraw(void)
 			}
 			DrawLine(_pos.x, _pos.y, KeepPosX + CHIP_SIZE_X, KeepPosY /*+ CHIP_SIZE_Y*/, 0xffffffff, 2);			// 動くけどキャラに固定されないひも(だったもの)
 
-			DrawGraph(_pos.x, _pos.y, playerImage[player.type], true);												// キャラクタをおもりとして描画
+			DrawGraph(_pos.x - player.size.x, _pos.y, jumpImage[player.type], true);								// キャラクタをおもりとして描画
 		}
 		break;
 	}
