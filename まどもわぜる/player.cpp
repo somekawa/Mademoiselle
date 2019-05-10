@@ -464,9 +464,19 @@ void PlayerDraw(void)
 			{
 				_pos.y = CORRECTION;
 			}
-			DrawLine(_pos.x, _pos.y, KeepPosX + CHIP_SIZE_X, KeepPosY /*+ CHIP_SIZE_Y*/, 0xffffffff, 2);			// 動くけどキャラに固定されないひも(だったもの)
 
-			DrawGraph(_pos.x - player.size.x, _pos.y, jumpImage[player.type], true);								// キャラクタをおもりとして描画
+
+			if (player.moveDir == DIR_RIGHT)
+			{
+				DrawLine(_pos.x, _pos.y, KeepPosX + CHIP_SIZE_X, KeepPosY /*+ CHIP_SIZE_Y*/, 0xffffffff, 2);		// 動くけどキャラに固定されないひも(だったもの)
+				DrawGraph(_pos.x - player.size.x, _pos.y, jumpImage[player.type], true);							// キャラクタをおもりとして描画
+			}
+			else
+			{
+				DrawLine(_pos.x , _pos.y, KeepPosX - CHIP_SIZE_X, KeepPosY /*+ CHIP_SIZE_Y*/, 0xffffffff, 2);		// 動くけどキャラに固定されないひも(だったもの)
+				DrawTurnGraph(_pos.x , _pos.y, jumpImage[player.type], true);
+			}
+
 		}
 		break;
 	}
@@ -484,7 +494,14 @@ void WireDraw(void)
 		if (TimeCnt < 150)
 		{
 			//ひもの支点を定義する
-			_endPoint.x = KeepPosX + CHIP_SIZE_X;
+			if (player.moveDir == DIR_RIGHT)
+			{
+				_endPoint.x = KeepPosX + CHIP_SIZE_X;
+			}
+			else
+			{
+				_endPoint.x = KeepPosX - CHIP_SIZE_X;
+			}
 			_endPoint.y = KeepPosY /*+ CHIP_SIZE_Y*/;
 
 			Vec2 v = (_pos - _endPoint);//振り子の支点から振り子の錘までのベクトル
