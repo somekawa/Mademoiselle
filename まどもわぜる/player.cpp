@@ -218,6 +218,8 @@ void PlayerControl(void)
 
 				movedHitCheck3 = movedHitCheck;												// 3 = 右
 				movedHitCheck3.x = movedPos.x + player.hitPosE.x - 1 + CHIP_SIZE_X;
+
+				//if ((IsPass(movedHitCheck)) && (IsPass(movedHitCheck2)) && (IsPass(movedHitCheck3)))		// 一定範囲内にブロックが存在しないことになる
 				if ((WireBlockPass(movedHitCheck)) && (WireBlockPass(movedHitCheck2)) && (WireBlockPass(movedHitCheck3)))		// 一定範囲内にブロックが存在しないことになる
 				{
 					player.wireFlag = false;			// 範囲内に存在しないのでfalseが正しい
