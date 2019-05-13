@@ -1,14 +1,2 @@
-﻿  player.cpp
-c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(225): warning C4244: '=': 'int' から 'float' への変換です。データが失われる可能性があります。
-c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(233): warning C4244: '=': 'int' から 'float' への変換です。データが失われる可能性があります。
-c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(266): warning C4244: '-=': 'double' から 'int' への変換です。データが失われる可能性があります。
-c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(267): warning C4244: '-=': 'double' から 'int' への変換です。データが失われる可能性があります。
-c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(381): warning C4244: '+=': 'double' から 'int' への変換です。データが失われる可能性があります。
-c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(382): warning C4244: '-=': 'double' から 'int' への変換です。データが失われる可能性があります。
-c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(446): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
-c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(448): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
-c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(491): warning C4244: '=': 'float' から 'int' への変換です。データが失われる可能性があります。
-c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(492): warning C4244: '=': 'float' から 'int' への変換です。データが失われる可能性があります。
-  stage.cpp
-  コードを生成中...
+﻿  LINK : 前回のインクリメンタル リンクで C:\Users\1816026\Desktop\Mademoiselle\まどもわぜる\x64\Debug\Project1.exe が見つからなかったか、ビルドされませんでした。フル リンクを行います。
   Project1.vcxproj -> C:\Users\1816026\Desktop\Mademoiselle\まどもわぜる\x64\Debug\Project1.exe

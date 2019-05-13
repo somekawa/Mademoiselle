@@ -17,11 +17,10 @@ void StageGameInit(void);
 void StageControl(void);
 void StageDraw(void);
 
-bool MapLoad(void);				// Ï¯Ìß‚ğÛ°ÄŞ@•K—v‚Å‚ ‚ê‚Îˆø”
 XY MapPosToIndex(XY pos);
-
 bool IsPass(XY pos);
 bool WireBlockPass(XY pos);
+bool Wall(XY pos);	//•Ç‚ğ‘–‚é
 
 XY MapIndexToPos(XY index);
 XY MapPos(XY pos, MOVE_DIR der);

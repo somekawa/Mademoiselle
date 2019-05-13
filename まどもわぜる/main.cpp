@@ -23,8 +23,7 @@ int titleImage;
 
 // ·¬×¸À°¾Ú¸Ä
 int charaSeleTitle;
-int wakImage[2];
-int yazirusiImage[2];
+int wakImage;
 
 XY mapPos;
 int maiImage;
@@ -156,11 +155,8 @@ int SystmInit(void)
 
 	// ·¬×¾Ú¸Ä
 	charaSeleTitle = LoadGraph("image/CharacterSelect.png");
-	wakImage[0] = LoadGraph("image/wak.png");
-	wakImage[1] = LoadGraph("image/wak0.png");
-	for (int i = 0; i < 2; i++) {
-		yazirusiImage[i] = LoadGraph("image/yazirusi.png");
-	}
+	wakImage = LoadGraph("image/wak0.png");
+	
 
 	return 1;
 
@@ -221,14 +217,11 @@ void GameCharasereDraw(void)
 	DrawGraph(150, 20, charaSeleTitle, true);
 	for (int x = 0; x < 2; x++) {
 		for (int y = 0; y < 2; y++) {
-			DrawGraph((SCREEN_SIZE_X / 2 + 1)*x, 120 + (341 * y), wakImage[1], true);
+			DrawGraph((SCREEN_SIZE_X / 2 + 1)*x, 120 + (341 * y), wakImage, true);
 		}
 	}
-	DrawGraph(0, 120, wakImage[0], true);
-	DrawBox(40, 120 + 40, 40 + 260, 160 + 260, 0xffffff, true);
 	PlayerDraw();
-	DrawTurnGraph(0, 240, yazirusiImage[0], true);
-	DrawGraph(260, 240, yazirusiImage[1], true);
+	
 	DrawString(0, 0, "Charasere", 0xffffff);
 }
 

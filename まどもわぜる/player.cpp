@@ -5,7 +5,7 @@
 #include"main.h"
 #include"stage.h"
 #include"player.h"
-#include"shot.h"
+
 
 #define INIT_VELOCITY 50		// 初期速度
 #define SECOND_PER_FRAME 0.3	// 1ﾌﾚｰﾑの秒数
@@ -23,15 +23,16 @@ enum PLAYER_SPEED {
 	PLAYER_SPEED_SEGWEY = 12
 };
 
+int p1Wak[2];
+int yazirusiImage[2];
+
 int playerImage[2];
+int playerIcon[2];
 int runImage[2][10];
 int jumpImage[2];
 int stopJumpImage[2];
-int downImage;
-int shotImage[2];
 int segweyImage[2][2];
 CHARACTER player;
-int downPos;
 int TimeCnt;					// ワイヤーの表示時間
 
 
@@ -98,8 +99,15 @@ inline float Cross(const Vec2 & a, const Vec2 & b) {
 
 void PlayerSystmInit(void)
 {
+	p1Wak[0] = LoadGraph("image/p1CSWak.png");
+	p1Wak[1] = LoadGraph("image/p1GWak.png");
+	for (int i = 0; i < 2; i++) {
+		yazirusiImage[i] = LoadGraph("image/yazirusi.png");
+	}
+
 	// 赤
 	playerImage[PLAYER_RED] = LoadGraph("image/playerR_stop.png");
+	playerIcon[PLAYER_RED] = LoadGraph("image/R_icon.png");
 	jumpImage[PLAYER_RED] = LoadGraph("image/playerR_jump.png");
 	stopJumpImage[PLAYER_RED] = LoadGraph("image/playerR_stop_jump.png");
 	LoadDivGraph("image/playerR_run.png", 10, 5, 2, 72, 72, runImage[PLAYER_RED], true);
@@ -107,14 +115,12 @@ void PlayerSystmInit(void)
 
 	// 青
 	playerImage[PLAYER_BLUE] = LoadGraph("image/playerB_stop.png");
+	playerIcon[PLAYER_BLUE] = LoadGraph("image/B_icon.png");
 	jumpImage[PLAYER_BLUE] = LoadGraph("image/playerB_jump.png");
 	stopJumpImage[PLAYER_BLUE] = LoadGraph("image/playerB_stop_jump.png");
 	LoadDivGraph("image/playerB_run.png", 10, 5, 2, 72, 72, runImage[PLAYER_BLUE], true);
 	LoadDivGraph("image/playerB_segway.png", 2, 2, 1, 72, 72, segweyImage[PLAYER_BLUE], true);
 
-	downImage = LoadGraph("image/red_down.png");
-	shotImage[0] = LoadGraph("image/red_stop_shot.png");
-	shotImage[1] = LoadGraph("image/red_down_shot.png");
 
 
 	
@@ -127,23 +133,22 @@ void PlayerGameInit(void)
 	player.offsetSize = { player.size.x / 2,player.size.y / 2 };
 	player.hitPosE = { 20,36 };
 	player.hitPosS = { 20,26 };
-	player.pos = { CHIP_SIZE_X * 4,CHIP_SIZE_Y * 13 - 25 };
+	player.pos = { CHIP_SIZE_X * 10,CHIP_SIZE_Y * 13 - 25 };
 	player.moveSpeed = PLAYER_SPEED_NORMAL;
 	player.animCnt = 0;
 	player.moveDir = DIR_RIGHT;
 	player.runFlag = false;
 	player.jumpFlag = false;
 	player.jumpCnt = 0;	// ｼﾞｬﾝﾌﾟできる回数
-	player.shotFlag = false;
-	player.downFlag = false;
 	player.segweyFlag = false;	// ｾｸﾞｳｪｲ
+	player.wallFlag = false;	// 壁
 
 	player.wireFlag = false;
 
 	player.visible = false;
 	player.visible2 = false;
 	player.imgLocCnt = 0;
-	downPos = 0;
+
 
 	//ひもの支点の初期化
 	_endPoint.x = 0;
@@ -192,15 +197,15 @@ void PlayerControl(void)
 
 		player.runFlag = false;
 		player.jumpFlag = true;
-		player.downFlag = false;
 		player.moveSpeed = PLAYER_SPEED_NORMAL;
 		player.imgLocCnt++;
-		downPos = 0;
+		
 
 		XY movedPos = player.pos;
 		XY movedHitCheck = movedPos;
 		XY movedHitCheck2;
 		XY movedHitCheck3;
+		XY wallChek = movedPos;
 
 		// ワイヤー処理
 		if (newKey[P2_UP])
@@ -218,8 +223,6 @@ void PlayerControl(void)
 
 				movedHitCheck3 = movedHitCheck;												// 3 = 右
 				movedHitCheck3.x = movedPos.x + player.hitPosE.x - 1 + CHIP_SIZE_X;
-
-				//if ((IsPass(movedHitCheck)) && (IsPass(movedHitCheck2)) && (IsPass(movedHitCheck3)))		// 一定範囲内にブロックが存在しないことになる
 				if ((WireBlockPass(movedHitCheck)) && (WireBlockPass(movedHitCheck2)) && (WireBlockPass(movedHitCheck3)))		// 一定範囲内にブロックが存在しないことになる
 				{
 					player.wireFlag = false;			// 範囲内に存在しないのでfalseが正しい
@@ -271,8 +274,9 @@ void PlayerControl(void)
 		if (trgKey[P2_A]) player.segweyFlag = !player.segweyFlag;
 		if (player.segweyFlag) player.moveSpeed = PLAYER_SPEED_SEGWEY;
 
-		// 移動
+		
 		if (player.visible && !player.visible2) {
+			// 移動
 			if (oldKey[P1_RIGHT] || (Pad1 & PAD_INPUT_RIGHT)) {
 				player.runFlag = true;
 				player.moveSpeed = player.moveSpeed;
@@ -376,30 +380,6 @@ void PlayerControl(void)
 			}
 		}
 
-
-		if ((!player.jumpFlag) && (!player.runFlag) && (oldKey[P1_DOWN]) || (Pad1 & PAD_INPUT_DOWN)) {
-			player.downFlag = true;
-			downPos = 8;
-		}
-
-		// ｼｮｯﾄ
-		if ((!player.shotFlag) && (oldKey[P1_A])) {
-			player.imgLocCnt = 0;
-			player.shotFlag = true;
-			if (player.moveDir == DIR_RIGHT) {
-				Shoot({ player.pos.x, player.pos.y - 12 + downPos }, player.moveDir, player.downFlag);
-			}
-			else if (player.moveDir == DIR_LEFT) {
-				Shoot({ player.pos.x,player.pos.y - 12 + downPos }, player.moveDir, player.downFlag);
-			}
-		}
-		else {
-
-			if (player.imgLocCnt > 6) {
-				player.shotFlag = false;
-			}
-		}
-
 		// playerを追うカメラ
 		if (player.pos.y > SCREEN_SIZE_Y - CHIP_SIZE_Y * 5) mapPos.y += ACC_G / 2;
 		if (player.pos.y < CHIP_SIZE_Y * MAP_Y - SCREEN_SIZE_Y + CHIP_SIZE_Y * 5) mapPos.y -= ACC_G * SECOND_PER_FRAME;
@@ -418,13 +398,15 @@ void PlayerDraw(void)
 {
 	switch (GetGameMode()) {
 	case GMODE_CHARASERE:
+		DrawGraph(0, 120, p1Wak[0], true);
 		if (player.visible) {
 			DrawRotaGraph(160, 300, 3, 0, runImage[player.type][(player.animCnt / 3) % 10], true);
 			DrawString(120 , 180, "キャラ決定！", 0x000000);
 		}
 		else {
 			DrawRotaGraph(160, 300, 3, 0, playerImage[player.type], true);
-			
+			DrawTurnGraph(0, 240, yazirusiImage[0], true);
+			DrawGraph(260, 240, yazirusiImage[1], true);
 		}
 
 		break;
@@ -435,9 +417,6 @@ void PlayerDraw(void)
 			if ((player.runFlag) && (!player.jumpFlag)) img = runImage[player.type][(player.animCnt / 3) % 10];
 			if ((player.jumpFlag) && (player.runFlag)) img = jumpImage[player.type];
 			if ((player.jumpCnt > 0) && (!player.runFlag)) img = stopJumpImage[player.type];
-			if (player.downFlag) img = downImage;
-			if ((!player.runFlag) && (oldKey[P1_A])) img = shotImage[0];
-			if ((!player.runFlag) && (oldKey[P1_A]) && (player.downFlag)) img = shotImage[1];
 			if (player.segweyFlag) img = segweyImage[player.type][(player.animCnt / 5) % 2];
 			if (player.moveDir == DIR_RIGHT) {
 
@@ -446,13 +425,10 @@ void PlayerDraw(void)
 			else if (player.moveDir == DIR_LEFT) {
 				DrawTurnGraph(player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y - player.offsetSize.y - mapPos.y, img, true);
 			}
-			if (player.downFlag) {
-				DrawString(780, 0, "PLAYERDOWN OK", 0xffffff);
-			}
 			DrawBox(player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y - player.offsetSize.y - mapPos.y,
 				player.pos.x + player.offsetSize.x - mapPos.x, player.pos.y + player.offsetSize.y - mapPos.y, 0xff0000, false);
-			DrawBox(player.pos.x - player.hitPosS.x - mapPos.x, player.pos.y - player.hitPosS.y - mapPos.y + downPos,
-				player.pos.x + player.hitPosE.x - mapPos.x, player.pos.y + player.hitPosE.y - mapPos.y + downPos, 0x00ffff, false);
+			DrawBox(player.pos.x - player.hitPosS.x - mapPos.x, player.pos.y - player.hitPosS.y - mapPos.y,
+				player.pos.x + player.hitPosE.x - mapPos.x, player.pos.y + player.hitPosE.y - mapPos.y, 0x00ffff, false);
 			DrawLine(player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y - mapPos.y,
 				player.pos.x + player.offsetSize.x - mapPos.x, player.pos.y - mapPos.y, 0x00ffff, true);
 			DrawLine(player.pos.x - mapPos.x, player.pos.y - player.offsetSize.y - mapPos.y,
@@ -480,6 +456,15 @@ void PlayerDraw(void)
 			}
 
 		}
+
+		// ｱｲｺﾝ
+		DrawGraph(50, 40, p1Wak[1], true);
+		DrawGraph(58, 74, playerIcon[player.type], true);
+		DrawBox(20, 5, 86, 71, 0xffffff, true);
+		DrawBox(20, 5, 86, 71, 0x000000, false);
+		DrawBox(100, 80, 200, 95, 0x000000, true);
+		DrawBox(101, 81, 199, 94, 0x00ff00, true);
+
 		break;
 	}
 

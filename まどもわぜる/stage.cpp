@@ -1,39 +1,10 @@
 #include "Dxlib.h"	//DxLibﾗｲﾌﾞﾗﾘを使用する　独自で準備したﾍｯﾀﾞｰﾌｧｲﾙは""で指定する
-#include <vector>
 #include <math.h>	// 標準ﾍｯﾀﾞｰﾌｧｲﾙは<>で指定する
 #include"main.h"
 #include "player.h"
 #include"stage.h"
 
-//struct DataHeader {
-//	unsigned char identifier[4];
-//	unsigned int  size;				// サイズ
-//	unsigned int  mapWidth;			// 横幅 72
-//	unsigned int  mapHeight;		// 縦幅 72
-//	unsigned char chipWidth;		// チップ横幅 32
-//	unsigned char chipHeight;		// チップ縦幅 32
-//	unsigned char layerCount;		// レイヤー数 基本的に１
-//	unsigned char bitCount;			// 8bit
-//};
-//#define MAP_FILE_ID "FMF_"
-//
-//enum MAP_ID {
-//	MAP_ID_F_WALL,		 // 
-//	MAP_ID_A_WALL,		 // 
-//	MAP_ID_H_WALL,
-//	MAP_ID_W_WALL,		 //　黄壁　
-//	MAP_ID_BACK,	 	 // 紫　背景
-//	MAP_ID_MAX
-//};
-//
-//DataHeader expData;
-//
-//std::vector<MAP_ID>mapDataBase; // データを入れる箱
-//std::vector<MAP_ID*>mapData; // アドレスを入れれる箱
-//
-//int mapImage2[5];
-int mapImage[5]; // ブロック
-
+int mapImage[5];
 
 
 int mapData[MAP_Y][MAP_X] = {	
@@ -104,8 +75,6 @@ void StageGameInit(void)
 	// ﾏｯﾌﾟ座標
 	mapPos.x = 0;
 	mapPos.y = 0;
-	MapLoad();
-
 }
 
 void StageControl(void)
@@ -123,14 +92,6 @@ void StageControl(void)
 
 void StageDraw(void)
 {
-	//for (int y = 0; y < expData.mapHeight; y++)
-	//{
-	//	for (int x = 0; x < expData.mapWidth; x++)
-	//	{
-	//		DrawGraph(x*expData.chipWidth - mapPos.x, y*expData.chipHeight - mapPos.y, mapImage2[mapData[y][x]], true);
-	//	}
-	//}
-
 	for (int x = 0; x < MAP_X; x++) {
 		for (int y = 0; y < MAP_Y; y++) {
 			DrawGraph(x*CHIP_SIZE_X - mapPos.x, y*CHIP_SIZE_Y - mapPos.y, mapImage[mapData[y][x]], true);
@@ -146,31 +107,6 @@ void StageDraw(void)
 
 }
 
-bool MapLoad(void)
-{
-	FILE*file;
-	fopen_s(&file, "MapData/map2.fmf", "rb");
-	fread(&expData, sizeof(expData), 1, file);		// ヘッダー部分読み込み
-
-	mapDataBase.resize(expData.mapWidth*expData.mapHeight);
-	for (int j = 0; j < expData.mapWidth*expData.mapHeight; j++)
-	{
-		fread(&mapDataBase[j], sizeof(unsigned char), 1, file); // 1個のデータ取り出す
-	}
-	fclose(file);
-
-	mapData.resize(expData.mapHeight);
-
-	for (int j = 0; j < expData.mapHeight; j++)
-	{
-		mapData[j] = &mapDataBase[expData.mapWidth*j];
-	}
-
-
-	return true;
-}
-
-
 XY MapPosToIndex(XY pos)	// pos = mvedPos
 {
 	XY mapIndex;
@@ -183,28 +119,12 @@ XY MapPosToIndex(XY pos)	// pos = mvedPos
 bool IsPass(XY pos)
 {
 	bool ret = true;			// 障害物があるかの判定: true = ない false = ある
-	//bool blueblock = true;		// ワイヤーをかけれるブロックがあるかの判定: true = ない　false = ある
 
 	int mapNo;
 	XY mapIndex;
 
 	mapIndex = MapPosToIndex(pos);
 	mapNo = mapData[mapIndex.y][mapIndex.x];
-
-	//switch (mapNo) // enumに
-	//{
-	//case MAP_ID::MAP_ID_F_WALL:
-	//case MAP_ID::MAP_ID_A_WALL:
-	//case MAP_ID::MAP_ID_H_WALL:
-	//case MAP_ID::MAP_ID_W_WALL:
-	//	blueblock = false;		// ブロックがあるのでくっつけたい
-	//	break;
-	//case MAP_ID::MAP_ID_BACK:
-	//	ret = false;
-	//	break;
-	//}
-	//return blueblock;
-
 
 	switch (mapNo)
 	{
@@ -213,6 +133,25 @@ bool IsPass(XY pos)
 	case 2:
 	case 3:
 		ret = false;			// 障害物があるので進めない
+		break;
+	}
+	return ret;
+}
+
+// 壁を走る
+bool Wall(XY pos)
+{
+	bool ret = false;
+	int mapNo;
+	XY mapIndex;
+
+	mapIndex = MapPosToIndex(pos);
+	mapNo = mapData[mapIndex.y][mapIndex.x];
+
+	switch (mapNo)
+	{
+	case 3:	// 特定の壁のみ
+		ret = true;
 		break;
 	}
 	return ret;

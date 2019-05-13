@@ -70,8 +70,7 @@ typedef struct {
 	bool jumpFlag;
 	bool jumpFlag2;
 	int jumpCnt;	// ¼Ş¬İÌß‚Å‚«‚é‰ñ”
-	bool shotFlag;
-	bool downFlag;
+	bool wallFlag;	// •Ç‚ğ‘–‚é
 	bool wireFlag;
 	bool segweyFlag;	// ¾¸Ş³ª²
 	int imgLocCnt;
