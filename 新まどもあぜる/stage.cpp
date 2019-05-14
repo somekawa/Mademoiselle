@@ -22,25 +22,31 @@ enum MAP_ID {
 	MAP_ID_UG,			 // 地中
 	MAP_ID_WALL,		 // 主な壁、地面
 	MAP_ID_WALL_KICK,	 // 壁蹴りジャンプ
-	MAP_ID_BACK,	 	 // 背景
+	MAP_ID_BACK,	 	 // 背景:透過
 	MAP_ID_MAX
 };
 
 DataHeader expData;
 
 std::vector<MAP_ID>mapDataBase; // データを入れる箱
-std::vector<MAP_ID*>mapData; // アドレスを入れれる箱
+std::vector<MAP_ID*>mapData;	// アドレスを入れれる箱
 
-int mapImage[5];
+//int mapImage[5];
 int mapImage2[5];
 
-int hatenaImage;
+int hatenaImage;		// ？ﾎﾞｯｸｽ画像
+// 背景
+int bgImage1;					
+// 背景のところから見える画像
+int bgPosX1_1 = 0;				// 横サイズ1
+int bgPosX1_2 = -SCREEN_SIZE_X*2 ;	// 横サイズ2
 
 void StageSystmInit(void)
 {
 	//LoadDivGraph("image/block.png", 5, 5, 1, CHIP_SIZE_X, CHIP_SIZE_Y, mapImage);
 	LoadDivGraph("image/back.png", 5, 5, 1, CHIP_SIZE_X, CHIP_SIZE_Y, mapImage2);
 	hatenaImage = LoadGraph("image/hatena.png");
+	bgImage1 = LoadGraph("image/nback.png");
 }
 
 void StageGameInit(void)
@@ -67,13 +73,32 @@ void StageControl(void)
 		= MAP_Y * CHIP_SIZE_Y - SCREEN_SIZE_Y;
 }
 
+void BgControl(void)
+{
+	// 背景
+	bgPosX1_1 += 3;
+	if (bgPosX1_1 >= SCREEN_SIZE_X * 2)
+	{
+		bgPosX1_1 = -SCREEN_SIZE_X * 2;
+	}
+	bgPosX1_2 += 3;
+	if (bgPosX1_2 >= SCREEN_SIZE_X * 2)
+	{
+		bgPosX1_2 = -SCREEN_SIZE_X * 2;
+	}
+}
+
 void StageDraw(void)
-{	
-	for (int y = 0; y < expData.mapHeight;y++)
+{
+	DrawTurnGraph(bgPosX1_1 - mapPos.x, -mapPos.y, bgImage1, false);
+	DrawGraph(bgPosX1_2 - mapPos.x, -mapPos.y, bgImage1, false);
+
+	for (int y = 0; y < expData.mapHeight; y++)
 	{
 		for (int x = 0; x < expData.mapWidth; x++)
 		{
-			DrawGraph(x*expData.chipWidth - mapPos.x,y*expData.chipHeight - mapPos.y,mapImage2[mapData[y][x]],true);
+			DrawGraph(x*expData.chipWidth - mapPos.x, y*expData.chipHeight - mapPos.y,
+				mapImage2[mapData[y][x]], true);
 		}
 	}
 	DrawGraph(SCREEN_SIZE_X / 2 - mapPos.x, SCREEN_SIZE_Y + 500 - mapPos.y, hatenaImage, true);
@@ -83,7 +108,6 @@ void StageDraw(void)
 	//		DrawGraph(x*CHIP_SIZE_X - mapPos.x, y*CHIP_SIZE_Y - mapPos.y, mapImage[mapData[y][x]], true);
 	//	}
 	//}	
-
 	//for (int x = 0; x < MAP_X; x++) {
 	//	for (int y = 0; y < MAP_Y; y++) {
 	//		//DrawBox(50 * x - mapPos.x, 50 * y, 50 + (50 * x) - mapPos.x, 50 + (50 * y), 0xffffff, false);
@@ -91,7 +115,6 @@ void StageDraw(void)
 	//	}
 	//}
 }
-
 
 bool MapLoad(void)
 {
@@ -113,7 +136,6 @@ bool MapLoad(void)
 		mapData[j] = &mapDataBase[expData.mapWidth*j];
 	}
 
-
    	return true;
 }
 
@@ -130,7 +152,7 @@ bool IsPass(XY pos)
 {
 	bool ret = true;
 	int mapNo;
-	bool blueblock = true;		// ワイヤーをかけれるブロックがあるかの判定: true = ない　false = ある
+	bool blueblock = true;		// ﾜｲﾔｰをかけれるﾌﾞﾛｯｸがあるかの判定: true = ない　false = ある
 	XY mapIndex;
 
 	mapIndex = MapPosToIndex(pos);
@@ -138,12 +160,11 @@ bool IsPass(XY pos)
 
 	switch (mapNo) // enumに
 	{
-	case MAP_ID::MAP_ID_CAGUHT:		// ワイヤーが引っかかるところ
-
-	case MAP_ID::MAP_ID_UG:			// 地中
+	case MAP_ID::MAP_ID_CAGUHT:		// ﾜｲﾔｰが引っかかるところ
+	case MAP_ID::MAP_ID_UG:			// 地中 ｷｬﾗが触れないところ
 	case MAP_ID::MAP_ID_WALL:		// 主な壁、地面
 	case MAP_ID::MAP_ID_WALL_KICK:	// 壁蹴りジャンプ
-		blueblock = false;			// ブロックがあるのでくっつけたい
+		blueblock = false;			// ﾌﾞﾛｯｸがあるのでくっつけたい
 		break;
 	case MAP_ID::MAP_ID_BACK:		  // 背景
 

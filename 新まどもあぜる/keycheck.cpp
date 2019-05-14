@@ -8,7 +8,8 @@ bool oldKey[KEY_MAX];
 
 void KeyCheckInit()
 {
-	for (int i = 0; i < KEY_MAX; i++) {
+	for (int i = 0; i < KEY_MAX; i++)
+	{
 		newKey[i] = false;
 		trgKey[i] = false;
 		upKey[i] = false;
@@ -19,7 +20,8 @@ void KeyCheckInit()
 void KeyCheck()
 {
 	// -----newKey
-	for (int i = 0; i < KEY_MAX; i++) {
+	for (int i = 0; i < KEY_MAX; i++) 
+	{
 		newKey[i] = false;	// ‘S•”‰Ÿ‚µ‚Ä‚¢‚È‚¢Ž–‚É‚·‚é
 		trgKey[i] = false;
 		upKey[i] = false;
@@ -44,7 +46,8 @@ void KeyCheck()
 	if(CheckHitKey(KEY_INPUT_SPACE)) newKey[START] = true;
 
 	// -----trgKey & upKey & oldKey
-	for (int i = 0; i < KEY_MAX; i++) {
+	for (int i = 0; i < KEY_MAX; i++) 
+	{
 		trgKey[i] = newKey[i] &~oldKey[i];	// trgKey
 		upKey[i] = ~newKey[i] & oldKey[i];	// upKey
 

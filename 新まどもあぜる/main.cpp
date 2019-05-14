@@ -66,11 +66,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			break;
 
 		case GMODE_TITLE:	// À²ÄÙ
-			if (fadeIn) {
+			if (fadeIn)
+			{
 				if (!FadeInScreen(5))fadeIn = false;
 			}
-			else if (fadeOut) {
-				if (!FadeOutScreen(5)) {
+			else if (fadeOut) 
+			{
+				if (!FadeOutScreen(5))
+				{
 					gameMode = GMODE_CHARASERE; // ·¬×¾Ú‚É‚Æ‚Ô
 					fadeOut = false;
 					fadeIn = true;
@@ -82,11 +85,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 			// ·¬×¾Ú¸Ä
 		case GMODE_CHARASERE:
-			if (fadeIn) {
+			if (fadeIn) 
+			{
 				if (!FadeInScreen(5))fadeIn = false;
 			}
-			else if (fadeOut) {
-				if (!FadeOutScreen(5)) {
+			else if (fadeOut)
+			{
+				if (!FadeOutScreen(5)) 
+				{
 					gameMode = GMODE_STAGESERE;
 					fadeOut = false;
 					fadeIn = true;
@@ -98,11 +104,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 			// ½Ã°¼Þ¾Ú¸Ä
 		case GMODE_STAGESERE:
-			if (fadeIn) {
+			if (fadeIn) 
+			{
 				if (!FadeInScreen(5))fadeIn = false;
 			}
-			else if (fadeOut) {
-				if (!FadeOutScreen(5)) {
+			else if (fadeOut) 
+			{
+				if (!FadeOutScreen(5)) 
+				{
 					gameMode = GMODE_GAME;
 					fadeOut = false;
 					fadeIn = true;
@@ -113,7 +122,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			break;
 
 		case GMODE_GAME:	// ¹Þ°Ñ’†
-			if (fadeIn) {
+			if (fadeIn) 
+			{
 				if (!FadeInScreen(5))fadeIn = false;
 			}
 			else if (trgKey[START]) gameMode = GMODE_OVER;
@@ -121,11 +131,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			break;
 
 		case GMODE_OVER:	// ¹Þ°Ñµ°ÊÞ°
-			if (fadeIn) {
+			if (fadeIn) 
+			{
 				if (!FadeInScreen(5))fadeIn = false;
 			}
-			else if (fadeOut) {
-				if (!FadeOutScreen(5)) {
+			else if (fadeOut) 
+			{
+				if (!FadeOutScreen(5)) 
+				{
 					gameMode = GMODE_INIT;
 					fadeOut = false;
 					fadeIn = true;
@@ -168,18 +181,19 @@ int SystmInit(void)
 	selectImage1 = LoadGraph("image/1player.png");
 	selectImage2 = LoadGraph("image/4player.png");
 	titleImage = LoadGraph("image/title2.png");
-	stageImage1=LoadGraph("image/map1_ps.bmp");
-
 	// ·¬×¾Ú¸Ä
 	charaSeleTitle = LoadGraph("image/CharacterSelect.png");
 	wakImage = LoadGraph("image/wak0.png");
+	// ½Ã°¼Þ¾Ú¸Ä
+	stageImage1=LoadGraph("image/map1_ps.bmp");
+
 	return 1;
 }
 
 void GameInit(void)
 {
-	fadeIn = true;
-	fadeOut = false;
+	fadeIn	= true;
+	fadeOut	= false;
 	pauseFlag = 0;
 	cnt = 0;
 	PlayerGameInit();
@@ -189,10 +203,12 @@ void GameInit(void)
 
 void GameTitle(void)
 {
-	if (cnt > 2500) {
+	if (cnt > 2500) 
+	{
 		cnt = 2500;
 	}
-	else {
+	else 
+	{
 		cnt++;
 	}
 	GameTitleDraw();
@@ -224,8 +240,10 @@ void GameCharasereDraw(void)
 	DrawLine(0, SCREEN_SIZE_Y / 2 + 60, SCREEN_SIZE_X, SCREEN_SIZE_Y / 2 + 60, 0xffffff, true);
 	DrawLine(SCREEN_SIZE_X / 2, 120, SCREEN_SIZE_X / 2, SCREEN_SIZE_Y, 0xffffff, true);
 	DrawGraph(150, 20, charaSeleTitle, true);
-	for (int x = 0; x < 2; x++) {
-		for (int y = 0; y < 2; y++) {
+	for (int x = 0; x < 2; x++) 
+	{
+		for (int y = 0; y < 2; y++) 
+		{
 			DrawGraph((SCREEN_SIZE_X / 2 + 1)*x, 120 + (341 * y), wakImage, true);
 		}
 	}
@@ -243,7 +261,7 @@ void StageSelectDarw(void)
 {
 	DrawBox(150, 20, SCREEN_SIZE_X - 150, 120, 0xffffff, false);
 
-	DrawGraph(0, 125, stageImage1, true);
+	DrawGraph(0, 125, stageImage1, true);// ‘I‚×‚é½Ã°¼Þ1
 	DrawLine(0, SCREEN_SIZE_Y / 2 + 60, SCREEN_SIZE_X, SCREEN_SIZE_Y / 2 + 60, 0xffffff, true);
 	DrawLine(SCREEN_SIZE_X / 2, 120, SCREEN_SIZE_X / 2, SCREEN_SIZE_Y, 0xffffff, true);
 
@@ -259,20 +277,24 @@ void GameMain(void)
 		cnt++;
 	}*/
 
-	if (trgKey[P1_PAUSE]) {
+	if (trgKey[P1_PAUSE]) 
+	{
 		pauseFlag = !pauseFlag;
 	}
-	if (pauseFlag) {
+	if (pauseFlag)
+	{
 		SetDrawBright(128, 128, 128);
 	}
-	else {
+	else 
+	{
 		gameCnt++;
 		PlayerControl();
 		StageControl();
 		HitCheck();
 	}
 	GameMainDraw();
-	if (pauseFlag) {
+	if (pauseFlag) 
+	{
 		SetDrawBright(255, 255, 255);
 		DrawString(SCREEN_SIZE_X / 2 - 40, SCREEN_SIZE_Y / 2 - 5, "P A U S E", 0xffffff);
 	}
@@ -281,7 +303,7 @@ void GameMain(void)
 void GameMainDraw(void)
 {
 	StageDraw();// ½Ã°¼Þ‚Ì•`‰æ
-
+	BgControl();
 	PlayerDraw();
 	WireDraw();
 	DrawGraph(CHIP_SIZE_X * 5 - mapPos.x, CHIP_SIZE_Y * 23 - mapPos.y, maiImage, true);
