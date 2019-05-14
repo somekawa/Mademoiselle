@@ -70,12 +70,15 @@ typedef struct {
 	bool jumpFlag;
 	bool jumpFlag2;
 	int jumpCnt;	// ¼Ş¬İÌß‚Å‚«‚é‰ñ”
-	bool wallFlag;	// •Ç‚ğ‘–‚é
+	bool shotFlag;
+	bool downFlag;
 	bool wireFlag;
 	bool segweyFlag;	// ¾¸Ş³ª²
 	int imgLocCnt;
 	XY velocity;
 	int cnt;
+	float UpDownSpeed;		// —‰º‘¬“x
+	float AddUpDownSpeed;	// ã‰º‚Ì‰ÁZ—Ê
 	DWORD linkCnt;
 }CHARACTER;
 
