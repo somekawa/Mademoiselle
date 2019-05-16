@@ -708,6 +708,10 @@ void PlNormal(void)
 		if (IsPass(player_RD))// RDのchipID取得して移動できるIDか調べる
 		{
 			player.pos.x += player.moveSpeed;
+			if (player.pos.x > SCREEN_SIZE_X / 2)//カメラが右に行く
+			{
+				mapPos.x += player.moveSpeed;
+			}
 
 		}
 		else
@@ -724,6 +728,10 @@ void PlNormal(void)
 		if (IsPass(player_LD))	// LDのchipID取得して移動できるIDか調べる
 		{
 			player.pos.x -= player.moveSpeed;
+			if (player.pos.x < MAP_X * CHIP_SIZE_X - SCREEN_SIZE_X / 2)//カメラが左に行く
+			{
+				mapPos.x -= player.moveSpeed;
+			}
 
 		}
 		else
