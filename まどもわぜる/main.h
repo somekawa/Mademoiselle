@@ -81,7 +81,7 @@ enum PLAYER_TYPE {
 };
 
 typedef struct {
-	int type;	//ﾌﾟﾚｲﾔｰｶﾗｰ
+	int type;				//ﾌﾟﾚｲﾔｰｶﾗｰ
 	bool visible;
 	bool visible2;
 	int point;
@@ -99,11 +99,12 @@ typedef struct {
 	bool runFlag;
 	bool jumpFlag;
 	bool jumpFlag2;
-	int jumpCnt;	// ｼﾞｬﾝﾌﾟできる回数
+	int jumpCnt;			// ｼﾞｬﾝﾌﾟできる回数
 	bool shotFlag;
 	bool downFlag;
-	bool wireFlag;
-	bool segweyFlag;	// ｾｸﾞｳｪｲ
+	bool wireFlag;			// ワイヤーをだす
+	bool wireOkFlag;		// ワイヤーを使っていい壁にぶつかったとき
+	bool segweyFlag;		// ｾｸﾞｳｪｲ
 	int imgLocCnt;
 	Position velocity;
 	int cnt;

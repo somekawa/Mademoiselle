@@ -4,13 +4,15 @@ enum PLAYER_STATE {
 	PLAYER_NORMAL,		// 左右移動 
 	PLAYER_DOWN,	    // ジャンプ下降
 	PLAYER_JUMP_UP,		// ジャンプの上昇
+	PLAYER_Y_PRE,		// ﾜｲﾔｰｱｸｼｮﾝの準備(ワイヤーを伸ばす)
 	PLAYER_Y_ACTION,	// ﾜｲﾔｰｱｸｼｮﾝ
 	PLAYER_Y_JUMP,		// ﾜｲﾔｰｼﾞｬﾝﾌﾟ
 };
 
-void PlJumpUp(void);
-void PlDown(void);
 void PlNormal(void);
+void PlDown(void);
+void PlJumpUp(void);
+void PlWirePrepare(void);
 void PlWireAction(void);
 void PlWireJump(void);
 

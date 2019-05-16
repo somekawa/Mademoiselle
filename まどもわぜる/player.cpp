@@ -127,7 +127,8 @@ void PlayerGameInit(void)
 	player.downFlag = false;
 	player.segweyFlag = false;	// ｾｸﾞｳｪｲ
 
-	player.wireFlag = false;
+	player.wireFlag   = false;
+	player.wireOkFlag = false;
 
 	player.visible = true;
 	player.visible2 = false;
@@ -138,6 +139,7 @@ void PlayerGameInit(void)
 	_endPoint.x = 0;
 	_endPoint.y = 0;
 	_v = 0;			// 振り子のふり幅
+	TimeCnt = 0;
 
 	_g = 2.0f;		//重力の定義
 	_length = 0;	//紐の長さの計算
@@ -177,7 +179,7 @@ void PlayerControl(void)
 			if (player.type <= -1)player.type = PLAYER_MAX - 1;
 		}
 		else {
-			player.animCnt++;
+			//player.animCnt++;
 		}
 		//if (trgKey[P1_UP]) player.visible = !player.visible;
 
@@ -468,7 +470,8 @@ void PlayerDraw(void)
 
 			if (player.moveDir == DIR_RIGHT)
 			{
-				DrawLine(player.pos.x, player.pos.y - player.size.y, furiko_pos.x, furiko_pos.y, 0xffffffff, 2);	// 動くけどキャラに固定されないひも(だったもの)
+				DrawLine(player.pos.x, player.pos.y - player.size.y, furiko_pos.x, furiko_pos.y, 0xffffffff, 2);		// 動くけどキャラに固定されないひも(だったもの)
+				DrawGraph(furiko_pos.x - player.size.x, furiko_pos.y - player.size.y/2, jumpImage[player.type], true);  // キャラクタをおもりとして描画
 				//DrawGraph(player.pos.x - player.size.x, player.pos.y, jumpImage[player.type], true);			// キャラクタをおもりとして描画
 			}
 			else
@@ -732,6 +735,35 @@ void PlNormal(void)
 
 	}
 
+	if (newKey[P2_UP])
+	{
+		//紐の長さの計算
+
+		_length = player.pos.y;
+
+		// 紐の長さの補正
+		if (_length >= 250)		// 長すぎるとき
+		{
+			_length = 250;
+		}
+		else if (_length < 120)		// 短すぎるとき
+		{
+			_length = 120;
+		}
+
+		// KeepPosYを指定ブロックの高さに合わせる
+		//KeepPosY = furiko_pos.y - CHIP_SIZE_Y / 4 - mapPos.y;
+		player.wireFlag = true;
+		furiko_pos = { 0,0 };
+		_endPoint = player.pos;
+
+		OnAdjust();
+		player.visible = false;
+		player.visible2 = true;
+
+		player_state = PLAYER_Y_PRE;
+	}
+
 	
 
 }
@@ -789,9 +821,8 @@ void PlDown(void)
 		{
 			player.UpDownSpeed = DOWN_SPEED_DEF;
 			player.AddUpDownSpeed = 0.8f;
+			player_state = PLAYER_DOWN;
 		}
-
-		player_state = PLAYER_DOWN;
 	}
 	else
 	{
@@ -801,37 +832,13 @@ void PlDown(void)
 			player.AddUpDownSpeed = 0.8f;
 			player_state = PLAYER_JUMP_UP;
 		}
-		else if (newKey[P2_UP])
-		{
-			//紐の長さの計算
-			
-			_length = player.pos.y ;
-
-			//// 紐の長さの補正
-			//if (_length >= 250)		// 長すぎるとき
-			//{
-			//	_length = 250;
-			//}
-			//else if (_length < 120)		// 短すぎるとき
-			//{
-			//	_length = 120;
-			//}
-			//else
-			//{
-			//	_length = furiko_pos.y - player.offsetSize.y;
-			//}
-
-			// KeepPosYを指定ブロックの高さに合わせる
-			//KeepPosY = furiko_pos.y - CHIP_SIZE_Y / 4 - mapPos.y;
-			player.wireFlag = true;
-			player.visible = false;
-			player.visible2 = true;
-
-			player_state = PLAYER_Y_ACTION;
-		}
 		else
 		{
-			player_state = PLAYER_NORMAL;
+			if (player_state != PLAYER_Y_ACTION)
+			{
+				player_state = PLAYER_NORMAL;
+			}
+			
 		}
 		return;
 	}
@@ -851,11 +858,25 @@ void PlDown(void)
 
 }
 
-// 前と座標の中心点が変わっているから注意!!
-void PlWireAction(void)
+void PlWirePrepare(void)
 {
 	XY player_RU = { player.pos.x + player.moveSpeed + player.hitPosE.x , player.pos.y - player.moveSpeed - player.hitPosS.y };	// 左上
 	XY player_LU = { player.pos.x - player.moveSpeed - player.hitPosS.x , player.pos.y - player.moveSpeed - player.hitPosS.y };	// 右上
+
+	if (player.wireFlag == true)
+	{
+		player_state = PLAYER_Y_ACTION;
+		player.wireOkFlag = true;
+	}
+
+}
+
+
+// 前と座標の中心点が変わっているから注意!!
+void PlWireAction(void)
+{
+	//XY player_RU = { player.pos.x + player.moveSpeed + player.hitPosE.x , player.pos.y - player.moveSpeed - player.hitPosS.y };	// 左上
+	//XY player_LU = { player.pos.x - player.moveSpeed - player.hitPosS.x , player.pos.y - player.moveSpeed - player.hitPosS.y };	// 右上
 
 	//XY movedHitCheck = player.pos;
 
@@ -903,7 +924,7 @@ void PlWireAction(void)
 	//	}
 	//}
 
-	if (player.wireFlag)
+	if (player.wireOkFlag)
 	{
 		if (TimeCnt < 150)
 		{
@@ -938,7 +959,14 @@ void PlWireAction(void)
 			player.visible = true;
 			player.visible2 = false;
 			player_state = PLAYER_NORMAL;
+
+			// ワイヤー表示時間の初期化
 			TimeCnt = 0;
+
+			// 振り子スタート位置の初期化(左上にご注目ください)
+			_v = 0;
+			furiko_pos = { 0,0 };
+			//furiko_pos = player.pos;
 		}
 
 
@@ -957,11 +985,20 @@ void PlayerState(void)
 	case PLAYER_NORMAL:			// 左右移動 
 	case PLAYER_DOWN:	        // ジャンプ下降
 		PlNormal();
-		PlDown();
+		if (player_state != PLAYER_Y_PRE)
+		{
+			PlDown();
+		}
 		break;
 	case PLAYER_JUMP_UP:		// ジャンプの上昇
 		PlNormal();
-		PlJumpUp();
+		if (player_state != PLAYER_Y_PRE)
+		{
+			PlJumpUp();
+		}
+		break;
+	case PLAYER_Y_PRE:
+		PlWirePrepare();		// ﾜｲﾔｰｱｸｼｮﾝの準備(ワイヤーを伸ばす)
 		break;
 	case PLAYER_Y_ACTION:		// ﾜｲﾔｰｱｸｼｮﾝ
 		PlWireAction();
