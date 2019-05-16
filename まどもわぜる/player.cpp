@@ -127,8 +127,8 @@ void PlayerGameInit(void)
 	player.downFlag = false;
 	player.segweyFlag = false;	// ｾｸﾞｳｪｲ
 
-	player.wireFlag   = false;
 	player.wireOkFlag = false;
+	player.wireFlag   = false;
 
 	player.visible = true;
 	player.visible2 = false;
@@ -472,12 +472,11 @@ void PlayerDraw(void)
 			{
 				DrawLine(player.pos.x, player.pos.y - player.size.y, furiko_pos.x, furiko_pos.y, 0xffffffff, 2);		// 動くけどキャラに固定されないひも(だったもの)
 				DrawGraph(furiko_pos.x - player.size.x, furiko_pos.y - player.size.y/2, jumpImage[player.type], true);  // キャラクタをおもりとして描画
-				//DrawGraph(player.pos.x - player.size.x, player.pos.y, jumpImage[player.type], true);			// キャラクタをおもりとして描画
 			}
 			else
 			{
-				//DrawLine(player.pos.x , player.pos.y, furiko_pos.x, furiko_pos.y, 0xffffffff, 2);		// 動くけどキャラに固定されないひも(だったもの)
-				//DrawTurnGraph(player.pos.x - player.size.x, player.pos.y, jumpImage[player.type], true);						// キャラクタをおもりとして描画
+				DrawLine(player.pos.x , player.pos.y - player.size.y, furiko_pos.x, furiko_pos.y, 0xffffffff, 2);		// 動くけどキャラに固定されないひも(だったもの)
+				DrawTurnGraph(furiko_pos.x - player.size.x / 3, furiko_pos.y - player.size.y / 4, jumpImage[player.type], true);		// キャラクタをおもりとして描画
 			}
 
 		}
@@ -754,8 +753,18 @@ void PlNormal(void)
 		// KeepPosYを指定ブロックの高さに合わせる
 		//KeepPosY = furiko_pos.y - CHIP_SIZE_Y / 4 - mapPos.y;
 		player.wireFlag = true;
-		furiko_pos = { 0,0 };
-		_endPoint = player.pos;
+
+		if(player.moveDir == DIR_RIGHT)
+		{
+			furiko_pos = { 0,0 };
+			_endPoint = player.pos;
+		}
+		if (player.moveDir == DIR_LEFT)
+		{
+			furiko_pos = {2400,0};
+			_endPoint = player.pos;
+		}
+		
 
 		OnAdjust();
 		player.visible = false;
@@ -860,14 +869,36 @@ void PlDown(void)
 
 void PlWirePrepare(void)
 {
-	XY player_RU = { player.pos.x + player.moveSpeed + player.hitPosE.x , player.pos.y - player.moveSpeed - player.hitPosS.y };	// 左上
-	XY player_LU = { player.pos.x - player.moveSpeed - player.hitPosS.x , player.pos.y - player.moveSpeed - player.hitPosS.y };	// 右上
+	//XY player_RU = { player.pos.x + player.moveSpeed + player.hitPosE.x , player.pos.y - player.moveSpeed - player.hitPosS.y };	// 右上
+	//XY player_LU = { player.pos.x - player.moveSpeed - player.hitPosS.x , player.pos.y - player.moveSpeed - player.hitPosS.y };	// 左上
 
-	if (player.wireFlag == true)
-	{
-		player_state = PLAYER_Y_ACTION;
-		player.wireOkFlag = true;
-	}
+	//if (player.wireFlag)
+	//{
+	//	for (int i = 5; i <= 10; i++)
+	//	{
+	//		player_RU.y = player_RU.y - (CHIP_SIZE_Y * i);		// 右上高さ
+	//		player_LU.y = player_LU.y - (CHIP_SIZE_Y * i);		// 左上高さ
+
+	//		if (WireBlockPass({ (float)player_RU.x , (float)(player_RU.y) }) && WireBlockPass({ (float)player_LU.x , (float)(player_LU.y) }))
+	//		{
+	//			// 5~10マス上に指定ブロックがない
+	//			player.wireFlag = false;
+	//			player_state = PLAYER_NORMAL;
+	//			
+	//		}
+	//		else
+	//		{
+	//			// 5~10マス上に指定ブロックがある
+	//			player.wireOkFlag = true;
+	//			player_state = PLAYER_Y_ACTION;
+	//		}
+
+	//	}
+	//	
+	//}
+
+	player.wireOkFlag = true;
+	player_state = PLAYER_Y_ACTION;
 
 }
 
@@ -875,8 +906,8 @@ void PlWirePrepare(void)
 // 前と座標の中心点が変わっているから注意!!
 void PlWireAction(void)
 {
-	//XY player_RU = { player.pos.x + player.moveSpeed + player.hitPosE.x , player.pos.y - player.moveSpeed - player.hitPosS.y };	// 左上
-	//XY player_LU = { player.pos.x - player.moveSpeed - player.hitPosS.x , player.pos.y - player.moveSpeed - player.hitPosS.y };	// 右上
+	//XY player_RU = { player.pos.x + player.moveSpeed + player.hitPosE.x , player.pos.y - player.moveSpeed - player.hitPosS.y };	
+	//XY player_LU = { player.pos.x - player.moveSpeed - player.hitPosS.x , player.pos.y - player.moveSpeed - player.hitPosS.y };	
 
 	//XY movedHitCheck = player.pos;
 
@@ -935,7 +966,7 @@ void PlWireAction(void)
 			}
 			else
 			{
-				//_endPoint.x = furiko_pos.x;
+				_endPoint.x = player.pos.x;
 			}
 			_endPoint.y = player.pos.y;
 
@@ -963,10 +994,18 @@ void PlWireAction(void)
 			// ワイヤー表示時間の初期化
 			TimeCnt = 0;
 
-			// 振り子スタート位置の初期化(左上にご注目ください)
-			_v = 0;
-			furiko_pos = { 0,0 };
-			//furiko_pos = player.pos;
+			// 振り子スタート位置の初期化
+			if(player.moveDir == DIR_RIGHT)
+			{
+				_v = 0;
+				furiko_pos = { 0,0 };
+			}
+			if (player.moveDir == DIR_LEFT)
+			{
+				_v = 0;
+				furiko_pos = {2400,0};
+			}
+			
 		}
 
 
@@ -998,7 +1037,7 @@ void PlayerState(void)
 		}
 		break;
 	case PLAYER_Y_PRE:
-		PlWirePrepare();		// ﾜｲﾔｰｱｸｼｮﾝの準備(ワイヤーを伸ばす)
+		PlWirePrepare();		// ﾜｲﾔｰｱｸｼｮﾝの準備(ワイヤーを伸ばせるか判定)
 		break;
 	case PLAYER_Y_ACTION:		// ﾜｲﾔｰｱｸｼｮﾝ
 		PlWireAction();
