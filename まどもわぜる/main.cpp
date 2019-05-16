@@ -26,7 +26,7 @@ int charaSeleTitle;
 int wakImage[2];
 int yazirusiImage[2];
 
-XY mapPos;
+Position mapPos;
 int maiImage;
 int cnt;
 

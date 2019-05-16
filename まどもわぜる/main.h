@@ -1,4 +1,6 @@
 #pragma once
+#include <math.h>				// 標準ﾍｯﾀﾞｰﾌｧｲﾙは<>で指定する
+
 
 // 定数
 #define SCREEN_SIZE_X 1200
@@ -10,7 +12,35 @@
 #define ACC_G 9.8
 
 
+struct Position {
+	Position(float ix, float iy) { x = ix; y = iy; }
+	Position() {
+		x = 0;
+		y = 0;
+	}
+	float x;
+	float y;
+	float Length() {
+		return hypotf(x, y);
+	}
+	Position normalized() {
+		return Position(x / Length(), y / Length());
+	}
+	Position operator+(const Position & in) {
+		return Position(x + in.x, y + in.y);
+	}
 
+	Position operator-(const Position & in) {
+		return Position(x - in.x, y - in.y);
+	}
+
+	Position operator*(float s) {
+		return Position(x * s, y * s);
+	}
+
+
+
+};
 
 // 定義
 typedef struct {
@@ -56,12 +86,12 @@ typedef struct {
 	bool visible2;
 	int point;
 	MOVE_DIR moveDir;
-	XY pos;
-	XY hitPosS;		//当たり判定用の左上
-	XY hitPosE;		//当たり判定用の右下
-	XY offsetSize;
-	XY size;
-	int moveSpeed;
+	Position pos;
+	Position hitPosS;		//当たり判定用の左上
+	Position hitPosE;		//当たり判定用の右下
+	Position offsetSize;
+	Position size;
+	float moveSpeed;
 	int life;
 	int lifeMax;
 	int animCnt;
@@ -75,12 +105,12 @@ typedef struct {
 	bool wireFlag;
 	bool segweyFlag;	// ｾｸﾞｳｪｲ
 	int imgLocCnt;
-	XY velocity;
+	Position velocity;
 	int cnt;
 	float UpDownSpeed;		// 落下速度
 	float AddUpDownSpeed;	// 上下の加算量
 	DWORD linkCnt;
 }CHARACTER;
 
-extern XY mapPos;
+extern Position mapPos;
 GAME_MODE GetGameMode(void);	// 今のｹﾞｰﾑﾓｰﾄﾞ

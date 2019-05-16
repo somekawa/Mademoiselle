@@ -27,13 +27,13 @@ void StageDraw(void);
 bool MapLoad(void);				// Ï¯Ìß‚ğÛ°ÄŞ@•K—v‚Å‚ ‚ê‚Îˆø”
 
 
-XY MapPosToIndex(XY pos);
-bool IsPass(XY pos);
-//bool WireBlockPass(XY pos);
+XY MapPosToIndex(Position pos);
+bool IsPass(Position pos);
+bool WireBlockPass(Position pos);
 
-XY MapIndexToPos(XY index);
+Position MapIndexToPos(Position index);
 
-XY GetWorldPos_Map(XY pos, MOVE_DIR der);
+Position GetWorldPos_Map(Position pos, MOVE_DIR der);
 
 
 

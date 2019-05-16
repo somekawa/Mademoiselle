@@ -1,4 +1,5 @@
 
+
 #include "Dxlib.h"				// DxLibﾗｲﾌﾞﾗﾘを使用する　独自で準備したﾍｯﾀﾞｰﾌｧｲﾙは""で指定する
 #include <math.h>				// 標準ﾍｯﾀﾞｰﾌｧｲﾙは<>で指定する
 #include"keycheck.h"
@@ -46,37 +47,9 @@ bool _isJumped;
 void OnMove(float& x, float& y, float vx, float vy);
 void OnAdjust();
 
-struct Position {
-	Position(float ix, float iy) { x = ix; y = iy; }
-	Position() {
-		x = 0;
-		y = 0;
-	}
-	float x;
-	float y;
-	float Length() {
-		return hypotf(x, y);
-	}
-	Position normalized() {
-		return Position(x / Length(), y / Length());
-	}
-	Position operator+(const Position & in) {
-		return Position(x + in.x, y + in.y);
-	}
-
-	Position operator-(const Position & in) {
-		return Position(x - in.x, y - in.y);
-	}
-
-	Position operator*(float s) {
-		return Position(x * s, y * s);
-	}
 
 
-
-};
-
-Position _pos;
+Position furiko_pos;
 Position _endPoint;
 float _g;
 float _v;
@@ -143,7 +116,7 @@ void PlayerGameInit(void)
 	player.offsetSize = { -player.size.x / 2,-player.size.y };
 	player.hitPosE = { 20,0 };
 	player.hitPosS = { 20,62 };
-	player.pos = { CHIP_SIZE_X * 6,SCREEN_SIZE_Y + CHIP_SIZE_Y * 13 };
+	player.pos = { CHIP_SIZE_X *15, CHIP_SIZE_Y * 14 };
 	player.moveSpeed = PLAYER_SPEED_NORMAL;
 	player.animCnt = 0;
 	player.moveDir = DIR_RIGHT;
@@ -212,7 +185,7 @@ void PlayerControl(void)
 	}
 
 	//
-	//	case GMODE_GAME:	// ｹﾞｰﾑ中
+		//case GMODE_GAME:	// ｹﾞｰﾑ中
 	//		
 	//
 	//
@@ -225,62 +198,62 @@ void PlayerControl(void)
 	//		downPos = 0;
 	//
 	//		
-	//		XY movedHitCheck;
-	//		XY movedHitCheck2;
-	//		XY movedHitCheck3;
-	//
-	//		// ワイヤー処理
-	//		if (newKey[P2_UP])
-	//		{
-	//
-	//			
-	//
-	//			// 5~10マス以内の頭上にブロックがあったら、ワイヤーが出せるようにしたい
-	//			for (int i = 5; i <= 10; )
-	//			{
-	//				movedHitCheck.y = player.pos.y  - (CHIP_SIZE_Y * i);		// 高さ
-	//				if ((WireBlockPass(movedHitCheck)) && (WireBlockPass({ movedHitCheck.x - CHIP_SIZE_X / 2 ,movedHitCheck.y })) && (WireBlockPass({ movedHitCheck.x + CHIP_SIZE_X / 2 ,movedHitCheck.y })))		// 一定範囲内にブロックが存在しないことになる
-	//				{
-	//					player.wireFlag = false;			// 範囲内に存在しないのでfalseが正しい
-	//					i++;
-	//				}
-	//				else
-	//				{
-	//					// ブロックが存在するときの処理
-	//
-	//					//紐の長さの計算
-	//					_length = player.pos.y + player.offsetSize.y;
-	//
-	//					// 紐の長さの補正
-	//					if (_length >= 250)
-	//					{
-	//						_length = 250;
-	//					}
-	//
-	//					// KeepPosXの補正
-	//					if (_length < KEEPPOSX_CORRECTION)
-	//					{
-	//						KeepPosX = KEEPPOSX_CORRECTION;
-	//					}
-	//					else
-	//					{
-	//						KeepPosX = _length;
-	//					}
-	//
-	//					// KeepPosYを指定ブロックの高さに合わせる
-	//					KeepPosY = movedHitCheck.y - CHIP_SIZE_Y / 4 - mapPos.y;
-	//					player.wireFlag = true;
-	//					player.visible = false;
-	//					player.visible2 = true;
-	//
-	//					TimeCnt = 0;
-	//					return;
-	//				}
-	//				
-	//			}
-	//			
-	//
-	//		}
+			//XY movedHitCheck = player.pos;
+			//XY movedHitCheck2;
+			//XY movedHitCheck3;
+	
+			//// ワイヤー処理
+			//if (newKey[P2_UP])
+			//{
+	
+			//	
+	
+			//	// 5~10マス以内の頭上にブロックがあったら、ワイヤーが出せるようにしたい
+			//	for (int i = 5; i <= 10; )
+			//	{
+			//		movedHitCheck.y = player.pos.y  - (CHIP_SIZE_Y * i);		// 高さ
+			//		if ((WireBlockPass(movedHitCheck)) && (WireBlockPass({ movedHitCheck.x - CHIP_SIZE_X / 2 ,movedHitCheck.y })) && (WireBlockPass({ movedHitCheck.x + CHIP_SIZE_X / 2 ,movedHitCheck.y })))		// 一定範囲内にブロックが存在しないことになる
+			//		{
+			//			player.wireFlag = false;			// 範囲内に存在しないのでfalseが正しい
+			//			i++;
+			//		}
+			//		else
+			//		{
+			//			// ブロックが存在するときの処理
+	
+			//			//紐の長さの計算
+			//			_length = player.pos.y + player.offsetSize.y;
+	
+			//			// 紐の長さの補正
+			//			if (_length >= 250)
+			//			{
+			//				_length = 250;
+			//			}
+	
+			//			// KeepPosXの補正
+			//			if (_length < KEEPPOSX_CORRECTION)
+			//			{
+			//				KeepPosX = KEEPPOSX_CORRECTION;
+			//			}
+			//			else
+			//			{
+			//				KeepPosX = _length;
+			//			}
+	
+			//			// KeepPosYを指定ブロックの高さに合わせる
+			//			KeepPosY = movedHitCheck.y - CHIP_SIZE_Y / 4 - mapPos.y;
+			//			player.wireFlag = true;
+			//			player.visible = false;
+			//			player.visible2 = true;
+	
+			//			TimeCnt = 0;
+			//			return;
+			//		}
+			//		
+			//	}
+			//	
+	
+			//}
 	//
 	//		// ｾｸﾞｳｪｲ
 	//		if (trgKey[P2_A]) player.segweyFlag = !player.segweyFlag;
@@ -422,7 +395,7 @@ void PlayerControl(void)
 	//		}
 	//
 			// playerを追うカメラ
-		if (player.pos.y > SCREEN_SIZE_Y - CHIP_SIZE_Y * 5) mapPos.y += ACC_G + mapPos.y;
+		//if (player.pos.y > SCREEN_SIZE_Y - CHIP_SIZE_Y * 5) mapPos.y += ACC_G ;
 		if (player.pos.y < CHIP_SIZE_Y * MAP_Y - SCREEN_SIZE_Y + CHIP_SIZE_Y * 5) mapPos.y -= ACC_G * SECOND_PER_FRAME;
 //
 //
@@ -488,26 +461,23 @@ void PlayerDraw(void)
 		if (!player.visible && player.visible2)
 		{
 			// ワイヤーがあまりにも短すぎたときの対処
-			if (_pos.y < CORRECTION)
-			{
-				_pos.y = CORRECTION;
-			}
-
+			//if (furiko_pos.y < CORRECTION)
+			//{
+			//	furiko_pos.y = CORRECTION;
+			//}
 
 			if (player.moveDir == DIR_RIGHT)
 			{
-				DrawLine(_pos.x, _pos.y, KeepPosX + CHIP_SIZE_X, KeepPosY /*+ CHIP_SIZE_Y*/, 0xffffffff, 2);		// 動くけどキャラに固定されないひも(だったもの)
-				DrawGraph(_pos.x - player.size.x, _pos.y, jumpImage[player.type], true);							// キャラクタをおもりとして描画
+				DrawLine(player.pos.x, player.pos.y - player.size.y, furiko_pos.x, furiko_pos.y, 0xffffffff, 2);	// 動くけどキャラに固定されないひも(だったもの)
+				//DrawGraph(player.pos.x - player.size.x, player.pos.y, jumpImage[player.type], true);			// キャラクタをおもりとして描画
 			}
 			else
 			{
-				DrawLine(_pos.x , _pos.y, KeepPosX - CHIP_SIZE_X, KeepPosY /*+ CHIP_SIZE_Y*/, 0xffffffff, 2);		// 動くけどキャラに固定されないひも(だったもの)
-				DrawTurnGraph(_pos.x , _pos.y, jumpImage[player.type], true);
+				//DrawLine(player.pos.x , player.pos.y, furiko_pos.x, furiko_pos.y, 0xffffffff, 2);		// 動くけどキャラに固定されないひも(だったもの)
+				//DrawTurnGraph(player.pos.x - player.size.x, player.pos.y, jumpImage[player.type], true);						// キャラクタをおもりとして描画
 			}
 
 		}
-
-		
 
 		break;
 	}
@@ -524,153 +494,153 @@ void WireDraw(void)
 
 	
 
-	if (player.wireFlag)
-	{
-		
+	//if (player.wireFlag)
+	//{
+	//	
 
-		if (TimeCnt < 150)
-		{
-			skyFlag = true;
+	//	if (TimeCnt < 150)
+	//	{
+	//		skyFlag = true;
 
-			//ひもの支点を定義する
-			if (player.moveDir == DIR_RIGHT)
-			{
-				_endPoint.x = KeepPosX + CHIP_SIZE_X;
-			}
-			else
-			{
-				_endPoint.x = KeepPosX - CHIP_SIZE_X;
-			}
-			_endPoint.y = KeepPosY /*+ CHIP_SIZE_Y*/;
+	//		//ひもの支点を定義する
+	//		if (player.moveDir == DIR_RIGHT)
+	//		{
+	//			_endPoint.x = KeepPosX + CHIP_SIZE_X;
+	//		}
+	//		else
+	//		{
+	//			_endPoint.x = KeepPosX - CHIP_SIZE_X;
+	//		}
+	//		_endPoint.y = KeepPosY /*+ CHIP_SIZE_Y*/;
 
-			Vec2 v = (_pos - _endPoint);//振り子の支点から振り子の錘までのベクトル
-			v = v.normalized();//正規化する
-			//外積と内積を利用して角度を計算
-			float cost = Dot(v, Vec2(-1, 0));
-			float sint = Cross(v, Vec2(-1, 0));
-			float theta = atan2f(cost, sint);
+	//		Vec2 v = (_pos - _endPoint);//振り子の支点から振り子の錘までのベクトル
+	//		v = v.normalized();//正規化する
+	//		//外積と内積を利用して角度を計算
+	//		float cost = Dot(v, Vec2(-1, 0));
+	//		float sint = Cross(v, Vec2(-1, 0));
+	//		float theta = atan2f(cost, sint);
 
-			_v += _g * cost;
+	//		_v += _g * cost;
 
-			
+	//		
 
-			if (CheckHitKey(KEY_INPUT_F))				 // Fキーを押したら
-			{
-				XY movedPos = player.pos;
-				XY movedHitCheck = movedPos;
-				XY movedHitCheck2;
-				XY movedHitCheck3;
-				
+	//		if (CheckHitKey(KEY_INPUT_F))				 // Fキーを押したら
+	//		{
+	//			XY movedPos = player.pos;
+	//			XY movedHitCheck = movedPos;
+	//			XY movedHitCheck2;
+	//			XY movedHitCheck3;
+	//			
 
-				movedPos = player.pos;
-				movedHitCheck.y = movedPos.y + player.offsetSize.y;
-				movedHitCheck2 = movedHitCheck;													// 左
-				movedHitCheck2.x = movedPos.x - player.hitPosS.x;
-				movedHitCheck3 = movedHitCheck;													// 右
-				movedHitCheck3.x = movedPos.x + player.hitPosE.x - 1;
+	//			movedPos = player.pos;
+	//			movedHitCheck.y = movedPos.y + player.offsetSize.y;
+	//			movedHitCheck2 = movedHitCheck;													// 左
+	//			movedHitCheck2.x = movedPos.x - player.hitPosS.x;
+	//			movedHitCheck3 = movedHitCheck;													// 右
+	//			movedHitCheck3.x = movedPos.x + player.hitPosE.x - 1;
 
-				
+	//			
 
-				playerX_now = _pos.x + mapPos.x;		 // 切り離す瞬間
-				playerY_now = _pos.y + mapPos.y;		 // 切り離す瞬間
+	//			playerX_now = _pos.x + mapPos.x;		 // 切り離す瞬間
+	//			playerY_now = _pos.y + mapPos.y;		 // 切り離す瞬間
 
-				getRadian(playerX_old, playerY_old, playerX_now, playerY_now);					// 角度(ラジアン)を求めるためのやつ
-
-
-				// 地面に接触してる
-				//if (!(IsPass(movedHitCheck)) && (IsPass(movedHitCheck2)) && (IsPass(movedHitCheck3)))
-				//{		
-				//	PlayerDraw();
-				//	skyFlag = false;
-				//}
-				//else
-				//{
-				//	//playerX_now = _pos.x + mapPos.x;		 // 切り離す瞬間
-				//	//playerY_now = _pos.y + mapPos.y;		 // 切り離す瞬間
-
-				//	//getRadian(playerX_old, playerY_old, playerX_now, playerY_now);
-
-				//	while (skyFlag == true)
-				//	{
-				//		Disassembly_C(radian);			// x軸
-				//		Disassembly_S(radian, _g);		// y軸
-
-				//		DrawGraph(_pos.x + mapPos.x + Disassembly_C(radian), _pos.y + mapPos.y + Disassembly_S(radian, _g), stopJumpImage[player.type], true);
-				//	}
-				//	
-				//}
-				
-
-				
-					
-
-					//Disassembly_C(radian);			// x軸
-					//Disassembly_S(radian);			// y軸
-
-					player.visible = true;			// アニメーションするキャラが表示される
-					player.visible2 = false;		// ワイヤー中の静止画キャラが非表示になる
-					player.wireFlag = false;		// ワイヤーが非表示になる
-
-					// 着地地点の描画位置
-					//player.pos.x = _pos.x + mapPos.x + player.offsetSize.x;
-					//player.pos.y = _pos.y + mapPos.y;
-
-					//DrawGraph(Disassembly_C(radian), Disassembly_S(radian , _g), stopJumpImage[player.type], true);
-				
-					
-					// ここに二段ジャンプ用処理の追加が必要かも
-
-					
-
-					PlayerDraw();
-					
-				
-			}
-			else
-			{
-				// 更新前にoldに保存
-				playerX_old = _pos.x + mapPos.x;		// 1フレーム前
-				playerY_old = _pos.y + mapPos.y;		// 1フレーム前
-
-				playerX_now = 0;						// 切り離す瞬間だからまだ0
-				playerY_now = 0;						// 切り離す瞬間だからまだ0
-
-				player.visible = false;
-				player.visible2 = true;
-				player.wireFlag = true;
-				_isPushJump = false;
-			}
+	//			getRadian(playerX_old, playerY_old, playerX_now, playerY_now);					// 角度(ラジアン)を求めるためのやつ
 
 
+	//			// 地面に接触してる
+	//			//if (!(IsPass(movedHitCheck)) && (IsPass(movedHitCheck2)) && (IsPass(movedHitCheck3)))
+	//			//{		
+	//			//	PlayerDraw();
+	//			//	skyFlag = false;
+	//			//}
+	//			//else
+	//			//{
+	//			//	//playerX_now = _pos.x + mapPos.x;		 // 切り離す瞬間
+	//			//	//playerY_now = _pos.y + mapPos.y;		 // 切り離す瞬間
+
+	//			//	//getRadian(playerX_old, playerY_old, playerX_now, playerY_now);
+
+	//			//	while (skyFlag == true)
+	//			//	{
+	//			//		Disassembly_C(radian);			// x軸
+	//			//		Disassembly_S(radian, _g);		// y軸
+
+	//			//		DrawGraph(_pos.x + mapPos.x + Disassembly_C(radian), _pos.y + mapPos.y + Disassembly_S(radian, _g), stopJumpImage[player.type], true);
+	//			//	}
+	//			//	
+	//			//}
+	//			
+
+	//			
+	//				
+
+	//				//Disassembly_C(radian);			// x軸
+	//				//Disassembly_S(radian);			// y軸
+
+	//				player.visible = true;			// アニメーションするキャラが表示される
+	//				player.visible2 = false;		// ワイヤー中の静止画キャラが非表示になる
+	//				player.wireFlag = false;		// ワイヤーが非表示になる
+
+	//				// 着地地点の描画位置
+	//				player.pos.x = _pos.x + mapPos.x + player.offsetSize.x;
+	//				//player.pos.y = _pos.y + mapPos.y;
+
+	//				DrawGraph(Disassembly_C(radian), Disassembly_S(radian , _g), stopJumpImage[player.type], true);
+	//			
+	//				
+	//				// ここに二段ジャンプ用処理の追加が必要かも
+
+	//				
+
+	//				PlayerDraw();
+	//				
+	//			
+	//		}
+	//		else
+	//		{
+	//			// 更新前にoldに保存
+	//			playerX_old = _pos.x + mapPos.x;		// 1フレーム前
+	//			playerY_old = _pos.y + mapPos.y;		// 1フレーム前
+
+	//			playerX_now = 0;						// 切り離す瞬間だからまだ0
+	//			playerY_now = 0;						// 切り離す瞬間だからまだ0
+
+	//			player.visible = false;
+	//			player.visible2 = true;
+	//			player.wireFlag = true;
+	//			_isPushJump = false;
+	//		}
 
 
 
-			//あとは振り子の角度に従って、その時々の加速度を求め、
-			//速度(_v)に加算しよう
-			//それをX成分、Y成分に分けて
-			//OnMoveの第3第4引数に代入
 
-			
-			OnMove(_pos.x, _pos.y, _v * sint, _v * cost);
-			OnAdjust();		// これがないとひもが伸びていく
-		
-		//DrawLine(KeepPos, player.pos.y, KeepPos+100, 0, 0xffffffff, 1);		// 動かないけどキャラに固定されるひも
 
-		//DrawLine(_pos.x, _pos.y, KeepPosX + CHIP_SIZE_X, KeepPosY + CHIP_SIZE_Y, 0xffffffff, 2);			// 動くけどキャラに固定されないひも
+	//		//あとは振り子の角度に従って、その時々の加速度を求め、
+	//		//速度(_v)に加算しよう
+	//		//それをX成分、Y成分に分けて
+	//		//OnMoveの第3第4引数に代入
 
-		//DrawGraph(_pos.x, _pos.y, playerImage, true);						// キャラクタをおもりとして描画
+	//		
+	//		OnMove(_pos.x, _pos.y, _v * sint, _v * cost);
+	//		OnAdjust();		// これがないとひもが伸びていく
+	//	
+	//	//DrawLine(KeepPos, player.pos.y, KeepPos+100, 0, 0xffffffff, 1);		// 動かないけどキャラに固定されるひも
 
-			TimeCnt++;
-		}
-		else
-		{
-			player.wireFlag = false;
-			player.visible = true;
-			player.visible2 = false;
-			skyFlag = false;
-		}
+	//	//DrawLine(_pos.x, _pos.y, KeepPosX + CHIP_SIZE_X, KeepPosY + CHIP_SIZE_Y, 0xffffffff, 2);			// 動くけどキャラに固定されないひも
 
-	}
+	//	//DrawGraph(_pos.x, _pos.y, playerImage, true);						// キャラクタをおもりとして描画
+
+	//		TimeCnt++;
+	//	}
+	//	else
+	//	{
+	//		player.wireFlag = false;
+	//		player.visible = true;
+	//		player.visible2 = false;
+	//		skyFlag = false;
+	//	}
+
+	//}
 }
 
 
@@ -683,9 +653,9 @@ void OnMove(float& x, float& y, float vx, float vy) {
 }
 
 void OnAdjust() {
-	Vec2 v = (_pos - _endPoint);
+	Vec2 v = (furiko_pos - _endPoint);
 	if (v.Length() > _length) {
-		_pos = _endPoint + v.normalized() * _length;
+		furiko_pos = _endPoint + v.normalized() * _length;
 	}
 }
 
@@ -726,8 +696,8 @@ float Disassembly_S(float& radian_sin , float g)		// y軸
 void PlNormal(void)
 {
 	player.runFlag  = false;
-	XY player_RD = { player.pos.x + player.moveSpeed + player.hitPosE.x , player.pos.y - 1 };
-	XY player_LD = { player.pos.x - player.moveSpeed - player.hitPosS.x , player.pos.y - 1 };
+	Position player_RD = { player.pos.x + player.moveSpeed + player.hitPosE.x , player.pos.y - 1 };
+	Position player_LD = { player.pos.x - player.moveSpeed - player.hitPosS.x , player.pos.y - 1 };
 
 	if (newKey[P1_RIGHT])
 	{
@@ -761,17 +731,20 @@ void PlNormal(void)
 		}
 
 	}
+
+	
+
 }
 
 void PlJumpUp(void)
 {
-	XY player_RD = { player.pos.x + player.moveSpeed + player.hitPosE.x , player.pos.y - player.moveSpeed - player.hitPosS.y };	// 左上
-	XY player_LD = { player.pos.x - player.moveSpeed - player.hitPosS.x , player.pos.y - player.moveSpeed - player.hitPosS.y };	// 右上
+	Position player_RU = { player.pos.x + player.moveSpeed + player.hitPosE.x , player.pos.y - player.moveSpeed - player.hitPosS.y };	// 左上
+	Position player_LU = { player.pos.x - player.moveSpeed - player.hitPosS.x , player.pos.y - player.moveSpeed - player.hitPosS.y };	// 右上
 
 	player.UpDownSpeed += player.AddUpDownSpeed;
 
-	//　RD と LD の y座標に-1して上のブロック情報を得る(?)
-	if (IsPass({ player_RD.x , player_RD.y - 1 }) && IsPass({ player_LD.x , player_LD.y - 1 }))
+	//　RD と LD の y座標に-1して上のブロック情報を得る
+	if (IsPass({ player_RU.x , player_RU.y - 1 }) && IsPass({ player_LU.x , player_LU.y - 1 }))
 	{
 		// 上に何もない
 		player_state = PLAYER_JUMP_UP;
@@ -787,21 +760,13 @@ void PlJumpUp(void)
 	// 上昇の処理(ある一定値を超えそうになると落下に切り替わるようにする)
 	if (player.UpDownSpeed <= 0.0f)
 	{
-		if (IsPass({ (int)player_RD.x , (int)(player_RD.y + player.UpDownSpeed) }) && IsPass({ (int)player_LD.x , (int)(player_LD.y + player.UpDownSpeed) }))
+		if (IsPass({ player_RU.x , (player_RU.y + player.UpDownSpeed) }) && IsPass({ player_LU.x , (player_LU.y + player.UpDownSpeed) }))
 		{
-			/*if (player.moveDir == DIR_RIGHT)
-			{
-				player.pos.x += player.moveSpeed;
-			}
-			if (player.moveDir == DIR_LEFT)
-			{
-				player.pos.x -= player.moveSpeed;
-			}*/
 			player.pos.y += player.UpDownSpeed;
 		}
 		else
 		{
-			player.pos.y = GetWorldPos_Map({ (int)player_RD.x , (int)(player_RD.y + player.UpDownSpeed) }, DIR_DOWN).y + player.hitPosS.y ;
+			player.pos.y = GetWorldPos_Map({ player_RU.x , (player_RU.y + player.UpDownSpeed) }, DIR_DOWN).y + player.hitPosS.y ;
 		}
 		
 	}
@@ -810,16 +775,12 @@ void PlJumpUp(void)
 		player_state = PLAYER_DOWN;
 	}
 
-	
-	
-	
-	
 }
 
 void PlDown(void)
 {
-	XY player_RD = { player.pos.x + player.moveSpeed + player.hitPosE.x , player.pos.y - 1 };		// 右下
-	XY player_LD = { player.pos.x - player.moveSpeed - player.hitPosS.x , player.pos.y - 1 };		// 左下
+	Position player_RD = { player.pos.x + player.moveSpeed + player.hitPosE.x , player.pos.y - 1 };		// 右下
+	Position player_LD = { player.pos.x - player.moveSpeed - player.hitPosS.x , player.pos.y - 1 };		// 左下
 
 	//　RD と LD の y座標に+1して下のブロック情報を得る
 	if (IsPass({ player_RD.x , player_RD.y + 1 }) && IsPass({ player_LD.x , player_LD.y + 1 }))
@@ -840,6 +801,34 @@ void PlDown(void)
 			player.AddUpDownSpeed = 0.8f;
 			player_state = PLAYER_JUMP_UP;
 		}
+		else if (newKey[P2_UP])
+		{
+			//紐の長さの計算
+			
+			_length = player.pos.y ;
+
+			//// 紐の長さの補正
+			//if (_length >= 250)		// 長すぎるとき
+			//{
+			//	_length = 250;
+			//}
+			//else if (_length < 120)		// 短すぎるとき
+			//{
+			//	_length = 120;
+			//}
+			//else
+			//{
+			//	_length = furiko_pos.y - player.offsetSize.y;
+			//}
+
+			// KeepPosYを指定ブロックの高さに合わせる
+			//KeepPosY = furiko_pos.y - CHIP_SIZE_Y / 4 - mapPos.y;
+			player.wireFlag = true;
+			player.visible = false;
+			player.visible2 = true;
+
+			player_state = PLAYER_Y_ACTION;
+		}
 		else
 		{
 			player_state = PLAYER_NORMAL;
@@ -850,20 +839,110 @@ void PlDown(void)
 	player.UpDownSpeed += player.AddUpDownSpeed;
 
 	// 落下処理
-	if (IsPass({ (int)player_RD.x , (int)(player_RD.y + player.UpDownSpeed) }) && IsPass({ (int)player_LD.x , (int)(player_LD.y + player.UpDownSpeed) }))
+	if (IsPass({ player_RD.x , (player_RD.y + player.UpDownSpeed) }) && IsPass({ player_LD.x , (player_LD.y + player.UpDownSpeed) }))
 	{
 		player.pos.y += player.UpDownSpeed;
 	}
 	else
 	{
-		player.pos.y = GetWorldPos_Map({ (int)player_RD.x , (int)(player_RD.y + player.UpDownSpeed) }, DIR_UP).y;
+		player.pos.y = GetWorldPos_Map({ player_RD.x , (player_RD.y + player.UpDownSpeed) }, DIR_UP).y;
 	}
 
 
 }
 
+// 前と座標の中心点が変わっているから注意!!
 void PlWireAction(void)
 {
+	XY player_RU = { player.pos.x + player.moveSpeed + player.hitPosE.x , player.pos.y - player.moveSpeed - player.hitPosS.y };	// 左上
+	XY player_LU = { player.pos.x - player.moveSpeed - player.hitPosS.x , player.pos.y - player.moveSpeed - player.hitPosS.y };	// 右上
+
+	//XY movedHitCheck = player.pos;
+
+	//　RD と LD の y座標に-iして5~10マス上のブロック情報を得る(?)
+	//for (int i = 5; i <= 10;)
+	//{
+	//	movedHitCheck.y = player.pos.y - (CHIP_SIZE_Y * i);		// 高さ
+
+	//	if (WireBlockPass({ player_RU.x , player_RU.y - movedHitCheck.y }) && WireBlockPass({ player_LU.x , player_LU.y - movedHitCheck.y }))
+	//	{
+	//		// 5~10マス上に指定ブロックがない
+	//		player_state = PLAYER_NORMAL;
+	//		i++;
+	//	}
+	//	else
+	//	{
+	//		// 5~10マス上に指定ブロックがある
+
+	//		//紐の長さの計算
+	//		_length = player.pos.y + player.offsetSize.y;
+	//
+	//		// 紐の長さの補正
+	//		if (_length >= 250)
+	//		{
+	//			_length = 250;
+	//		}
+	//
+	//		// KeepPosXの補正
+	//		if (_length < KEEPPOSX_CORRECTION)
+	//		{
+	//			KeepPosX = KEEPPOSX_CORRECTION;
+	//		}
+	//		else
+	//		{
+	//			KeepPosX = _length;
+	//		}
+	//
+	//		// KeepPosYを指定ブロックの高さに合わせる
+	//		KeepPosY = movedHitCheck.y - CHIP_SIZE_Y / 4 - mapPos.y;
+	//		player.wireFlag = true;
+	//		player.visible = false;
+	//		player.visible2 = true;
+	//
+	//		player_state = PLAYER_Y_ACTION;
+	//	}
+	//}
+
+	if (player.wireFlag)
+	{
+		if (TimeCnt < 150)
+		{
+			//ひもの支点を定義する
+			if (player.moveDir == DIR_RIGHT)
+			{
+				_endPoint.x = player.pos.x;
+			}
+			else
+			{
+				//_endPoint.x = furiko_pos.x;
+			}
+			_endPoint.y = player.pos.y;
+
+			Vec2 v = (furiko_pos - _endPoint);//振り子の支点から振り子の錘までのベクトル
+			v = v.normalized();//正規化する
+
+			//外積と内積を利用して角度を計算
+			float cost = Dot(v, Vec2(-1, 0));
+			float sint = Cross(v, Vec2(-1, 0));
+			float theta = atan2f(cost, sint);
+
+			_v += _g * cost;
+
+			OnMove(furiko_pos.x, furiko_pos.y, _v * sint, _v * cost);
+			OnAdjust();		// これがないとひもが伸びていく
+			TimeCnt++;
+		}
+		else
+		{
+			player.wireFlag = false;
+			player.visible = true;
+			player.visible2 = false;
+			player_state = PLAYER_NORMAL;
+			TimeCnt = 0;
+		}
+
+
+	}
 }
 
 void PlWireJump(void)

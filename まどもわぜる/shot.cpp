@@ -29,65 +29,55 @@ void ShotGameInit(void)
 	}
 	shotCnt = 5;
 }
-void ShotControl(void)
-{
-	for (int i = 0; i < SHOT_MAX; i++) {
-		XY movedPos = shot[i].pos;
-		XY movedHitCheck = movedPos;
-		shot[i].animCnt++;
-		if (shot[i].visible) {
+//void ShotControl(void)
+//{
+//	for (int i = 0; i < SHOT_MAX; i++) {
+//		XY movedPos = shot[i].pos;
+//		XY movedHitCheck = movedPos;
+//		shot[i].animCnt++;
+//		if (shot[i].visible) {
+//
+//			shot[i].life--;
+//			/*
+//			if (shot[i].downFlag) {
+//				movedPos.y += shot[i].moveSpeed;
+//				movedHitCheck.y = movedPos.y + shot[i].offsetSize.y;
+//			}
+//			*/
+//			switch (shot[i].moveDir)
+//			{
+//			case DIR_RIGHT:
+//				movedPos.x += shot[i].moveSpeed;
+//				movedHitCheck.x = movedPos.x + shot[i].offsetSize.x;
+//				break;
+//			case DIR_LEFT:
+//				movedPos.x -= shot[i].moveSpeed;
+//				movedHitCheck.x = movedPos.x - shot[i].offsetSize.x;
+//				break;
+//			}
+//
+//		}
+//	}
+//}
 
-			shot[i].life--;
-			/*
-			if (shot[i].downFlag) {
-				movedPos.y += shot[i].moveSpeed;
-				movedHitCheck.y = movedPos.y + shot[i].offsetSize.y;
-			}
-			*/
-			switch (shot[i].moveDir)
-			{
-			case DIR_RIGHT:
-				movedPos.x += shot[i].moveSpeed;
-				movedHitCheck.x = movedPos.x + shot[i].offsetSize.x;
-				break;
-			case DIR_LEFT:
-				movedPos.x -= shot[i].moveSpeed;
-				movedHitCheck.x = movedPos.x - shot[i].offsetSize.x;
-				break;
-			}
-			
-			
-			if (IsPass(movedHitCheck)) {
-				shot[i].pos = movedPos;
-			}
-			else {
-				shot[i].life = 0;
-			}
-			if (shot[i].life == 0) {
-				DeleteShot(i);
-			}
-		}
-	}
-}
-
-void Shoot(XY pPos, MOVE_DIR pDir, bool flag)
-{
-	for (int i = 0; i < SHOT_MAX; i++) {
-		if (!shot[i].visible) {
-			shot[i].life = shot[i].lifeMax;
-			shot[i].pos = pPos;
-			shot[i].moveDir = pDir;
-			shot[i].downFlag = flag;
-			shot[i].animCnt = 0;
-			shot[i].visible = true;
-			shotCnt = 0;
-			break;
-		}
-
-	}
-
-	
-}
+//void Shoot(XY pPos, MOVE_DIR pDir, bool flag)
+//{
+//	for (int i = 0; i < SHOT_MAX; i++) {
+//		if (!shot[i].visible) {
+//			shot[i].life = shot[i].lifeMax;
+//			shot[i].pos = pPos;
+//			shot[i].moveDir = pDir;
+//			shot[i].downFlag = flag;
+//			shot[i].animCnt = 0;
+//			shot[i].visible = true;
+//			shotCnt = 0;
+//			break;
+//		}
+//
+//	}
+//
+//	
+//}
 
 CHARACTER GetShot(int index)
 {

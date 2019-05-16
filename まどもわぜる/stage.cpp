@@ -116,20 +116,21 @@ bool MapLoad(void)
 }
 
 
-XY MapPosToIndex(XY pos)	// pos = mvedPos
+XY MapPosToIndex(Position pos)	// pos = mvedPos
 {
 	XY mapIndex;
 
-	mapIndex = { pos.x / CHIP_SIZE_X, pos.y / CHIP_SIZE_Y };
+	mapIndex = { (int)pos.x / CHIP_SIZE_X, (int)pos.y / CHIP_SIZE_Y };
 
 	return mapIndex;
 }
 
-bool IsPass(XY pos)
+bool IsPass(Position pos)
 {
 	bool ret = true; // 動けるかどうか　trueなら動けない　false動ける
 	int mapNo;
 	bool blueblock = true;		// ワイヤーをかけれるブロックがあるかの判定: true = ない　false = ある
+	bool block = true;
 	XY mapIndex;
 
 	mapIndex = MapPosToIndex(pos);
@@ -138,11 +139,11 @@ bool IsPass(XY pos)
 	switch (mapNo) // enumに
 	{
 	case MAP_ID::MAP_ID_CAGUHT:		// ワイヤーが引っかかるところ
-
+		blueblock = false;			// ブロックがあるのでくっつけたい
 	case MAP_ID::MAP_ID_UG:			// 地中
 	case MAP_ID::MAP_ID_WALL:		// 主な壁、地面
 	case MAP_ID::MAP_ID_WALL_KICK:	// 壁蹴りジャンプ
-		blueblock = false;			// ブロックがあるのでくっつけたい
+		block = false;			// ブロックがあるのでくっつけたい
 
 		break;
 	case MAP_ID::MAP_ID_BACK:		  // 背景
@@ -150,46 +151,48 @@ bool IsPass(XY pos)
 		ret = false;
 		break;
 	}
+	return block;
+
 	return blueblock;
 	return ret;
 }
 
-//bool WireBlockPass(XY pos)
-//{
-//	bool blueblock = true;		// ワイヤーをかけれるブロックがあるかの判定: true = ない　false = ある
-//	int mapNo;
-//	XY mapIndex;
-//
-//	mapIndex = MapPosToIndex(pos);
-//	mapNo = mapData[mapIndex.y][mapIndex.x];
-//
-//	switch (mapNo)
-//	{
-//	case MAP_ID::MAP_ID_CAGUHT:		// ワイヤーが引っかかるところ
-//		blueblock = false;		// ブロックがあるのでくっつけたい
-//		 break;
-//	case MAP_ID::MAP_ID_UG:			// 地中
-//	case MAP_ID::MAP_ID_WALL:		// 主な壁、地面
-//	case MAP_ID::MAP_ID_WALL_KICK:	// 壁蹴りジャンプ
-//	case MAP_ID::MAP_ID_BACK:		  // 背景
-//		break;
-//	}
-//	return blueblock;
-//}
+bool WireBlockPass(Position pos)
+{
+	bool blueblock = true;		// ワイヤーをかけれるブロックがあるかの判定: true = ない　false = ある
+	int mapNo;
+	XY mapIndex;
+
+	mapIndex = MapPosToIndex(pos);
+	mapNo = mapData[mapIndex.y][mapIndex.x];
+
+	switch (mapNo)
+	{
+	case MAP_ID::MAP_ID_CAGUHT:		// ワイヤーが引っかかるところ
+		blueblock = false;		// ブロックがあるのでくっつけたい
+		 break;
+	case MAP_ID::MAP_ID_UG:			// 地中
+	case MAP_ID::MAP_ID_WALL:		// 主な壁、地面
+	case MAP_ID::MAP_ID_WALL_KICK:	// 壁蹴りジャンプ
+	case MAP_ID::MAP_ID_BACK:		  // 背景
+		break;
+	}
+	return blueblock;
+}
 
 // 壁にぴったりくっつくようにする
-XY MapIndexToPos(XY index)
+Position MapIndexToPos(XY index)
 {
-	XY mapPos;
+	Position mapPos;
 
-	mapPos = { index.x * CHIP_SIZE_X, index.y * CHIP_SIZE_Y };
+	mapPos = { (float)(index.x * CHIP_SIZE_X), (float)(index.y * CHIP_SIZE_Y) };
 
 	return mapPos;
 }
 
 
 // 自分の隣のブロックのLEFTなら左辺,RIGHTなら右辺
-XY GetWorldPos_Map(XY pos, MOVE_DIR der) {
+Position GetWorldPos_Map(Position pos, MOVE_DIR der) {
 	XY tmpIndex;
 	tmpIndex = MapPosToIndex(pos);
 	switch (der)
