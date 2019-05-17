@@ -4,9 +4,9 @@ enum PLAYER_STATE {
 	PLAYER_NORMAL,		// 左右移動 
 	PLAYER_DOWN,	    // ジャンプ下降
 	PLAYER_JUMP_UP,		// ジャンプの上昇
-	PLAYER_Y_PRE,		// ﾜｲﾔｰｱｸｼｮﾝの準備(ワイヤーを伸ばす)
-	PLAYER_Y_ACTION,	// ﾜｲﾔｰｱｸｼｮﾝ
-	PLAYER_Y_JUMP,		// ﾜｲﾔｰｼﾞｬﾝﾌﾟ
+	PLAYER_W_PRE,		// ﾜｲﾔｰｱｸｼｮﾝの準備(ワイヤーを伸ばす)
+	PLAYER_W_ACTION,	// ﾜｲﾔｰｱｸｼｮﾝ
+	PLAYER_W_JUMP,		// ﾜｲﾔｰｼﾞｬﾝﾌﾟ
 };
 
 void PlNormal(void);
