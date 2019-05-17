@@ -18,7 +18,7 @@
 
 #define KEEPPOSX_CORRECTION  120	// posの値の補正用数値
 
-#define ONEFRAME_WIRE_UP	   5    // 1フレームで上がるワイヤーの速度
+#define ONEFRAME_WIRE_UP	  15    // 1フレームで上がるワイヤーの速度
 
 //#define PAI 3.141592
 //#define JUMPSPEED 2
@@ -471,12 +471,6 @@ void PlayerDraw(void)
 
 		if (!player.visible && player.visible2)
 		{
-			// ワイヤーがあまりにも短すぎたときの対処
-			//if (furiko_pos.y < CORRECTION)
-			//{
-			//	furiko_pos.y = CORRECTION;
-			//}
-
 			if (player.moveDir == DIR_RIGHT)
 			{
 				DrawGraph(player.pos.x - player.size.x - mapPos.x , player.pos.y - player.size.y  - mapPos.y , jumpImage[player.type], true);		   // キャラクタをおもりとして描画
@@ -490,24 +484,19 @@ void PlayerDraw(void)
 
 		if (player_state == PLAYER_W_PRE || player_state == PLAYER_W_ACTION)
 		{
-			// 指定ブロックがとりあえず自分より上にある状態なら
 			if (player.wireOkFlag == true)
 			{
-				DrawLine(player.pos.x - mapPos.x, player.pos.y - player.size.y - mapPos.y, furiko_pos.x - mapPos.x, furiko_pos.y - mapPos.y, 0xffffffff, 2);		// 動くけどキャラに固定されないひも(だったもの)
+				DrawLine(player.pos.x - mapPos.x, player.pos.y - player.size.y - mapPos.y, furiko_pos.x - mapPos.x, furiko_pos.y - mapPos.y, 0xffffffff, 2);		// ワイヤー
 			}
 			else
 			{
-				if (WirePreTimeCnt <= 30)
+				if (WirePreTimeCnt <= furiko_pos.y)
 				{
-					DrawLine(player.pos.x - mapPos.x, player.pos.y - player.size.y - mapPos.y, furiko_pos.x - mapPos.x, furiko_pos.y - mapPos.y, 0xffffffff, 2);		// 動くけどキャラに固定されないひも(だったもの)
+					DrawLine(player.pos.x - mapPos.x, player.pos.y - player.size.y - mapPos.y, furiko_pos.x - mapPos.x, furiko_pos.y - mapPos.y, 0xffffffff, 2);	// ワイヤー
 					WirePreTimeCnt++;
 				}
 				
 			}
-
-			// 指定ブロックが上にないとき(何か障害物にあたるまでは伸ばしきりたい)
-
-			
 		}
 
 
@@ -926,10 +915,20 @@ void PlWirePrepare(void)
 		}
 		
 	}
-	else
+
+	// 上から降ってくる
+	// 指定範囲外 & 指定ブロックがない
+	if (!(IsPass({ furiko_RU.x , furiko_RU.y })) || !(IsPass({ furiko_LU.x , furiko_LU.y })))
 	{
-		// 指定範囲外 & 指定ブロックがない
-		
+		// 背景以外がある
+		WirePreTimeCnt = 0;
+		//player.pos.x = furiko_RU.x - player.size.x / 2;
+		//player.pos.y = furiko_RU.y + player.size.y  - mapPos.y;
+		//player.visible = true;
+		//player.visible2 = false;
+		player.wireFlag = false;
+		player.wireOkFlag = false;
+		player_state = PLAYER_NORMAL;
 	}
 
 	//player.wireOkFlag = true;
@@ -981,16 +980,10 @@ void PlWireAction(void)
 			WireTimeCnt = 0;
 
 			// 振り子スタート位置の初期化
-			if (player.moveDir == DIR_RIGHT)
-			{
-				_v = 0;
-				furiko_pos = { 0,0 };
-			}
-			if (player.moveDir == DIR_LEFT)
-			{
-				_v = 0;
-				furiko_pos = { 2400,0 };
-			}
+			_v = 0;
+			furiko_pos = { 0,0 };
+			
+			
 
 		}
 
