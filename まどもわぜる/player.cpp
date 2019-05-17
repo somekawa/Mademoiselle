@@ -106,7 +106,7 @@ void PlayerSystmInit(void)
 	shotImage[1] = LoadGraph("image/red_down_shot.png");
 
 
-	
+
 }
 
 void PlayerGameInit(void)
@@ -116,7 +116,7 @@ void PlayerGameInit(void)
 	player.offsetSize = { -player.size.x / 2,-player.size.y };
 	player.hitPosE = { 20,0 };
 	player.hitPosS = { 20,62 };
-	player.pos = { CHIP_SIZE_X *15, CHIP_SIZE_Y * 14 };
+	player.pos = { CHIP_SIZE_X * 15, CHIP_SIZE_Y * 14 };
 	player.moveSpeed = PLAYER_SPEED_NORMAL;
 	player.animCnt = 0;
 	player.moveDir = DIR_RIGHT;
@@ -128,7 +128,7 @@ void PlayerGameInit(void)
 	player.segweyFlag = false;	// ｾｸﾞｳｪｲ
 
 	player.wireOkFlag = false;
-	player.wireFlag   = false;
+	player.wireFlag = false;
 
 	player.visible = true;
 	player.visible2 = false;
@@ -203,18 +203,19 @@ void PlayerControl(void)
 			//XY movedHitCheck = player.pos;
 			//XY movedHitCheck2;
 			//XY movedHitCheck3;
-	
+
 			//// ワイヤー処理
 			//if (newKey[P2_UP])
 			//{
-	
+
 			//	
-	
+
 			//	// 5~10マス以内の頭上にブロックがあったら、ワイヤーが出せるようにしたい
 			//	for (int i = 5; i <= 10; )
 			//	{
 			//		movedHitCheck.y = player.pos.y  - (CHIP_SIZE_Y * i);		// 高さ
-			//		if ((WireBlockPass(movedHitCheck)) && (WireBlockPass({ movedHitCheck.x - CHIP_SIZE_X / 2 ,movedHitCheck.y })) && (WireBlockPass({ movedHitCheck.x + CHIP_SIZE_X / 2 ,movedHitCheck.y })))		// 一定範囲内にブロックが存在しないことになる
+			//		if ((WireBlockPass(movedHitCheck)) && (WireBlockPass({ movedHitCheck.x - CHIP_SIZE_X / 2 ,movedHitCheck.y })) &&
+			//											(WireBlockPass({ movedHitCheck.x + CHIP_SIZE_X / 2 ,movedHitCheck.y })))		// 一定範囲内にブロックが存在しないことになる
 			//		{
 			//			player.wireFlag = false;			// 範囲内に存在しないのでfalseが正しい
 			//			i++;
@@ -222,16 +223,16 @@ void PlayerControl(void)
 			//		else
 			//		{
 			//			// ブロックが存在するときの処理
-	
+
 			//			//紐の長さの計算
 			//			_length = player.pos.y + player.offsetSize.y;
-	
+
 			//			// 紐の長さの補正
 			//			if (_length >= 250)
 			//			{
 			//				_length = 250;
 			//			}
-	
+
 			//			// KeepPosXの補正
 			//			if (_length < KEEPPOSX_CORRECTION)
 			//			{
@@ -241,20 +242,20 @@ void PlayerControl(void)
 			//			{
 			//				KeepPosX = _length;
 			//			}
-	
+
 			//			// KeepPosYを指定ブロックの高さに合わせる
 			//			KeepPosY = movedHitCheck.y - CHIP_SIZE_Y / 4 - mapPos.y;
 			//			player.wireFlag = true;
 			//			player.visible = false;
 			//			player.visible2 = true;
-	
+
 			//			TimeCnt = 0;
 			//			return;
 			//		}
 			//		
 			//	}
 			//	
-	
+
 			//}
 	//
 	//		// ｾｸﾞｳｪｲ
@@ -398,17 +399,17 @@ void PlayerControl(void)
 	//
 			// playerを追うカメラ
 		//if (player.pos.y > SCREEN_SIZE_Y - CHIP_SIZE_Y * 5) mapPos.y += ACC_G ;
-		if (player.pos.y < CHIP_SIZE_Y * MAP_Y - SCREEN_SIZE_Y + CHIP_SIZE_Y * 5) mapPos.y -= ACC_G * SECOND_PER_FRAME;
-//
-//
-//		//// 左右にじわじわ動く
-		/*if (player.pos.x > SCREEN_SIZE_X - CHIP_SIZE_X * 5) mapPos.x += 1;
-		if (player.pos.x < CHIP_SIZE_X * MAP_X - SCREEN_SIZE_X + CHIP_SIZE_X * 5) mapPos.x -= SECOND_PER_FRAME;*/
-	//	break;
-	//}
-//	
-//
-		PlayerState();
+	if (player.pos.y < CHIP_SIZE_Y * MAP_Y - SCREEN_SIZE_Y + CHIP_SIZE_Y * 5) mapPos.y -= ACC_G * SECOND_PER_FRAME;
+	//
+	//
+	//		//// 左右にじわじわ動く
+			/*if (player.pos.x > SCREEN_SIZE_X - CHIP_SIZE_X * 5) mapPos.x += 1;
+			if (player.pos.x < CHIP_SIZE_X * MAP_X - SCREEN_SIZE_X + CHIP_SIZE_X * 5) mapPos.x -= SECOND_PER_FRAME;*/
+			//	break;
+			//}
+		//	
+		//
+	PlayerState();
 }
 
 void PlayerDraw(void)
@@ -417,11 +418,11 @@ void PlayerDraw(void)
 	case GMODE_CHARASERE:
 		if (player.visible) {
 			DrawRotaGraph(160, 300, 3, 0, runImage[player.type][(player.animCnt / 3) % 10], true);
-			DrawString(120 , 180, "キャラ決定！", 0x000000);
+			DrawString(120, 180, "キャラ決定！", 0x000000);
 		}
 		else {
 			DrawRotaGraph(160, 300, 3, 0, playerImage[player.type], true);
-			
+
 		}
 
 		break;
@@ -438,7 +439,7 @@ void PlayerDraw(void)
 			if (player.segweyFlag) img = segweyImage[player.type][(player.animCnt / 5) % 2];
 			if (player.moveDir == DIR_RIGHT) {
 
-				DrawGraph(player.pos.x+player.offsetSize.x -mapPos.x, player.pos.y + player.offsetSize.y - mapPos.y, img, true);
+				DrawGraph(player.pos.x + player.offsetSize.x - mapPos.x, player.pos.y + player.offsetSize.y - mapPos.y, img, true);
 			}
 			else if (player.moveDir == DIR_LEFT) {
 				DrawTurnGraph(player.pos.x + player.offsetSize.x - mapPos.x, player.pos.y + player.offsetSize.y - mapPos.y, img, true);
@@ -451,10 +452,10 @@ void PlayerDraw(void)
 
 
 			DrawBox(player.pos.x - player.hitPosS.x - mapPos.x, player.pos.y - player.hitPosS.y - mapPos.y + downPos,
-				player.pos.x+ player.hitPosE.x  - mapPos.x, player.pos.y  - mapPos.y + downPos, 0x00ffff, false);
+				player.pos.x + player.hitPosE.x - mapPos.x, player.pos.y - mapPos.y + downPos, 0x00ffff, false);
 
 
-			DrawLine(player.pos.x + player.offsetSize.x - mapPos.x, player.pos.y-(player.size.y / 2) - mapPos.y,
+			DrawLine(player.pos.x + player.offsetSize.x - mapPos.x, player.pos.y - (player.size.y / 2) - mapPos.y,
 				player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y - (player.size.y / 2) - mapPos.y, 0x00ffff, true);
 			DrawLine(player.pos.x - mapPos.x, player.pos.y + player.offsetSize.y - mapPos.y,
 				player.pos.x - mapPos.x, player.pos.y - mapPos.y, 0x00ffff, true);
@@ -471,11 +472,11 @@ void PlayerDraw(void)
 			if (player.moveDir == DIR_RIGHT)
 			{
 				DrawLine(player.pos.x, player.pos.y - player.size.y, furiko_pos.x, furiko_pos.y, 0xffffffff, 2);		// 動くけどキャラに固定されないひも(だったもの)
-				DrawGraph(furiko_pos.x - player.size.x, furiko_pos.y - player.size.y/2, jumpImage[player.type], true);  // キャラクタをおもりとして描画
+				DrawGraph(furiko_pos.x - player.size.x, furiko_pos.y - player.size.y / 2, jumpImage[player.type], true);  // キャラクタをおもりとして描画
 			}
 			else
 			{
-				DrawLine(player.pos.x , player.pos.y - player.size.y, furiko_pos.x, furiko_pos.y, 0xffffffff, 2);		// 動くけどキャラに固定されないひも(だったもの)
+				DrawLine(player.pos.x, player.pos.y - player.size.y, furiko_pos.x, furiko_pos.y, 0xffffffff, 2);		// 動くけどキャラに固定されないひも(だったもの)
 				DrawTurnGraph(furiko_pos.x - player.size.x / 3, furiko_pos.y - player.size.y / 4, jumpImage[player.type], true);		// キャラクタをおもりとして描画
 			}
 
@@ -494,7 +495,7 @@ void WireDraw(void)
 
 	// WとFを同時に押したときのバグがえぐい
 
-	
+
 
 	//if (player.wireFlag)
 	//{
@@ -651,7 +652,7 @@ void OnMove(float& x, float& y, float vx, float vy) {
 	// 移動のための処理
 	x += vx;
 	y += vy;
-	
+
 }
 
 void OnAdjust() {
@@ -679,7 +680,7 @@ float Disassembly_C(float radian_cos)		// x軸
 	return cosf(radian_cos);
 }
 
-float Disassembly_S(float& radian_sin , float g)		// y軸
+float Disassembly_S(float& radian_sin, float g)		// y軸
 {
 	//radian_sin = radian;
 	//g = _g;
@@ -697,7 +698,8 @@ float Disassembly_S(float& radian_sin , float g)		// y軸
 
 void PlNormal(void)
 {
-	player.runFlag  = false;
+	player.runFlag = false;
+
 	Position player_RD = { player.pos.x + player.moveSpeed + player.hitPosE.x , player.pos.y - 1 };
 	Position player_LD = { player.pos.x - player.moveSpeed - player.hitPosS.x , player.pos.y - 1 };
 
@@ -742,7 +744,7 @@ void PlNormal(void)
 
 	}
 
-	if (newKey[P2_UP])
+	if (trgKey[P2_UP])
 	{
 		//紐の長さの計算
 
@@ -760,28 +762,27 @@ void PlNormal(void)
 
 		// KeepPosYを指定ブロックの高さに合わせる
 		//KeepPosY = furiko_pos.y - CHIP_SIZE_Y / 4 - mapPos.y;
-		player.wireFlag = true;
 
-		if(player.moveDir == DIR_RIGHT)
+
+		if (player.moveDir == DIR_RIGHT)
 		{
 			furiko_pos = { 0,0 };
 			_endPoint = player.pos;
 		}
 		if (player.moveDir == DIR_LEFT)
 		{
-			furiko_pos = {2400,0};
+			furiko_pos = { 2400,0 };
 			_endPoint = player.pos;
 		}
-		
+
 
 		OnAdjust();
-		player.visible = false;
-		player.visible2 = true;
+		player.wireFlag = true;
 
 		player_state = PLAYER_Y_PRE;
 	}
 
-	
+
 
 }
 
@@ -815,9 +816,9 @@ void PlJumpUp(void)
 		}
 		else
 		{
-			player.pos.y = GetWorldPos_Map({ player_RU.x , (player_RU.y + player.UpDownSpeed) }, DIR_DOWN).y + player.hitPosS.y ;
+			player.pos.y = GetWorldPos_Map({ player_RU.x , (player_RU.y + player.UpDownSpeed) }, DIR_DOWN).y + player.hitPosS.y;
 		}
-		
+
 	}
 	else
 	{
@@ -855,7 +856,7 @@ void PlDown(void)
 			{
 				player_state = PLAYER_NORMAL;
 			}
-			
+
 		}
 		return;
 	}
@@ -877,36 +878,49 @@ void PlDown(void)
 
 void PlWirePrepare(void)
 {
-	//XY player_RU = { player.pos.x + player.moveSpeed + player.hitPosE.x , player.pos.y - player.moveSpeed - player.hitPosS.y };	// 右上
-	//XY player_LU = { player.pos.x - player.moveSpeed - player.hitPosS.x , player.pos.y - player.moveSpeed - player.hitPosS.y };	// 左上
+	Position player_RU = { player.pos.x + player.moveSpeed + player.hitPosE.x , player.pos.y - player.moveSpeed - player.hitPosS.y };	// 右上
+	Position player_LU = { player.pos.x - player.moveSpeed - player.hitPosS.x , player.pos.y - player.moveSpeed - player.hitPosS.y };	// 左上
 
-	//if (player.wireFlag)
-	//{
-	//	for (int i = 5; i <= 10; i++)
-	//	{
-	//		player_RU.y = player_RU.y - (CHIP_SIZE_Y * i);		// 右上高さ
-	//		player_LU.y = player_LU.y - (CHIP_SIZE_Y * i);		// 左上高さ
+	if (player.wireFlag)
+	{
+		for (int i = 0; i <= 10; i++)
+		{
+			// 32ずつ減っていればおｋ
+			player_RU.y = player_RU.y - CHIP_SIZE_Y;		// 右上高さ
+			player_LU.y = player_LU.y - CHIP_SIZE_Y;		// 左上高さ
 
-	//		if (WireBlockPass({ (float)player_RU.x , (float)(player_RU.y) }) && WireBlockPass({ (float)player_LU.x , (float)(player_LU.y) }))
-	//		{
-	//			// 5~10マス上に指定ブロックがない
-	//			player.wireFlag = false;
-	//			player_state = PLAYER_NORMAL;
-	//			
-	//		}
-	//		else
-	//		{
-	//			// 5~10マス上に指定ブロックがある
-	//			player.wireOkFlag = true;
-	//			player_state = PLAYER_Y_ACTION;
-	//		}
+			if (WireBlockPass({ player_RU.x , (player_RU.y) }) && WireBlockPass({ player_LU.x , (player_LU.y) }))
+			{
+				// 0~10マス以内に指定ブロックがない
+				player.visible = true;
+				player.visible2 = false;
+				player.wireFlag = false;
+				player.wireOkFlag = false;
+				player_state = PLAYER_NORMAL;
 
-	//	}
-	//	
-	//}
+			}
+			else
+			{
+				// 0~10マス以内に指定ブロックがある
 
-	player.wireOkFlag = true;
-	player_state = PLAYER_Y_ACTION;
+				// 指定ブロックにワイヤーを繋げる
+				player.pos.x = player_RU.x - mapPos.x;
+				player.pos.y = player_RU.y + player.size.y;
+
+				player.visible = false;
+				player.visible2 = true;
+				player.wireFlag = false;
+				player.wireOkFlag = true;
+				player_state = PLAYER_Y_ACTION;
+				return;		// 1つ目に見つけたブロックでいいのでreturnで抜ける
+			}
+
+		}
+
+	}
+
+	//player.wireOkFlag = true;
+	//player_state = PLAYER_Y_ACTION;
 
 }
 
@@ -914,55 +928,6 @@ void PlWirePrepare(void)
 // 前と座標の中心点が変わっているから注意!!
 void PlWireAction(void)
 {
-	//XY player_RU = { player.pos.x + player.moveSpeed + player.hitPosE.x , player.pos.y - player.moveSpeed - player.hitPosS.y };	
-	//XY player_LU = { player.pos.x - player.moveSpeed - player.hitPosS.x , player.pos.y - player.moveSpeed - player.hitPosS.y };	
-
-	//XY movedHitCheck = player.pos;
-
-	//　RD と LD の y座標に-iして5~10マス上のブロック情報を得る(?)
-	//for (int i = 5; i <= 10;)
-	//{
-	//	movedHitCheck.y = player.pos.y - (CHIP_SIZE_Y * i);		// 高さ
-
-	//	if (WireBlockPass({ player_RU.x , player_RU.y - movedHitCheck.y }) && WireBlockPass({ player_LU.x , player_LU.y - movedHitCheck.y }))
-	//	{
-	//		// 5~10マス上に指定ブロックがない
-	//		player_state = PLAYER_NORMAL;
-	//		i++;
-	//	}
-	//	else
-	//	{
-	//		// 5~10マス上に指定ブロックがある
-
-	//		//紐の長さの計算
-	//		_length = player.pos.y + player.offsetSize.y;
-	//
-	//		// 紐の長さの補正
-	//		if (_length >= 250)
-	//		{
-	//			_length = 250;
-	//		}
-	//
-	//		// KeepPosXの補正
-	//		if (_length < KEEPPOSX_CORRECTION)
-	//		{
-	//			KeepPosX = KEEPPOSX_CORRECTION;
-	//		}
-	//		else
-	//		{
-	//			KeepPosX = _length;
-	//		}
-	//
-	//		// KeepPosYを指定ブロックの高さに合わせる
-	//		KeepPosY = movedHitCheck.y - CHIP_SIZE_Y / 4 - mapPos.y;
-	//		player.wireFlag = true;
-	//		player.visible = false;
-	//		player.visible2 = true;
-	//
-	//		player_state = PLAYER_Y_ACTION;
-	//	}
-	//}
-
 	if (player.wireOkFlag)
 	{
 		if (TimeCnt < 150)
@@ -995,6 +960,7 @@ void PlWireAction(void)
 		else
 		{
 			player.wireFlag = false;
+			player.wireOkFlag = false;
 			player.visible = true;
 			player.visible2 = false;
 			player_state = PLAYER_NORMAL;
@@ -1003,7 +969,7 @@ void PlWireAction(void)
 			TimeCnt = 0;
 
 			// 振り子スタート位置の初期化
-			if(player.moveDir == DIR_RIGHT)
+			if (player.moveDir == DIR_RIGHT)
 			{
 				_v = 0;
 				furiko_pos = { 0,0 };
@@ -1011,9 +977,9 @@ void PlWireAction(void)
 			if (player.moveDir == DIR_LEFT)
 			{
 				_v = 0;
-				furiko_pos = {2400,0};
+				furiko_pos = { 2400,0 };
 			}
-			
+
 		}
 
 
