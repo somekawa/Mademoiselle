@@ -23,6 +23,8 @@ void PlayerDraw(void);
 
 void PlayerState(void);
 
+void AddRad(void);
+
 
 // ワイヤーアクションについて
 void WireDraw(void);

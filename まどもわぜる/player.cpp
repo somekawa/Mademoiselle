@@ -20,6 +20,10 @@
 
 #define ONEFRAME_WIRE_UP	  15    // 1フレームで上がるワイヤーの速度
 
+#define FURIKO_SPEED_DEF      1.6f
+#define FURIKO_SPEED_MAX      3.2f
+#define FURIKO_SPEED_MIN	  0.2f
+
 //#define PAI 3.141592
 //#define JUMPSPEED 2
 
@@ -54,10 +58,10 @@ void OnAdjust();
 
 
 Position furiko_pos;
-Position _endPoint;
 float _g;
 float _v;
-float _length;
+Position _length;
+
 
 float KeepPosX;		// 座標の保存用
 float KeepPosY;		// 座標の保存用
@@ -75,6 +79,17 @@ float radian;
 bool skyFlag;
 
 //float rot;
+
+//Position Maxrad;		// 最大の角度(-20)
+//Position minrad;		// 最小の角度(-160)
+
+float MaxDeg;
+float minDeg;
+float nowDeg;
+float furikoSpeed;
+
+float defDeg;
+
 
 
 
@@ -141,14 +156,16 @@ void PlayerGameInit(void)
 	player.imgLocCnt = 0;
 	downPos = 0;
 
+	player.right = false;
+	player.left = false;
+
 	//ひもの支点の初期化
-	_endPoint.x = 0;
-	_endPoint.y = 0;
 	_v = 0;			// 振り子のふり幅
 	WireTimeCnt = 0;
 
 	_g = 2.0f;		//重力の定義
-	_length = 0;	//紐の長さの計算
+	_length = { 0 , 0 };	//紐の長さの計算
+
 
 	KeepPosX = 0;	// 座標の保存用
 	KeepPosY = 0;	// 座標の保存用
@@ -169,6 +186,15 @@ void PlayerGameInit(void)
 	player_state = PLAYER_NORMAL;
 
 	WirePreTimeCnt = 0;
+
+	//Maxrad = { 0,0 };
+	//minrad = { 0,0 };
+
+	MaxDeg = 0.0f;
+	minDeg = 0.0f;
+	nowDeg = 0.0f;
+	furikoSpeed = 0.0f;
+	defDeg = 0.0f;
 
 
 	//rot = -rand() % 90;
@@ -407,7 +433,7 @@ void PlayerControl(void)
 	//
 			// playerを追うカメラ
 		//if (player.pos.y > SCREEN_SIZE_Y - CHIP_SIZE_Y * 5) mapPos.y += ACC_G ;
-	if (player.pos.y < CHIP_SIZE_Y * MAP_Y - SCREEN_SIZE_Y + CHIP_SIZE_Y * 5) mapPos.y -= ACC_G * SECOND_PER_FRAME;
+	//if (player.pos.y < CHIP_SIZE_Y * MAP_Y - SCREEN_SIZE_Y + CHIP_SIZE_Y * 5) mapPos.y -= ACC_G * SECOND_PER_FRAME;
 	//
 	//
 	//		//// 左右にじわじわ動く
@@ -473,18 +499,18 @@ void PlayerDraw(void)
 		{
 			if (player.moveDir == DIR_RIGHT)
 			{
-				DrawGraph(player.pos.x - player.size.x - mapPos.x , player.pos.y - player.size.y  - mapPos.y , jumpImage[player.type], true);		   // キャラクタをおもりとして描画
+				DrawGraph(player.pos.x  - mapPos.x - 56, player.pos.y - player.size.y - mapPos.y - 23, jumpImage[player.type], true);		   // キャラクタをおもりとして描画
 			}
 			else
 			{
-				DrawTurnGraph(player.pos.x - player.size.x / 3 - mapPos.x, player.pos.y - player.size.y / 4 - mapPos.y, jumpImage[player.type], true); // キャラクタをおもりとして描画
+				DrawTurnGraph(player.pos.x  - mapPos.x - 15, player.pos.y - player.size.y  - mapPos.y - 23, jumpImage[player.type], true);	   // キャラクタをおもりとして描画
 			}
 
 		}
 
 		if (player_state == PLAYER_W_PRE || player_state == PLAYER_W_ACTION)
 		{
-			if (player.wireOkFlag == true)
+			if (player.wireOkFlag)
 			{
 				DrawLine(player.pos.x - mapPos.x, player.pos.y - player.size.y - mapPos.y, furiko_pos.x - mapPos.x, furiko_pos.y - mapPos.y, 0xffffffff, 2);		// ワイヤー
 			}
@@ -495,7 +521,7 @@ void PlayerDraw(void)
 					DrawLine(player.pos.x - mapPos.x, player.pos.y - player.size.y - mapPos.y, furiko_pos.x - mapPos.x, furiko_pos.y - mapPos.y, 0xffffffff, 2);	// ワイヤー
 					WirePreTimeCnt++;
 				}
-				
+
 			}
 		}
 
@@ -674,10 +700,10 @@ void OnMove(float& x, float& y, float vx, float vy) {
 }
 
 void OnAdjust() {
-	Vec2 v = (furiko_pos - _endPoint);
-	if (v.Length() > _length) {
-		furiko_pos = _endPoint + v.normalized() * _length;
-	}
+	//Vec2 v = (furiko_pos - _endPoint);
+	//if (v.Length() > _length) {
+	//	furiko_pos = _endPoint + v.normalized() * _length;
+	//}
 }
 
 bool GetPlayerV(void)
@@ -748,10 +774,10 @@ void PlNormal(void)
 		if (IsPass(player_LD))	// LDのchipID取得して移動できるIDか調べる
 		{
 			player.pos.x -= player.moveSpeed;
-			if (player.pos.x < MAP_X * CHIP_SIZE_X - SCREEN_SIZE_X / 2)//カメラが左に行く
-			{
-				mapPos.x -= player.moveSpeed;
-			}
+			//if (player.pos.x < expData.mapWidth * CHIP_SIZE_X - SCREEN_SIZE_X / 2)//カメラが左に行く
+			//{
+			//	mapPos.x -= player.moveSpeed;
+			//}
 
 		}
 		else
@@ -764,24 +790,20 @@ void PlNormal(void)
 
 	if (trgKey[P2_UP])
 	{
-		//紐の長さの計算
-
-		_length = player.pos.y;
-
-		// 紐の長さの補正
-		if (_length >= 250)		// 長すぎるとき
+		if (player.moveDir == DIR_RIGHT)
 		{
-			_length = 250;
+			player.right = true;
+			player.left = false;
 		}
-		else if (_length < 120)		// 短すぎるとき
+
+		if (player.moveDir == DIR_LEFT)
 		{
-			_length = 120;
+			player.right = false;
+			player.left = true;
 		}
-		
+
+
 		furiko_pos = { player.pos.x , player.pos.y - player.size.y };
-		_endPoint = player.pos;
-		
-		OnAdjust();
 		player.wireFlag = true;
 
 		player_state = PLAYER_W_PRE;
@@ -888,14 +910,46 @@ void PlWirePrepare(void)
 	Position furiko_RU = { furiko_pos.x + player.size.x / 2, furiko_pos.y };
 	Position furiko_LU = { furiko_pos.x - player.size.x / 2, furiko_pos.y };
 
-	if ( !(WireBlockPass({ furiko_RU.x , furiko_RU.y })) || !(WireBlockPass({ furiko_LU.x , furiko_LU.y })))  
+	if (player.pos.y - furiko_pos.y <= 300)	// 指定範囲
 	{
-		if(player.pos.y - furiko_pos.y <= 300)	// 指定範囲
+		if (!(WireBlockPass({ furiko_RU.x , furiko_RU.y })) || !(WireBlockPass({ furiko_LU.x , furiko_LU.y })))
 		{
+			// 長さを出す
+			_length = furiko_pos - player.pos;
+
+
+			// プレイヤーの座標を-90°で設定?
+			player.pos.x = cos((-90.0f * PI) / 180.0f) * _length.y + furiko_pos.x;
+			player.pos.y = sin((-90.0f * PI) / 180.0f) * _length.y + furiko_pos.y;
+
+			MaxDeg = -20.0f;
+			minDeg = -160.0f;
+
+			nowDeg = -90.0f;
+
+			defDeg = -90.0f;
+
+			furikoSpeed = FURIKO_SPEED_DEF;
+
+			// 最大
+			//Maxrad.x = (-20.0f * PI / 180.0f) + furiko_pos.x;
+			//Maxrad.y = (-20.0f * PI / 180.0f) + furiko_pos.y;
+
+			//Maxrad.x = (-20 * PI / 180) + _length.x + furiko_pos.x;
+			//Maxrad.y = (-20 * PI / 180) + _length.y + furiko_pos.y;
+
+			// 最小
+			//minrad.x = (-160.0f * PI / 180.0f) + furiko_pos.x;
+			//minrad.y = (-160.0f * PI / 180.0f) + furiko_pos.y;
+
+			//minrad.x = (-160 * PI / 180) + _length.x + furiko_pos.x;
+			//minrad.y = (-160 * PI / 180) + _length.y + furiko_pos.y;
+
+
 			// 指定範囲以内 & 指定ブロックがある
 			// 指定ブロックにワイヤーを繋げる
-			player.pos.x = furiko_RU.x - mapPos.x;
-			player.pos.y = furiko_RU.y + player.size.y - mapPos.y;
+			//player.pos.x = furiko_RU.x - mapPos.x;
+			//player.pos.y = furiko_RU.y + player.size.y - mapPos.y;
 			player.visible = false;
 			player.visible2 = true;
 			player.wireFlag = false;
@@ -903,22 +957,19 @@ void PlWirePrepare(void)
 			player_state = PLAYER_W_ACTION;
 			return;		// 1つ目に見つけたブロックでいいのでreturnで抜ける
 		}
-		else
-		{
-			// 指定範囲外 & 指定ブロックがある
-			//player.visible = true;
-			//player.visible2 = false;
-			WirePreTimeCnt = 0;
-			player.wireFlag = false;
-			player.wireOkFlag = false;
-			player_state = PLAYER_NORMAL;
-		}
-		
-	}
+		//else
+		//{
+		//	// 指定範囲外 & 指定ブロックがある
+		//	//player.visible = true;
+		//	//player.visible2 = false;
+		//	//WirePreTimeCnt = 0;
+		//	//player.wireFlag = false;
+		//	//player.wireOkFlag = false;
+		//	//player_state = PLAYER_NORMAL;
+		//}
 
-	// 上から降ってくる
-	// 指定範囲外 & 指定ブロックがない
-	if (!(IsPass({ furiko_RU.x , furiko_RU.y })) || !(IsPass({ furiko_LU.x , furiko_LU.y })))
+	}
+	else
 	{
 		// 背景以外がある
 		WirePreTimeCnt = 0;
@@ -941,31 +992,31 @@ void PlWireAction(void)
 {
 	if (player.wireOkFlag)
 	{
-		if (WireTimeCnt < 150)
+		if (WireTimeCnt < 200)
 		{
-			//ひもの支点を定義する
-			if (player.moveDir == DIR_RIGHT)
+
+			if (CheckHitKey(KEY_INPUT_F))
 			{
-				_endPoint.x = furiko_pos.x;
+				player_state = PLAYER_W_JUMP;
+				return;
 			}
-			else
-			{
-				_endPoint.x = furiko_pos.x;
-			}
-			_endPoint.y = furiko_pos.y;
 
-			Vec2 v = (_endPoint - player.pos);//振り子の支点から振り子の錘までのベクトル
-			v = v.normalized();//正規化する
 
-			//外積と内積を利用して角度を計算
-			float cost = Dot(v, Vec2(-1, 0));
-			float sint = Cross(v, Vec2(-1, 0));
-			float theta = atan2f(cost, sint);
+			//Vec2 v = (furiko_pos - player.pos);//振り子の支点から振り子の錘までのベクトル
+			//v = v.normalized();//正規化する
 
-			_v += _g * cost;
+			////外積と内積を利用して角度を計算
+			//float cost = Dot(v, Vec2(-1, 0));
+			//float sint = Cross(v, Vec2(-1, 0));
+			//float theta = atan2f(cost, sint);
 
-			OnMove(player.pos.x, player.pos.y, _v * sint, _v * cost);
-			OnAdjust();		// これがないとひもが伸びていく
+			//_v += _g * cost;
+
+			//OnMove(player.pos.x, player.pos.y, _v * sint, _v * cost);
+			//OnAdjust();		// これがないとひもが伸びていく
+
+			AddRad();
+
 			WireTimeCnt++;
 		}
 		else
@@ -982,8 +1033,9 @@ void PlWireAction(void)
 			// 振り子スタート位置の初期化
 			_v = 0;
 			furiko_pos = { 0,0 };
-			
-			
+
+			furikoSpeed = FURIKO_SPEED_DEF;
+
 
 		}
 
@@ -991,8 +1043,137 @@ void PlWireAction(void)
 	}
 }
 
+void AddRad(void)
+{
+	// 角度を足すんだよぉぉぉぉ!!!!!!
+
+	player.pos.x = cos((nowDeg * PI) / 180.0f) * _length.y + furiko_pos.x;
+	player.pos.y = sin((nowDeg * PI) / 180.0f) * _length.y + furiko_pos.y;
+
+	if (player.right == true)
+	{
+		if (player.moveDir == DIR_RIGHT)
+		{
+			// プレイヤーが右向き
+
+
+			if (nowDeg >= defDeg && furikoSpeed != FURIKO_SPEED_MIN)		// 現在の座標がdeFDeg(-90)より大きい = 中心より右側にいるとき
+			{
+				furikoSpeed = furikoSpeed - 0.15f;							// 減速
+			}
+
+			nowDeg = nowDeg - furikoSpeed;		// 1°ずつ引いてくやつ
+
+
+			if (nowDeg < defDeg && furikoSpeed != FURIKO_SPEED_MAX)			// 現在の座標がdeFDeg(-90)より小さい = 中心より左側にいるとき
+			{
+				furikoSpeed = furikoSpeed + 0.15f;							// 加速
+			}
+
+			if (nowDeg <= minDeg)
+			{
+				player.moveDir = DIR_LEFT;
+			}
+		}
+		else
+		{
+			// プレイヤーが左向き
+
+
+			if (nowDeg > defDeg && furikoSpeed != FURIKO_SPEED_MAX)			// 現在の座標がdeFDeg(-90)より大きい = 中心より右側にいるとき
+			{
+				furikoSpeed = furikoSpeed + 0.15f;							// 加速
+			}
+
+			nowDeg = nowDeg + furikoSpeed;		// 1°ずつ足してくやつ
+
+
+			if (nowDeg <= defDeg && furikoSpeed != FURIKO_SPEED_MIN)		// 現在の座標がdeFDeg(-90)より大きい = 中心より左側にいるとき
+			{
+				furikoSpeed = furikoSpeed - 0.15f;							// 減速
+			}
+
+			if (nowDeg >= MaxDeg)
+			{
+				player.moveDir = DIR_RIGHT;
+			}
+		}
+	}
+
+	if (player.left == true)
+	{
+		if (player.moveDir == DIR_RIGHT)
+		{
+			// プレイヤーが右向き
+			nowDeg = nowDeg - furikoSpeed;		// 1°ずつ引いてくやつ
+
+
+			if (nowDeg >= defDeg && furikoSpeed != FURIKO_SPEED_MIN)		// 現在の座標がdeFDeg(-90)より大きい = 中心より右側にいるとき
+			{
+				furikoSpeed = furikoSpeed - 0.15f;							// 減速
+			}
+
+
+
+			if (nowDeg < defDeg && furikoSpeed != FURIKO_SPEED_MAX)			// 現在の座標がdeFDeg(-90)より小さい = 中心より左側にいるとき
+			{
+				furikoSpeed = furikoSpeed + 0.15f;							// 加速
+			}
+
+			if (nowDeg <= minDeg)
+			{
+				player.moveDir = DIR_LEFT;
+			}
+		}
+		else
+		{
+			// プレイヤーが左向き
+			if (nowDeg > defDeg && furikoSpeed != FURIKO_SPEED_MAX)			// 現在の座標がdeFDeg(-90)より大きい = 中心より右側にいるとき
+			{
+				furikoSpeed = furikoSpeed + 0.15f;							// 加速
+			}
+
+
+
+			if (nowDeg <= defDeg && furikoSpeed != FURIKO_SPEED_MIN)		// 現在の座標がdeFDeg(-90)より大きい = 中心より左側にいるとき
+			{
+				furikoSpeed = furikoSpeed - 0.15f;							// 減速
+			}
+
+			nowDeg = nowDeg + furikoSpeed;		// 1°ずつ足してくやつ
+
+
+			if (nowDeg >= MaxDeg)
+			{
+				player.moveDir = DIR_RIGHT;
+			}
+		}
+	}
+
+	
+}
+
 void PlWireJump(void)
 {
+	player.visible = true;			// アニメーションするキャラが表示される
+	player.visible2 = false;		// ワイヤー中の静止画キャラが非表示になる
+	player.wireFlag = false;		// ワイヤーが非表示になる
+
+	// 着地地点の描画位置
+	/*if (player.moveDir == DIR_RIGHT)
+	{
+		player.pos.x = furiko_pos.x + mapPos.x - player.size.x / 2;
+	}
+	else
+	{
+		player.pos.x = furiko_pos.x - mapPos.x + player.size.x / 2;
+
+	}*/
+	//player.pos.x = furiko_pos.x + mapPos.x - player.size.x / 2;
+	//player.pos.y = furiko_pos.y + mapPos.y + player.size.y;
+
+	player_state = PLAYER_NORMAL;
+
 }
 
 
@@ -1030,3 +1211,4 @@ void PlayerState(void)
 	player.animCnt++;
 
 }
+

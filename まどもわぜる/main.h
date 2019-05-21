@@ -6,10 +6,8 @@
 #define SCREEN_SIZE_X 1200
 #define SCREEN_SIZE_Y 800
 
-#define PI 3.141592
-
-#define PI 3.141592
-#define ACC_G 9.8
+#define PI 3.141592f
+#define ACC_G 9.8f
 
 
 struct Position {
@@ -111,6 +109,8 @@ typedef struct {
 	float UpDownSpeed;		// óéâ∫ë¨ìx
 	float AddUpDownSpeed;	// è„â∫ÇÃâ¡éZó 
 	DWORD linkCnt;
+	bool right;
+	bool left;
 }CHARACTER;
 
 extern Position mapPos;

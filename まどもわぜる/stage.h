@@ -11,10 +11,12 @@ enum MAP_ID {
 #define CHIP_SIZE_X 32
 #define CHIP_SIZE_Y 32
 
-#define MAP_X 76
-//#define MAP_X 50
 
-#define MAP_Y 52
+
+//#define MAP_X 76
+////#define MAP_X 50
+//
+//#define MAP_Y 52
 //#define MAP_Y 30
 
 
