@@ -8,21 +8,22 @@
 #include"player.h"
 #include"shot.h"
 
-#define INIT_VELOCITY 50		// 初期速度
-#define SECOND_PER_FRAME 0.3	// 1ﾌﾚｰﾑの秒数
+#define INIT_VELOCITY 50			// 初期速度
+#define SECOND_PER_FRAME 0.3		// 1ﾌﾚｰﾑの秒数
 
-#define DOWN_SPEED_DEF	5.0f	// デフォルトの落下速度
-#define UP_SPEED_DEF   -15.0f	// デフォルトの上昇速度
+#define DOWN_SPEED_DEF	5.0f		// デフォルトの落下速度
+#define UP_SPEED_DEF   -15.0f		// デフォルトの上昇速度
 
-#define CORRECTION	  100		// ワイヤーの長さ補正用数値(特にy座標)
+#define CORRECTION	  100			// ワイヤーの長さ補正用数値(特にy座標)
 
 #define KEEPPOSX_CORRECTION  120	// posの値の補正用数値
 
 #define ONEFRAME_WIRE_UP	  15    // 1フレームで上がるワイヤーの速度
 
-#define FURIKO_SPEED_DEF      1.6f
-#define FURIKO_SPEED_MAX      3.2f
-#define FURIKO_SPEED_MIN	  0.2f
+#define FURIKO_SPEED_DEF      1.8f	// 振り子の初速度
+#define FURIKO_SPEED_MAX      3.0f	// 振り子の最大速度
+#define FURIKO_SPEED_MIN	  0.5f	// 振り子の最小速度
+#define FURIKO_ADD			  0.1f	// 振り子の加減算速度
 
 //#define PAI 3.141592
 //#define JUMPSPEED 2
@@ -78,15 +79,9 @@ float radian;
 
 bool skyFlag;
 
-//float rot;
-
-//Position Maxrad;		// 最大の角度(-20)
-//Position minrad;		// 最小の角度(-160)
-
-float MaxDeg;
-float minDeg;
-float nowDeg;
-float furikoSpeed;
+float MaxDeg;		// 最大角度
+float minDeg;		// 最小角度
+float furikoSpeed;	// 振り子のスピード
 
 float defDeg;
 
@@ -192,7 +187,7 @@ void PlayerGameInit(void)
 
 	MaxDeg = 0.0f;
 	minDeg = 0.0f;
-	nowDeg = 0.0f;
+	player.nowDeg = 0.0f;
 	furikoSpeed = 0.0f;
 	defDeg = 0.0f;
 
@@ -925,7 +920,7 @@ void PlWirePrepare(void)
 			MaxDeg = -20.0f;
 			minDeg = -160.0f;
 
-			nowDeg = -90.0f;
+			player.nowDeg = -90.0f;
 
 			defDeg = -90.0f;
 
@@ -1047,8 +1042,8 @@ void AddRad(void)
 {
 	// 角度を足すんだよぉぉぉぉ!!!!!!
 
-	player.pos.x = cos((nowDeg * PI) / 180.0f) * _length.y + furiko_pos.x;
-	player.pos.y = sin((nowDeg * PI) / 180.0f) * _length.y + furiko_pos.y;
+	player.pos.x = cos((player.nowDeg * PI) / 180.0f) * _length.y + furiko_pos.x;
+	player.pos.y = sin((player.nowDeg * PI) / 180.0f) * _length.y + furiko_pos.y;
 
 	if (player.right == true)
 	{
@@ -1057,20 +1052,20 @@ void AddRad(void)
 			// プレイヤーが右向き
 
 
-			if (nowDeg >= defDeg && furikoSpeed != FURIKO_SPEED_MIN)		// 現在の座標がdeFDeg(-90)より大きい = 中心より右側にいるとき
+			if (player.nowDeg >= defDeg && furikoSpeed != FURIKO_SPEED_MIN)		// 現在の座標がdeFDeg(-90)より大きい = 中心より右側にいるとき
 			{
-				furikoSpeed = furikoSpeed - 0.15f;							// 減速
+				furikoSpeed = furikoSpeed - FURIKO_ADD;							// 減速
 			}
 
-			nowDeg = nowDeg - furikoSpeed;		// 1°ずつ引いてくやつ
+			player.nowDeg = player.nowDeg - furikoSpeed;		// 1°ずつ引いてくやつ
 
 
-			if (nowDeg < defDeg && furikoSpeed != FURIKO_SPEED_MAX)			// 現在の座標がdeFDeg(-90)より小さい = 中心より左側にいるとき
+			if (player.nowDeg < defDeg && furikoSpeed != FURIKO_SPEED_MAX)			// 現在の座標がdeFDeg(-90)より小さい = 中心より左側にいるとき
 			{
-				furikoSpeed = furikoSpeed + 0.15f;							// 加速
+				furikoSpeed = furikoSpeed + FURIKO_ADD;							// 加速
 			}
 
-			if (nowDeg <= minDeg)
+			if (player.nowDeg <= minDeg)
 			{
 				player.moveDir = DIR_LEFT;
 			}
@@ -1080,20 +1075,20 @@ void AddRad(void)
 			// プレイヤーが左向き
 
 
-			if (nowDeg > defDeg && furikoSpeed != FURIKO_SPEED_MAX)			// 現在の座標がdeFDeg(-90)より大きい = 中心より右側にいるとき
+			if (player.nowDeg > defDeg && furikoSpeed != FURIKO_SPEED_MAX)			// 現在の座標がdeFDeg(-90)より大きい = 中心より右側にいるとき
 			{
-				furikoSpeed = furikoSpeed + 0.15f;							// 加速
+				furikoSpeed = furikoSpeed + FURIKO_ADD;							// 加速
 			}
 
-			nowDeg = nowDeg + furikoSpeed;		// 1°ずつ足してくやつ
+			player.nowDeg = player.nowDeg + furikoSpeed;		// 1°ずつ足してくやつ
 
 
-			if (nowDeg <= defDeg && furikoSpeed != FURIKO_SPEED_MIN)		// 現在の座標がdeFDeg(-90)より大きい = 中心より左側にいるとき
+			if (player.nowDeg <= defDeg && furikoSpeed != FURIKO_SPEED_MIN)		// 現在の座標がdeFDeg(-90)より大きい = 中心より左側にいるとき
 			{
-				furikoSpeed = furikoSpeed - 0.15f;							// 減速
+				furikoSpeed = furikoSpeed - FURIKO_ADD;							// 減速
 			}
 
-			if (nowDeg >= MaxDeg)
+			if (player.nowDeg >= MaxDeg)
 			{
 				player.moveDir = DIR_RIGHT;
 			}
@@ -1105,22 +1100,22 @@ void AddRad(void)
 		if (player.moveDir == DIR_RIGHT)
 		{
 			// プレイヤーが右向き
-			nowDeg = nowDeg - furikoSpeed;		// 1°ずつ引いてくやつ
+			player.nowDeg = player.nowDeg - furikoSpeed;		// 1°ずつ引いてくやつ
 
 
-			if (nowDeg >= defDeg && furikoSpeed != FURIKO_SPEED_MIN)		// 現在の座標がdeFDeg(-90)より大きい = 中心より右側にいるとき
+			if (player.nowDeg >= defDeg && furikoSpeed != FURIKO_SPEED_MIN)		// 現在の座標がdeFDeg(-90)より大きい = 中心より右側にいるとき
 			{
-				furikoSpeed = furikoSpeed - 0.15f;							// 減速
+				furikoSpeed = furikoSpeed - FURIKO_ADD;							// 減速
 			}
 
 
 
-			if (nowDeg < defDeg && furikoSpeed != FURIKO_SPEED_MAX)			// 現在の座標がdeFDeg(-90)より小さい = 中心より左側にいるとき
+			if (player.nowDeg < defDeg && furikoSpeed != FURIKO_SPEED_MAX)			// 現在の座標がdeFDeg(-90)より小さい = 中心より左側にいるとき
 			{
-				furikoSpeed = furikoSpeed + 0.15f;							// 加速
+				furikoSpeed = furikoSpeed + FURIKO_ADD;							// 加速
 			}
 
-			if (nowDeg <= minDeg)
+			if (player.nowDeg <= minDeg)
 			{
 				player.moveDir = DIR_LEFT;
 			}
@@ -1128,22 +1123,22 @@ void AddRad(void)
 		else
 		{
 			// プレイヤーが左向き
-			if (nowDeg > defDeg && furikoSpeed != FURIKO_SPEED_MAX)			// 現在の座標がdeFDeg(-90)より大きい = 中心より右側にいるとき
+			if (player.nowDeg > defDeg && furikoSpeed != FURIKO_SPEED_MAX)			// 現在の座標がdeFDeg(-90)より大きい = 中心より右側にいるとき
 			{
-				furikoSpeed = furikoSpeed + 0.15f;							// 加速
+				furikoSpeed = furikoSpeed + FURIKO_ADD;							// 加速
 			}
 
 
 
-			if (nowDeg <= defDeg && furikoSpeed != FURIKO_SPEED_MIN)		// 現在の座標がdeFDeg(-90)より大きい = 中心より左側にいるとき
+			if (player.nowDeg <= defDeg && furikoSpeed != FURIKO_SPEED_MIN)		// 現在の座標がdeFDeg(-90)より大きい = 中心より左側にいるとき
 			{
-				furikoSpeed = furikoSpeed - 0.15f;							// 減速
+				furikoSpeed = furikoSpeed - FURIKO_ADD;							// 減速
 			}
 
-			nowDeg = nowDeg + furikoSpeed;		// 1°ずつ足してくやつ
+			player.nowDeg = player.nowDeg + furikoSpeed;		// 1°ずつ足してくやつ
 
 
-			if (nowDeg >= MaxDeg)
+			if (player.nowDeg >= MaxDeg)
 			{
 				player.moveDir = DIR_RIGHT;
 			}

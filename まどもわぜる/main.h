@@ -109,8 +109,9 @@ typedef struct {
 	float UpDownSpeed;		// 落下速度
 	float AddUpDownSpeed;	// 上下の加算量
 	DWORD linkCnt;
-	bool right;
-	bool left;
+	bool right;				// 右向き
+	bool left;				// 左向き
+	float nowDeg;		// 今のプレイヤーの角度
 }CHARACTER;
 
 extern Position mapPos;
