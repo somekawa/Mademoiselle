@@ -31,15 +31,19 @@ DataHeader expData;
 std::vector<MAP_ID>mapDataBase; // データを入れる箱
 std::vector<MAP_ID*>mapData; // アドレスを入れれる箱
 
-int mapImage[5];
+//int mapImage[5];
 int mapImage2[5];
 
-int hatenaImage;
+// 背景
+int bgImage1;
+int bgPosX1 = 0;				// 横サイズ1
+int bgPosX2 = -PLAY_SIZE_X;	// 横サイズ2
 
 
 void StageSystmInit(void)
 {
 	LoadDivGraph("image/back.png", 5, 5, 1, CHIP_SIZE_X, CHIP_SIZE_Y, mapImage2);
+	bgImage1 = LoadGraph("image/nback.png");
 }
 
 void StageGameInit(void)
@@ -65,8 +69,27 @@ void StageControl(void)
 		= expData.mapHeight * CHIP_SIZE_Y - SCREEN_SIZE_Y;
 }
 
+void BgControl(void)
+{
+	// 背景
+	bgPosX1 += 1;
+	if (bgPosX1 >= PLAY_SIZE_X)
+	{
+		bgPosX1 = -PLAY_SIZE_X;
+	}
+	bgPosX2 += 1;
+	if (bgPosX2 >= PLAY_SIZE_X)
+	{
+		bgPosX2 = -PLAY_SIZE_X;
+	}
+}
+
+
 void StageDraw(void)
 {
+	DrawTurnGraph(bgPosX1 - mapPos.x, -mapPos.y, bgImage1, false);
+	DrawGraph(bgPosX2 - mapPos.x, -mapPos.y, bgImage1, false);
+
 	for (int y = 0; y < expData.mapHeight; y++)
 	{
 		for (int x = 0; x < expData.mapWidth; x++)
@@ -74,14 +97,12 @@ void StageDraw(void)
 			DrawGraph(x*expData.chipWidth - mapPos.x, y*expData.chipHeight - mapPos.y, mapImage2[mapData[y][x]], true);
 		}
 	}
-	DrawGraph(SCREEN_SIZE_X / 2 - mapPos.x, SCREEN_SIZE_Y + 500 - mapPos.y, hatenaImage, true);
 
 	//for (int x = 0; x < MAP_X; x++) {
 	//	for (int y = 0; y < MAP_Y; y++) {
 	//		DrawGraph(x*CHIP_SIZE_X - mapPos.x, y*CHIP_SIZE_Y - mapPos.y, mapImage[mapData[y][x]], true);
 	//	}
 	//}
-
 	//for (int x = 0; x < MAP_X; x++) {
 	//	for (int y = 0; y < MAP_Y; y++) {
 	//		//DrawBox(50 * x - mapPos.x, 50 * y, 50 + (50 * x) - mapPos.x, 50 + (50 * y), 0xffffff, false);
@@ -94,7 +115,7 @@ void StageDraw(void)
 bool MapLoad(void)
 {
 	FILE*file;
-	fopen_s(&file, "MapData/map2.fmf", "rb");
+	fopen_s(&file, "MapData/map1.fmf", "rb");
 	fread(&expData, sizeof(expData), 1, file);		// ヘッダー部分読み込み
 
 	mapDataBase.resize(expData.mapWidth*expData.mapHeight);

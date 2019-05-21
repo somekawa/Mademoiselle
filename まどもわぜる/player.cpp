@@ -1,12 +1,9 @@
-
-
 #include "Dxlib.h"				// DxLibﾗｲﾌﾞﾗﾘを使用する　独自で準備したﾍｯﾀﾞｰﾌｧｲﾙは""で指定する
 #include <math.h>				// 標準ﾍｯﾀﾞｰﾌｧｲﾙは<>で指定する
-#include"keycheck.h"
-#include"main.h"
-#include"stage.h"
-#include"player.h"
-#include"shot.h"
+#include "keycheck.h"
+#include "main.h"
+#include "stage.h"
+#include "player.h"
 
 #define INIT_VELOCITY 50			// 初期速度
 #define SECOND_PER_FRAME 0.3		// 1ﾌﾚｰﾑの秒数
@@ -36,15 +33,23 @@ enum PLAYER_SPEED {
 	PLAYER_SPEED_SEGWEY = 12
 };
 
+
+int p1Wak[2];
+int yazirusiImage[2];
+
 int playerImage[2];
+int playerIcon[2];
 int runImage[2][10];
 int jumpImage[2];
 int stopJumpImage[2];
-int downImage;
-int shotImage[2];
 int segweyImage[2][2];
 CHARACTER player;
-int downPos;
+
+// アイテム関連 
+bool itemBoxFlag = true;
+int itemBoxPosX = CHIP_SIZE_X * 15 - mapPos.x;
+int itemBoxPosY = CHIP_SIZE_Y * 16 - mapPos.y;
+int hatenaImage;		// ？ﾎﾞｯｸｽ画像
 
 int WirePreTimeCnt;					// ワイヤーを少しずつ伸ばして途中で途切れるまでの時間
 int WireTimeCnt;					// ワイヤーの表示時間
@@ -103,6 +108,16 @@ inline float Cross(const Vec2 & a, const Vec2 & b) {
 
 void PlayerSystmInit(void)
 {
+	hatenaImage = LoadGraph("image/hatena.png");
+
+	p1Wak[0] = LoadGraph("image/p1CSWak.png");
+	p1Wak[1] = LoadGraph("image/p1GWak.png");
+	for (int i = 0; i < 2; i++)
+	{
+		yazirusiImage[i] = LoadGraph("image/yazirusi.png");
+	}
+
+
 	// 赤
 	playerImage[PLAYER_RED] = LoadGraph("image/playerR_stop.png");
 	jumpImage[PLAYER_RED] = LoadGraph("image/playerR_jump.png");
@@ -116,12 +131,6 @@ void PlayerSystmInit(void)
 	stopJumpImage[PLAYER_BLUE] = LoadGraph("image/playerB_stop_jump.png");
 	LoadDivGraph("image/playerB_run.png", 10, 5, 2, 72, 72, runImage[PLAYER_BLUE], true);
 	LoadDivGraph("image/playerB_segway.png", 2, 2, 1, 72, 72, segweyImage[PLAYER_BLUE], true);
-
-	downImage = LoadGraph("image/red_down.png");
-	shotImage[0] = LoadGraph("image/red_stop_shot.png");
-	shotImage[1] = LoadGraph("image/red_down_shot.png");
-
-
 
 }
 
@@ -139,8 +148,6 @@ void PlayerGameInit(void)
 	player.runFlag = false;
 	player.jumpFlag = false;
 	player.jumpCnt = 0;	// ｼﾞｬﾝﾌﾟできる回数
-	player.shotFlag = false;
-	player.downFlag = false;
 	player.segweyFlag = false;	// ｾｸﾞｳｪｲ
 
 	player.wireOkFlag = false;
@@ -149,7 +156,6 @@ void PlayerGameInit(void)
 	player.visible = true;
 	player.visible2 = false;
 	player.imgLocCnt = 0;
-	downPos = 0;
 
 	player.right = false;
 	player.left = false;
@@ -445,12 +451,15 @@ void PlayerDraw(void)
 {
 	switch (GetGameMode()) {
 	case GMODE_CHARASERE:
+		DrawGraph(0, 120, p1Wak[0], true);
 		if (player.visible) {
 			DrawRotaGraph(160, 300, 3, 0, runImage[player.type][(player.animCnt / 3) % 10], true);
 			DrawString(120, 180, "キャラ決定！", 0x000000);
 		}
 		else {
 			DrawRotaGraph(160, 300, 3, 0, playerImage[player.type], true);
+			DrawTurnGraph(0, 240, yazirusiImage[0], true);
+			DrawGraph(260, 240, yazirusiImage[1], true);
 
 		}
 
@@ -462,9 +471,6 @@ void PlayerDraw(void)
 			if ((player.runFlag) && (!player.jumpFlag)) img = runImage[player.type][(player.animCnt / 3) % 10];
 			if ((player.jumpFlag) && (player.runFlag)) img = jumpImage[player.type];
 			if ((player.jumpCnt > 0) && (!player.runFlag)) img = stopJumpImage[player.type];
-			if (player.downFlag) img = downImage;
-			if ((!player.runFlag) && (oldKey[P1_A])) img = shotImage[0];
-			if ((!player.runFlag) && (oldKey[P1_A]) && (player.downFlag)) img = shotImage[1];
 			if (player.segweyFlag) img = segweyImage[player.type][(player.animCnt / 5) % 2];
 			if (player.moveDir == DIR_RIGHT) {
 
@@ -473,15 +479,12 @@ void PlayerDraw(void)
 			else if (player.moveDir == DIR_LEFT) {
 				DrawTurnGraph(player.pos.x + player.offsetSize.x - mapPos.x, player.pos.y + player.offsetSize.y - mapPos.y, img, true);
 			}
-			if (player.downFlag) {
-				DrawString(780, 0, "PLAYERDOWN OK", 0xffffff);
-			}
 			DrawBox(player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y + player.offsetSize.y - mapPos.y,
 				player.pos.x + player.offsetSize.x - mapPos.x, player.pos.y - mapPos.y, 0xff0000, false);
 
 
-			DrawBox(player.pos.x - player.hitPosS.x - mapPos.x, player.pos.y - player.hitPosS.y - mapPos.y + downPos,
-				player.pos.x + player.hitPosE.x - mapPos.x, player.pos.y - mapPos.y + downPos, 0x00ffff, false);
+			DrawBox(player.pos.x - player.hitPosS.x - mapPos.x, player.pos.y - player.hitPosS.y - mapPos.y ,
+				player.pos.x + player.hitPosE.x - mapPos.x, player.pos.y - mapPos.y , 0x00ffff, false);
 
 
 			DrawLine(player.pos.x + player.offsetSize.x - mapPos.x, player.pos.y - (player.size.y / 2) - mapPos.y,
@@ -518,6 +521,28 @@ void PlayerDraw(void)
 				}
 
 			}
+		}
+		// ｱｲｺﾝ
+		DrawGraph(50, 40, p1Wak[1], true);
+		DrawGraph(58, 74, playerIcon[player.type], true);
+		DrawBox(20, 5, 86, 71, 0xffffff, true);
+		DrawBox(20, 5, 86, 71, 0x000000, false);
+		DrawBox(100, 80, 200, 95, 0x000000, true);
+		DrawBox(101, 81, 199, 94, 0x00ff00, true);
+
+
+
+
+		//itemBoxDraw();
+		if (itemBoxFlag == true)
+		{
+			DrawGraph(CHIP_SIZE_X * 15 - mapPos.x, CHIP_SIZE_X * 16 - mapPos.y, hatenaImage, true);// 左上1つ
+			DrawGraph(SCREEN_SIZE_X - CHIP_SIZE_X * 3 - mapPos.x, SCREEN_SIZE_Y * 2 - CHIP_SIZE_X * 3 - mapPos.y, hatenaImage, true);// 下部の真ん中
+			DrawGraph(SCREEN_SIZE_X * 2 - CHIP_SIZE_X * 10 - mapPos.x, SCREEN_SIZE_Y - mapPos.y, hatenaImage, true);// 左側真ん中
+		}
+		else
+		{
+			DrawString(SCREEN_SIZE_X / 2 - 40, SCREEN_SIZE_Y / 2 - 5, "HIT", 0x00000);
 		}
 
 
@@ -1207,3 +1232,20 @@ void PlayerState(void)
 
 }
 
+
+// PlayerControlに入ってた　PlayerDraw下部にも追加あり
+//if ((player.dropFlag == false) && (itemBoxFlag == true))
+//{
+//	if (player.pos.x < itemBoxPosX + CHIP_SIZE_X
+//		&& itemBoxPosX < player.pos.x
+//		&& player.pos.y < itemBoxPosY + CHIP_SIZE_Y
+//		&& itemBoxPosY < player.pos.y)
+//	{
+//		player.dropFlag = false;
+//		itemBoxFlag = false;// ここに入ればhitがでる
+//	}
+//}
+//if (itemBoxFlag == false)
+//{
+//	itemBoxFlag = true;
+//}
