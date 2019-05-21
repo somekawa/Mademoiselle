@@ -6,6 +6,9 @@
 #define SCREEN_SIZE_X 1200
 #define SCREEN_SIZE_Y 800
 
+#define PLAY_SIZE_X 2400	// プレイ画面全体のサイズX
+#define PLAY_SIZE_Y 1600	// プレイ画面全体のサイズY
+
 #define PI 3.141592f
 #define ACC_G 9.8f
 

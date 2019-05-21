@@ -25,6 +25,7 @@ void StageSystmInit(void);
 void StageGameInit(void);
 void StageControl(void);
 void StageDraw(void);
+void BgControl(void);
 
 bool MapLoad(void);				// Ï¯Ìß‚ğÛ°ÄŞ@•K—v‚Å‚ ‚ê‚Îˆø”
 
