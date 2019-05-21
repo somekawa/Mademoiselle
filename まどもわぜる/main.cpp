@@ -3,6 +3,7 @@
 #include"main.h"
 #include"player.h"
 #include"stage.h"
+#include"effect.h"
 
 
 
@@ -148,6 +149,7 @@ int SystmInit(void)
 	maiImage = LoadGraph("image/bollI.png");
 	PlayerSystmInit();
 	StageSystmInit();
+	EffectSystmInit();
 
 	selectImage1 = LoadGraph("image/1player.png");
 	selectImage2 = LoadGraph("image/4player.png");
@@ -168,6 +170,7 @@ void GameInit(void)
 	cnt = 0;
 	PlayerGameInit();
 	StageGameInit();
+	EffectGameInit();
 	gameMode = GMODE_TITLE;
 
 }
@@ -213,15 +216,13 @@ void GameCharasereDraw(void)
 	DrawLine(0, SCREEN_SIZE_Y / 2 + 60, SCREEN_SIZE_X, SCREEN_SIZE_Y / 2 + 60, 0xffffff, true);
 	DrawLine(SCREEN_SIZE_X / 2, 120, SCREEN_SIZE_X / 2, SCREEN_SIZE_Y, 0xffffff, true);
 	DrawGraph(150, 20, charaSeleTitle, true);
-	for (int x = 0; x < 2; x++)
-	{
-		for (int y = 0; y < 2; y++)
-		{
+	for (int x = 0; x < 2; x++) {
+		for (int y = 0; y < 2; y++) {
 			DrawGraph((SCREEN_SIZE_X / 2 + 1)*x, 120 + (341 * y), wakImage, true);
 		}
 	}
+	DrawBox(40, 120 + 40, 40 + 260, 160 + 260, 0xffffff, true);
 	PlayerDraw();
-
 	DrawString(0, 0, "Charasere", 0xffffff);
 }
 
@@ -243,8 +244,8 @@ void GameMain(void)
 	else {
 		gameCnt++;
 		PlayerControl();
-		//PlayerState();
 		StageControl();
+		EffectControl();
 		HitCheck();
 	}
 	GameMainDraw();
@@ -257,7 +258,6 @@ void GameMain(void)
 void GameMainDraw(void)
 {
 	StageDraw();
-	BgControl();
 	PlayerDraw();
 	WireDraw();
 	DrawGraph(CHIP_SIZE_X * 5 - mapPos.x, CHIP_SIZE_Y * 23 - mapPos.y, maiImage, true);
@@ -268,6 +268,7 @@ void GameMainDraw(void)
 	//DrawLine(0, SCREEN_SIZE_Y, SCREEN_SIZE_X, SCREEN_SIZE_Y, 0xffffff, cnt / 6);
 	//DrawLine(SCREEN_SIZE_X / 2, 0, SCREEN_SIZE_X / 2, SCREEN_SIZE_Y, 0xffffff, true);
 	//DrawLine(0, SCREEN_SIZE_Y / 2, SCREEN_SIZE_X, SCREEN_SIZE_Y / 2, 0xffffff, true);
+	EffectDraw();
 }
 
 void GameOver(void)

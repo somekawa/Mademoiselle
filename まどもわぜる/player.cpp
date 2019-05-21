@@ -1,26 +1,28 @@
+
+
 #include "Dxlib.h"				// DxLibﾗｲﾌﾞﾗﾘを使用する　独自で準備したﾍｯﾀﾞｰﾌｧｲﾙは""で指定する
 #include <math.h>				// 標準ﾍｯﾀﾞｰﾌｧｲﾙは<>で指定する
-#include "keycheck.h"
-#include "main.h"
-#include "stage.h"
-#include "player.h"
+#include"keycheck.h"
+#include"main.h"
+#include"stage.h"
+#include"player.h"
+#include"effect.h"
 
-#define INIT_VELOCITY 50			// 初期速度
-#define SECOND_PER_FRAME 0.3		// 1ﾌﾚｰﾑの秒数
+#define INIT_VELOCITY 50		// 初期速度
+#define SECOND_PER_FRAME 0.3	// 1ﾌﾚｰﾑの秒数
 
-#define DOWN_SPEED_DEF	5.0f		// デフォルトの落下速度
-#define UP_SPEED_DEF   -15.0f		// デフォルトの上昇速度
+#define DOWN_SPEED_DEF	5.0f	// デフォルトの落下速度
+#define UP_SPEED_DEF   -15.0f	// デフォルトの上昇速度
 
-#define CORRECTION	  100			// ワイヤーの長さ補正用数値(特にy座標)
+#define CORRECTION	  100		// ワイヤーの長さ補正用数値(特にy座標)
 
 #define KEEPPOSX_CORRECTION  120	// posの値の補正用数値
 
 #define ONEFRAME_WIRE_UP	  15    // 1フレームで上がるワイヤーの速度
 
-#define FURIKO_SPEED_DEF      1.8f	// 振り子の初速度
-#define FURIKO_SPEED_MAX      3.0f	// 振り子の最大速度
-#define FURIKO_SPEED_MIN	  0.5f	// 振り子の最小速度
-#define FURIKO_ADD			  0.1f	// 振り子の加減算速度
+#define FURIKO_SPEED_DEF      1.6f
+#define FURIKO_SPEED_MAX      3.2f
+#define FURIKO_SPEED_MIN	  0.2f
 
 //#define PAI 3.141592
 //#define JUMPSPEED 2
@@ -32,24 +34,18 @@ enum PLAYER_SPEED {
 	PLAYER_SPEED_NORMAL = 8,
 	PLAYER_SPEED_SEGWEY = 12
 };
-
-
 int p1Wak[2];
 int yazirusiImage[2];
 
-int playerImage[2];
-int playerIcon[2];
-int runImage[2][10];
-int jumpImage[2];
-int stopJumpImage[2];
-int segweyImage[2][2];
+int playerImage[PLAYER_MAX];
+int playerIcon[PLAYER_MAX];
+int runImage[PLAYER_MAX][10];
+int jumpImage[PLAYER_MAX];
+int stopJumpImage[PLAYER_MAX];
+int downImage;
+int shotImage[PLAYER_MAX];
+int segweyImage[PLAYER_MAX][2];
 CHARACTER player;
-
-// アイテム関連 
-bool itemBoxFlag = true;
-int itemBoxPosX = CHIP_SIZE_X * 15 - mapPos.x;
-int itemBoxPosY = CHIP_SIZE_Y * 16 - mapPos.y;
-int hatenaImage;		// ？ﾎﾞｯｸｽ画像
 
 int WirePreTimeCnt;					// ワイヤーを少しずつ伸ばして途中で途切れるまでの時間
 int WireTimeCnt;					// ワイヤーの表示時間
@@ -84,9 +80,15 @@ float radian;
 
 bool skyFlag;
 
-float MaxDeg;		// 最大角度
-float minDeg;		// 最小角度
-float furikoSpeed;	// 振り子のスピード
+//float rot;
+
+//Position Maxrad;		// 最大の角度(-20)
+//Position minrad;		// 最小の角度(-160)
+
+float MaxDeg;
+float minDeg;
+float nowDeg;
+float furikoSpeed;
 
 float defDeg;
 
@@ -108,18 +110,15 @@ inline float Cross(const Vec2 & a, const Vec2 & b) {
 
 void PlayerSystmInit(void)
 {
-	hatenaImage = LoadGraph("image/hatena.png");
-
 	p1Wak[0] = LoadGraph("image/p1CSWak.png");
 	p1Wak[1] = LoadGraph("image/p1GWak.png");
-	for (int i = 0; i < 2; i++)
-	{
+	for (int i = 0; i < 2; i++) {
 		yazirusiImage[i] = LoadGraph("image/yazirusi.png");
 	}
 
-
 	// 赤
 	playerImage[PLAYER_RED] = LoadGraph("image/playerR_stop.png");
+	playerIcon[PLAYER_RED] = LoadGraph("image/R_icon.png");
 	jumpImage[PLAYER_RED] = LoadGraph("image/playerR_jump.png");
 	stopJumpImage[PLAYER_RED] = LoadGraph("image/playerR_stop_jump.png");
 	LoadDivGraph("image/playerR_run.png", 10, 5, 2, 72, 72, runImage[PLAYER_RED], true);
@@ -127,10 +126,17 @@ void PlayerSystmInit(void)
 
 	// 青
 	playerImage[PLAYER_BLUE] = LoadGraph("image/playerB_stop.png");
+	playerIcon[PLAYER_BLUE] = LoadGraph("image/B_icon.png");
 	jumpImage[PLAYER_BLUE] = LoadGraph("image/playerB_jump.png");
 	stopJumpImage[PLAYER_BLUE] = LoadGraph("image/playerB_stop_jump.png");
 	LoadDivGraph("image/playerB_run.png", 10, 5, 2, 72, 72, runImage[PLAYER_BLUE], true);
 	LoadDivGraph("image/playerB_segway.png", 2, 2, 1, 72, 72, segweyImage[PLAYER_BLUE], true);
+
+	downImage = LoadGraph("image/red_down.png");
+	shotImage[0] = LoadGraph("image/red_stop_shot.png");
+	shotImage[1] = LoadGraph("image/red_down_shot.png");
+
+
 
 }
 
@@ -148,6 +154,8 @@ void PlayerGameInit(void)
 	player.runFlag = false;
 	player.jumpFlag = false;
 	player.jumpCnt = 0;	// ｼﾞｬﾝﾌﾟできる回数
+	player.shotFlag = false;
+	player.downFlag = false;
 	player.segweyFlag = false;	// ｾｸﾞｳｪｲ
 
 	player.wireOkFlag = false;
@@ -159,6 +167,8 @@ void PlayerGameInit(void)
 
 	player.right = false;
 	player.left = false;
+
+	player.wallRunSpeed = player.moveSpeed;	// 壁での速度
 
 	//ひもの支点の初期化
 	_v = 0;			// 振り子のふり幅
@@ -193,7 +203,7 @@ void PlayerGameInit(void)
 
 	MaxDeg = 0.0f;
 	minDeg = 0.0f;
-	player.nowDeg = 0.0f;
+	nowDeg = 0.0f;
 	furikoSpeed = 0.0f;
 	defDeg = 0.0f;
 
@@ -214,10 +224,13 @@ void PlayerControl(void)
 			if (player.type <= -1)player.type = PLAYER_MAX - 1;
 		}
 		else {
-			//player.animCnt++;
+			player.animCnt++;
 		}
-		//if (trgKey[P1_UP]) player.visible = !player.visible;
+		//if (trgKey[P1_A]) player.visible = !player.visible;
 
+		break;
+	case GMODE_GAME:
+		PlayerState();
 		break;
 	}
 
@@ -444,7 +457,7 @@ void PlayerControl(void)
 			//}
 		//	
 		//
-	PlayerState();
+
 }
 
 void PlayerDraw(void)
@@ -470,27 +483,51 @@ void PlayerDraw(void)
 			int img = playerImage[player.type];
 			if ((player.runFlag) && (!player.jumpFlag)) img = runImage[player.type][(player.animCnt / 3) % 10];
 			if ((player.jumpFlag) && (player.runFlag)) img = jumpImage[player.type];
-			if ((player.jumpCnt > 0) && (!player.runFlag)) img = stopJumpImage[player.type];
+			if ((player.jumpFlag) && (!player.runFlag)) img = stopJumpImage[player.type];
 			if (player.segweyFlag) img = segweyImage[player.type][(player.animCnt / 5) % 2];
-			if (player.moveDir == DIR_RIGHT) {
 
-				DrawGraph(player.pos.x + player.offsetSize.x - mapPos.x, player.pos.y + player.offsetSize.y - mapPos.y, img, true);
+			if (player_state == PLAYER_WALL_RIGHT) {
+				DrawBox(player.pos.x - player.hitPosS.y - mapPos.x, player.pos.y - player.hitPosE.x - mapPos.y,
+					player.pos.x - mapPos.x, player.pos.y + player.hitPosS.x - mapPos.y, 0x00ffff, false);
+			}
+			else if (player_state == PLAYER_WALL_LEFT) {
+				DrawBox(player.pos.x - mapPos.x, player.pos.y - player.hitPosE.x - mapPos.y,
+					player.pos.x + player.hitPosS.y - mapPos.x, player.pos.y + player.hitPosS.x - mapPos.y, 0x00ffff, false);
+			}
+
+			if (player.moveDir == DIR_RIGHT) {
+				if (player_state == PLAYER_WALL_RIGHT) {
+					DrawRotaGraph(player.pos.x - 36 - mapPos.x, player.pos.y - mapPos.y,
+						1, -PI / 2, img, true, false);
+				}
+				else {
+					DrawGraph(player.pos.x + player.offsetSize.x - mapPos.x, player.pos.y + player.offsetSize.y - mapPos.y, img, true);
+				}
 			}
 			else if (player.moveDir == DIR_LEFT) {
-				DrawTurnGraph(player.pos.x + player.offsetSize.x - mapPos.x, player.pos.y + player.offsetSize.y - mapPos.y, img, true);
+				if (player_state == PLAYER_WALL_LEFT) {
+					DrawRotaGraph(player.pos.x + 36 - mapPos.x, player.pos.y - mapPos.y,
+						1, PI / 2, img, true, true);
+				}
+				else {
+					DrawTurnGraph(player.pos.x + player.offsetSize.x - mapPos.x, player.pos.y + player.offsetSize.y - mapPos.y, img, true);
+				}
 			}
-			DrawBox(player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y + player.offsetSize.y - mapPos.y,
-				player.pos.x + player.offsetSize.x - mapPos.x, player.pos.y - mapPos.y, 0xff0000, false);
+
+			if ((player_state != PLAYER_WALL_RIGHT) && (player_state != PLAYER_WALL_LEFT)) {
+				DrawBox(player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y + player.offsetSize.y - mapPos.y,
+					player.pos.x + player.offsetSize.x - mapPos.x, player.pos.y - mapPos.y, 0xff0000, false);
 
 
-			DrawBox(player.pos.x - player.hitPosS.x - mapPos.x, player.pos.y - player.hitPosS.y - mapPos.y ,
-				player.pos.x + player.hitPosE.x - mapPos.x, player.pos.y - mapPos.y , 0x00ffff, false);
+				DrawBox(player.pos.x - player.hitPosS.x - mapPos.x, player.pos.y - player.hitPosS.y - mapPos.y,
+					player.pos.x + player.hitPosE.x - mapPos.x, player.pos.y - mapPos.y, 0x00ffff, false);
 
 
-			DrawLine(player.pos.x + player.offsetSize.x - mapPos.x, player.pos.y - (player.size.y / 2) - mapPos.y,
-				player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y - (player.size.y / 2) - mapPos.y, 0x00ffff, true);
-			DrawLine(player.pos.x - mapPos.x, player.pos.y + player.offsetSize.y - mapPos.y,
-				player.pos.x - mapPos.x, player.pos.y - mapPos.y, 0x00ffff, true);
+				DrawLine(player.pos.x + player.offsetSize.x - mapPos.x, player.pos.y - (player.size.y / 2) - mapPos.y,
+					player.pos.x - player.offsetSize.x - mapPos.x, player.pos.y - (player.size.y / 2) - mapPos.y, 0x00ffff, true);
+				DrawLine(player.pos.x - mapPos.x, player.pos.y + player.offsetSize.y - mapPos.y,
+					player.pos.x - mapPos.x, player.pos.y - mapPos.y, 0x00ffff, true);
+			}
 		}
 
 		if (!player.visible && player.visible2)
@@ -522,6 +559,7 @@ void PlayerDraw(void)
 
 			}
 		}
+
 		// ｱｲｺﾝ
 		DrawGraph(50, 40, p1Wak[1], true);
 		DrawGraph(58, 74, playerIcon[player.type], true);
@@ -529,23 +567,6 @@ void PlayerDraw(void)
 		DrawBox(20, 5, 86, 71, 0x000000, false);
 		DrawBox(100, 80, 200, 95, 0x000000, true);
 		DrawBox(101, 81, 199, 94, 0x00ff00, true);
-
-
-
-
-		//itemBoxDraw();
-		if (itemBoxFlag == true)
-		{
-			DrawGraph(CHIP_SIZE_X * 15 - mapPos.x, CHIP_SIZE_X * 16 - mapPos.y, hatenaImage, true);// 左上1つ
-			DrawGraph(SCREEN_SIZE_X - CHIP_SIZE_X * 3 - mapPos.x, SCREEN_SIZE_Y * 2 - CHIP_SIZE_X * 3 - mapPos.y, hatenaImage, true);// 下部の真ん中
-			DrawGraph(SCREEN_SIZE_X * 2 - CHIP_SIZE_X * 10 - mapPos.x, SCREEN_SIZE_Y - mapPos.y, hatenaImage, true);// 左側真ん中
-		}
-		else
-		{
-			DrawString(SCREEN_SIZE_X / 2 - 40, SCREEN_SIZE_Y / 2 - 5, "HIT", 0x00000);
-		}
-
-
 		break;
 	}
 
@@ -762,50 +783,67 @@ float Disassembly_S(float& radian_sin, float g)		// y軸
 
 void PlNormal(void)
 {
+	player.jumpFlag = false;
 	player.runFlag = false;
 
 	Position player_RD = { player.pos.x + player.moveSpeed + player.hitPosE.x , player.pos.y - 1 };
-	Position player_LD = { player.pos.x - player.moveSpeed - player.hitPosS.x , player.pos.y - 1 };
+	Position player_LD = { player.pos.x - player.moveSpeed - player.hitPosS.x - 1 , player.pos.y - 1 };
 
 	if (newKey[P1_RIGHT])
 	{
 		player.runFlag = true;
 		player.moveDir = DIR_RIGHT;
-		if (IsPass(player_RD))// RDのchipID取得して移動できるIDか調べる
-		{
-			player.pos.x += player.moveSpeed;
-			if (player.pos.x > SCREEN_SIZE_X / 2)//カメラが右に行く
-			{
-				mapPos.x += player.moveSpeed;
-			}
 
+		// 壁確認
+		if ((WallBlockPass(player_RD)) && (player.wallRunSpeed == player.moveSpeed) && (!newKey[P1_A])) {
+			player_state = PLAYER_WALL_RIGHT;
 		}
-		else
-		{
-			// 隣まで計算してplayer.pos.xに代入
-			player.pos.x = GetWorldPos_Map(player_RD, DIR_LEFT).x - player.hitPosS.x;
+		else {
+			if (IsPass(player_RD))// RDのchipID取得して移動できるIDか調べる
+			{
+				player.pos.x += player.moveSpeed;
+				if (player.pos.x > SCREEN_SIZE_X / 2)//カメラが右に行く
+				{
+					mapPos.x += player.moveSpeed;
+				}
 
+			}
+			else
+			{
+				// 隣まで計算してplayer.pos.xに代入
+				player.pos.x = GetWorldPos_Map(player_RD, DIR_LEFT).x - player.hitPosS.x;
+
+			}
 		}
 	}
 	if (newKey[P1_LEFT])
 	{
 		player.runFlag = true;
 		player.moveDir = DIR_LEFT;
-		if (IsPass(player_LD))	// LDのchipID取得して移動できるIDか調べる
-		{
-			player.pos.x -= player.moveSpeed;
-			//if (player.pos.x < expData.mapWidth * CHIP_SIZE_X - SCREEN_SIZE_X / 2)//カメラが左に行く
-			//{
-			//	mapPos.x -= player.moveSpeed;
-			//}
 
+		// 壁確認
+		if ((WallBlockPass(player_LD)) && (player.wallRunSpeed == player.moveSpeed) && (!newKey[P1_A])) {
+			if (player.wallRunSpeed == player.moveSpeed) {
+				player_state = PLAYER_WALL_LEFT;
+			}
 		}
 		else
 		{
-			// 隣まで計算してplayer.pos.xに代入
-			player.pos.x = GetWorldPos_Map(player_LD, DIR_RIGHT).x + player.hitPosS.x;
-		}
+			if (IsPass(player_LD))	// LDのchipID取得して移動できるIDか調べる
+			{
+				player.pos.x -= player.moveSpeed;
+				//if (player.pos.x < expData.mapWidth * CHIP_SIZE_X - SCREEN_SIZE_X / 2)//カメラが左に行く
+				//{
+				//	mapPos.x -= player.moveSpeed;
+				//}
 
+			}
+			else
+			{
+				// 隣まで計算してplayer.pos.xに代入
+				player.pos.x = GetWorldPos_Map(player_LD, DIR_RIGHT).x + player.hitPosS.x;
+			}
+		}
 	}
 
 	if (trgKey[P2_UP])
@@ -835,8 +873,8 @@ void PlNormal(void)
 
 void PlJumpUp(void)
 {
-	Position player_RU = { player.pos.x + player.moveSpeed + player.hitPosE.x , player.pos.y - player.moveSpeed - player.hitPosS.y };	// 左上
-	Position player_LU = { player.pos.x - player.moveSpeed - player.hitPosS.x , player.pos.y - player.moveSpeed - player.hitPosS.y };	// 右上
+	Position player_RU = { player.pos.x + player.hitPosE.x - 1 , player.pos.y - player.moveSpeed - player.hitPosS.y };	// 左上
+	Position player_LU = { player.pos.x - player.hitPosS.x , player.pos.y - player.moveSpeed - player.hitPosS.y };	// 右上
 
 	player.UpDownSpeed += player.AddUpDownSpeed;
 
@@ -845,6 +883,7 @@ void PlJumpUp(void)
 	{
 		// 上に何もない
 		player_state = PLAYER_JUMP_UP;
+		player.jumpFlag = true;
 	}
 	else
 	{
@@ -876,8 +915,8 @@ void PlJumpUp(void)
 
 void PlDown(void)
 {
-	Position player_RD = { player.pos.x + player.moveSpeed + player.hitPosE.x , player.pos.y - 1 };		// 右下
-	Position player_LD = { player.pos.x - player.moveSpeed - player.hitPosS.x , player.pos.y - 1 };		// 左下
+	Position player_RD = { player.pos.x + player.hitPosE.x - 1, player.pos.y - 1 };		// 右下
+	Position player_LD = { player.pos.x - player.hitPosS.x , player.pos.y - 1 };		// 左下
 
 	//　RD と LD の y座標に+1して下のブロック情報を得る
 	if (IsPass({ player_RD.x , player_RD.y + 1 }) && IsPass({ player_LD.x , player_LD.y + 1 }))
@@ -891,7 +930,7 @@ void PlDown(void)
 	}
 	else
 	{
-		if (trgKey[P1_UP])
+		if (trgKey[P1_A])
 		{
 			player.UpDownSpeed = UP_SPEED_DEF;
 			player.AddUpDownSpeed = 0.8f;
@@ -914,10 +953,14 @@ void PlDown(void)
 	if (IsPass({ player_RD.x , (player_RD.y + player.UpDownSpeed) }) && IsPass({ player_LD.x , (player_LD.y + player.UpDownSpeed) }))
 	{
 		player.pos.y += player.UpDownSpeed;
+		player.jumpFlag = true;
 	}
 	else
 	{
 		player.pos.y = GetWorldPos_Map({ player_RD.x , (player_RD.y + player.UpDownSpeed) }, DIR_UP).y;
+		player.wallRunSpeed = player.moveSpeed;
+		player.jumpFlag = false;
+		SetEffct(player.pos);
 	}
 
 
@@ -945,7 +988,7 @@ void PlWirePrepare(void)
 			MaxDeg = -20.0f;
 			minDeg = -160.0f;
 
-			player.nowDeg = -90.0f;
+			nowDeg = -90.0f;
 
 			defDeg = -90.0f;
 
@@ -1015,7 +1058,7 @@ void PlWireAction(void)
 		if (WireTimeCnt < 200)
 		{
 
-			if (CheckHitKey(KEY_INPUT_F))
+			if (newKey[P2_B])
 			{
 				player_state = PLAYER_W_JUMP;
 				return;
@@ -1067,8 +1110,8 @@ void AddRad(void)
 {
 	// 角度を足すんだよぉぉぉぉ!!!!!!
 
-	player.pos.x = cos((player.nowDeg * PI) / 180.0f) * _length.y + furiko_pos.x;
-	player.pos.y = sin((player.nowDeg * PI) / 180.0f) * _length.y + furiko_pos.y;
+	player.pos.x = cos((nowDeg * PI) / 180.0f) * _length.y + furiko_pos.x;
+	player.pos.y = sin((nowDeg * PI) / 180.0f) * _length.y + furiko_pos.y;
 
 	if (player.right == true)
 	{
@@ -1077,20 +1120,20 @@ void AddRad(void)
 			// プレイヤーが右向き
 
 
-			if (player.nowDeg >= defDeg && furikoSpeed != FURIKO_SPEED_MIN)		// 現在の座標がdeFDeg(-90)より大きい = 中心より右側にいるとき
+			if (nowDeg >= defDeg && furikoSpeed != FURIKO_SPEED_MIN)		// 現在の座標がdeFDeg(-90)より大きい = 中心より右側にいるとき
 			{
-				furikoSpeed = furikoSpeed - FURIKO_ADD;							// 減速
+				furikoSpeed = furikoSpeed - 0.15f;							// 減速
 			}
 
-			player.nowDeg = player.nowDeg - furikoSpeed;		// 1°ずつ引いてくやつ
+			nowDeg = nowDeg - furikoSpeed;		// 1°ずつ引いてくやつ
 
 
-			if (player.nowDeg < defDeg && furikoSpeed != FURIKO_SPEED_MAX)			// 現在の座標がdeFDeg(-90)より小さい = 中心より左側にいるとき
+			if (nowDeg < defDeg && furikoSpeed != FURIKO_SPEED_MAX)			// 現在の座標がdeFDeg(-90)より小さい = 中心より左側にいるとき
 			{
-				furikoSpeed = furikoSpeed + FURIKO_ADD;							// 加速
+				furikoSpeed = furikoSpeed + 0.15f;							// 加速
 			}
 
-			if (player.nowDeg <= minDeg)
+			if (nowDeg <= minDeg)
 			{
 				player.moveDir = DIR_LEFT;
 			}
@@ -1100,20 +1143,20 @@ void AddRad(void)
 			// プレイヤーが左向き
 
 
-			if (player.nowDeg > defDeg && furikoSpeed != FURIKO_SPEED_MAX)			// 現在の座標がdeFDeg(-90)より大きい = 中心より右側にいるとき
+			if (nowDeg > defDeg && furikoSpeed != FURIKO_SPEED_MAX)			// 現在の座標がdeFDeg(-90)より大きい = 中心より右側にいるとき
 			{
-				furikoSpeed = furikoSpeed + FURIKO_ADD;							// 加速
+				furikoSpeed = furikoSpeed + 0.15f;							// 加速
 			}
 
-			player.nowDeg = player.nowDeg + furikoSpeed;		// 1°ずつ足してくやつ
+			nowDeg = nowDeg + furikoSpeed;		// 1°ずつ足してくやつ
 
 
-			if (player.nowDeg <= defDeg && furikoSpeed != FURIKO_SPEED_MIN)		// 現在の座標がdeFDeg(-90)より大きい = 中心より左側にいるとき
+			if (nowDeg <= defDeg && furikoSpeed != FURIKO_SPEED_MIN)		// 現在の座標がdeFDeg(-90)より大きい = 中心より左側にいるとき
 			{
-				furikoSpeed = furikoSpeed - FURIKO_ADD;							// 減速
+				furikoSpeed = furikoSpeed - 0.15f;							// 減速
 			}
 
-			if (player.nowDeg >= MaxDeg)
+			if (nowDeg >= MaxDeg)
 			{
 				player.moveDir = DIR_RIGHT;
 			}
@@ -1125,22 +1168,22 @@ void AddRad(void)
 		if (player.moveDir == DIR_RIGHT)
 		{
 			// プレイヤーが右向き
-			player.nowDeg = player.nowDeg - furikoSpeed;		// 1°ずつ引いてくやつ
+			nowDeg = nowDeg - furikoSpeed;		// 1°ずつ引いてくやつ
 
 
-			if (player.nowDeg >= defDeg && furikoSpeed != FURIKO_SPEED_MIN)		// 現在の座標がdeFDeg(-90)より大きい = 中心より右側にいるとき
+			if (nowDeg >= defDeg && furikoSpeed != FURIKO_SPEED_MIN)		// 現在の座標がdeFDeg(-90)より大きい = 中心より右側にいるとき
 			{
-				furikoSpeed = furikoSpeed - FURIKO_ADD;							// 減速
+				furikoSpeed = furikoSpeed - 0.15f;							// 減速
 			}
 
 
 
-			if (player.nowDeg < defDeg && furikoSpeed != FURIKO_SPEED_MAX)			// 現在の座標がdeFDeg(-90)より小さい = 中心より左側にいるとき
+			if (nowDeg < defDeg && furikoSpeed != FURIKO_SPEED_MAX)			// 現在の座標がdeFDeg(-90)より小さい = 中心より左側にいるとき
 			{
-				furikoSpeed = furikoSpeed + FURIKO_ADD;							// 加速
+				furikoSpeed = furikoSpeed + 0.15f;							// 加速
 			}
 
-			if (player.nowDeg <= minDeg)
+			if (nowDeg <= minDeg)
 			{
 				player.moveDir = DIR_LEFT;
 			}
@@ -1148,22 +1191,22 @@ void AddRad(void)
 		else
 		{
 			// プレイヤーが左向き
-			if (player.nowDeg > defDeg && furikoSpeed != FURIKO_SPEED_MAX)			// 現在の座標がdeFDeg(-90)より大きい = 中心より右側にいるとき
+			if (nowDeg > defDeg && furikoSpeed != FURIKO_SPEED_MAX)			// 現在の座標がdeFDeg(-90)より大きい = 中心より右側にいるとき
 			{
-				furikoSpeed = furikoSpeed + FURIKO_ADD;							// 加速
+				furikoSpeed = furikoSpeed + 0.15f;							// 加速
 			}
 
 
 
-			if (player.nowDeg <= defDeg && furikoSpeed != FURIKO_SPEED_MIN)		// 現在の座標がdeFDeg(-90)より大きい = 中心より左側にいるとき
+			if (nowDeg <= defDeg && furikoSpeed != FURIKO_SPEED_MIN)		// 現在の座標がdeFDeg(-90)より大きい = 中心より左側にいるとき
 			{
-				furikoSpeed = furikoSpeed - FURIKO_ADD;							// 減速
+				furikoSpeed = furikoSpeed - 0.15f;							// 減速
 			}
 
-			player.nowDeg = player.nowDeg + furikoSpeed;		// 1°ずつ足してくやつ
+			nowDeg = nowDeg + furikoSpeed;		// 1°ずつ足してくやつ
 
 
-			if (player.nowDeg >= MaxDeg)
+			if (nowDeg >= MaxDeg)
 			{
 				player.moveDir = DIR_RIGHT;
 			}
@@ -1196,6 +1239,101 @@ void PlWireJump(void)
 
 }
 
+// 壁を走る
+// 右壁
+void PlWall_R(void)
+{
+	player.runFlag = false;
+	player.jumpFlag = false;
+	// 位置修正
+	player.pos.x = GetWorldPos_Map({ player.pos.x + player.moveSpeed + player.hitPosE.x , player.pos.y - 1 }, DIR_LEFT).x;
+
+	Position player_RU = { player.pos.x - 1, player.pos.y - player.wallRunSpeed - player.hitPosE.x };
+
+	// 専用の壁か？
+	if (WallBlockPass(player.pos)) {
+		// もう走れない・途中で降りる
+		if ((player.wallRunSpeed <= 0) || (newKey[P1_A])) {
+			// 位置修正
+			player.pos.x = GetWorldPos_Map(player_RU, DIR_LEFT).x;
+			if (oldKey[P1_LEFT]) {
+				player.wallRunSpeed = player.moveSpeed;
+				player_state = PLAYER_WALL_LEFT;
+			}
+			else {
+				// 通常に戻す
+				player_state = PLAYER_NORMAL;
+			}
+		}
+		else if (player.wallRunSpeed >= 0) {
+			// 上へ
+			if (newKey[P1_RIGHT]) {
+				player.runFlag = true;
+				player.moveDir = DIR_RIGHT;
+				if (IsPass(player_RU)) {	// 壁確認
+					player.pos.y -= player.wallRunSpeed;
+				}
+				else {
+					player.pos.y = GetWorldPos_Map(player_RU, DIR_DOWN).y + player.hitPosS.x;
+				}
+			}
+			player.wallRunSpeed -= 0.1f;	// 減速
+		}
+	}
+	else {
+		// 通常に戻す
+		player_state = PLAYER_NORMAL;
+	}
+}
+
+// 左壁
+void PlWall_L(void)
+{
+	player.runFlag = false;
+	player.jumpFlag = false;
+	// 位置修正
+	player.pos.x = GetWorldPos_Map({ player.pos.x - player.moveSpeed - player.hitPosS.x - 1 , player.pos.y - 1 }, DIR_RIGHT).x;
+
+	Position player_LU = { player.pos.x, player.pos.y - player.moveSpeed - player.hitPosE.x };
+
+	// 専用の壁か？
+	if (WallBlockPass({ player.pos.x - 1,player.pos.y })) {
+		// もう走れない・途中で降りる
+		if ((player.wallRunSpeed <= 0) || (newKey[P1_A])) {
+			//位置修正
+			player.pos.x = GetWorldPos_Map(player_LU, DIR_RIGHT).x;
+			if (oldKey[P1_RIGHT]) {
+				player.wallRunSpeed = player.moveSpeed;
+				// 右壁に変更
+				player_state = PLAYER_WALL_RIGHT;
+			}
+			else {
+				// 通常に戻す
+				player_state = PLAYER_NORMAL;
+			}
+		}
+		else if (player.wallRunSpeed >= 0) {
+			// 上へ
+			if (newKey[P1_LEFT]) {
+				player.runFlag = true;
+				player.moveDir = DIR_LEFT;
+				if (IsPass(player_LU)) {	// 壁確認
+					player.pos.y -= player.moveSpeed;
+				}
+				else {
+					player.pos.y = GetWorldPos_Map(player_LU, DIR_DOWN).y + player.hitPosE.x;
+				}
+			}
+			player.wallRunSpeed -= 0.1f;	// 減速
+		}
+	}
+	else {
+		// 通常に戻す
+		player_state = PLAYER_NORMAL;
+	}
+}
+
+
 
 void PlayerState(void)
 {
@@ -1225,6 +1363,12 @@ void PlayerState(void)
 	case PLAYER_W_JUMP:			// ﾜｲﾔｰｼﾞｬﾝﾌﾟ
 		PlWireJump();
 		break;
+	case PLAYER_WALL_RIGHT:		// 右壁
+		PlWall_R();
+		break;
+	case PLAYER_WALL_LEFT:		// 左壁
+		PlWall_L();
+		break;
 	default:
 		break;
 	}
@@ -1232,20 +1376,3 @@ void PlayerState(void)
 
 }
 
-
-// PlayerControlに入ってた　PlayerDraw下部にも追加あり
-//if ((player.dropFlag == false) && (itemBoxFlag == true))
-//{
-//	if (player.pos.x < itemBoxPosX + CHIP_SIZE_X
-//		&& itemBoxPosX < player.pos.x
-//		&& player.pos.y < itemBoxPosY + CHIP_SIZE_Y
-//		&& itemBoxPosY < player.pos.y)
-//	{
-//		player.dropFlag = false;
-//		itemBoxFlag = false;// ここに入ればhitがでる
-//	}
-//}
-//if (itemBoxFlag == false)
-//{
-//	itemBoxFlag = true;
-//}

@@ -25,13 +25,14 @@ void StageSystmInit(void);
 void StageGameInit(void);
 void StageControl(void);
 void StageDraw(void);
-void BgControl(void);
+
 bool MapLoad(void);				// Ï¯Ìß‚ğÛ°ÄŞ@•K—v‚Å‚ ‚ê‚Îˆø”
 
 
 XY MapPosToIndex(Position pos);
 bool IsPass(Position pos);
 bool WireBlockPass(Position pos);
+bool WallBlockPass(Position pos);
 
 Position MapIndexToPos(Position index);
 

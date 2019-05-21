@@ -7,6 +7,8 @@ enum PLAYER_STATE {
 	PLAYER_W_PRE,		// ﾜｲﾔｰｱｸｼｮﾝの準備(ワイヤーを伸ばす)
 	PLAYER_W_ACTION,	// ﾜｲﾔｰｱｸｼｮﾝ
 	PLAYER_W_JUMP,		// ﾜｲﾔｰｼﾞｬﾝﾌﾟ
+	PLAYER_WALL_RIGHT,	// 壁(右)を走る
+	PLAYER_WALL_LEFT,	// 壁(左)を走る
 };
 
 void PlNormal(void);
@@ -15,6 +17,9 @@ void PlJumpUp(void);
 void PlWirePrepare(void);
 void PlWireAction(void);
 void PlWireJump(void);
+void PlWall_R(void);	// 壁を走る(右)
+void PlWall_L(void);	// 壁を走る(左)
+
 
 void PlayerSystmInit(void);
 void PlayerGameInit(void);
