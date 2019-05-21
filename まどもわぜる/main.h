@@ -9,6 +9,7 @@
 #define PLAY_SIZE_X 2400	// プレイ画面全体のサイズX
 #define PLAY_SIZE_Y 1600	// プレイ画面全体のサイズY
 
+
 #define PI 3.141592f
 #define ACC_G 9.8f
 
@@ -101,7 +102,7 @@ typedef struct {
 	bool jumpFlag;
 	bool jumpFlag2;
 	int jumpCnt;			// ｼﾞｬﾝﾌﾟできる回数
-	float wallRunSpeed;	//壁にいるときのｽﾋﾟｰﾄﾞ
+	float wallRunSpeed;		//壁にいるときのｽﾋﾟｰﾄﾞ
 	bool shotFlag;
 	bool downFlag;
 	bool wireFlag;			// ワイヤーをだす
@@ -113,8 +114,10 @@ typedef struct {
 	float UpDownSpeed;		// 落下速度
 	float AddUpDownSpeed;	// 上下の加算量
 	DWORD linkCnt;
-	bool right;
-	bool left;
+	bool right;				// 右向き
+	bool left;				// 左向き
+	float nowDeg;			// 今のプレイヤーの角度
+	bool dropFlag;			// アイテムを取得しているかどうか
 }CHARACTER;
 
 extern Position mapPos;

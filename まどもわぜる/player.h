@@ -11,6 +11,14 @@ enum PLAYER_STATE {
 	PLAYER_WALL_LEFT,	// 壁(左)を走る
 };
 
+enum ITEM_STATE {
+	ITEM_NON,			// アイテムを取得していない状態(なにもなし)
+	ITEM_SEGWEY,		// セグウェイ
+	ITEM_KABOSU,		// かぼす(大分県産)
+	ITEM_UFO,			// UFO
+	ITEM_SPECIAL,		// 必殺技1回プラス
+};
+
 void PlNormal(void);
 void PlDown(void);
 void PlJumpUp(void);
@@ -20,6 +28,10 @@ void PlWireJump(void);
 void PlWall_R(void);	// 壁を走る(右)
 void PlWall_L(void);	// 壁を走る(左)
 
+void ItemSegwey(void);
+void ItemKabosu(void);
+void ItemUFO(void);
+void ItemSP(void);
 
 void PlayerSystmInit(void);
 void PlayerGameInit(void);
@@ -27,16 +39,14 @@ void PlayerControl(void);
 void PlayerDraw(void);
 
 void PlayerState(void);
+void ItemState(void);
 
-void AddRad(void);
+
+void AddRad(void);		// 角度の加減算
 
 
 // ワイヤーアクションについて
 void WireDraw(void);
-//ジャンプキー押されたイベント
-//void OnPushJumpKey(float& vx, float& vy);
-//着地イベント
-//void OnGround(float& x, float& y, float& vx, float& vy);
 
 bool GetPlayerV(void);	// ﾌﾟﾚｲﾔｰ生存確認
 

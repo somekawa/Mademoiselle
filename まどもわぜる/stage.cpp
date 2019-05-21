@@ -31,22 +31,23 @@ DataHeader expData;
 std::vector<MAP_ID>mapDataBase; // データを入れる箱
 std::vector<MAP_ID*>mapData; // アドレスを入れれる箱
 
-//int mapImage[5];
+int mapImage[5];
 int mapImage2[5];
 
-int hatenaImage;
+//int hatenaImage;
+
 // 背景
 int bgImage1;
 int bgPosX1 = 0;				// 横サイズ1
 int bgPosX2 = -PLAY_SIZE_X;	// 横サイズ2
 int bgImage_gr;
 
+
 void StageSystmInit(void)
 {
 	LoadDivGraph("image/back.png", 5, 5, 1, CHIP_SIZE_X, CHIP_SIZE_Y, mapImage2);
 	bgImage_gr = LoadGraph("image/map2_gr.png");
 	bgImage1 = LoadGraph("image/nback.png");
-
 }
 
 void StageGameInit(void)
@@ -100,7 +101,7 @@ void StageDraw(void)
 			DrawGraph(x*expData.chipWidth - mapPos.x, y*expData.chipHeight - mapPos.y, mapImage2[mapData[y][x]], true);
 		}
 	}
-	DrawGraph(SCREEN_SIZE_X / 2 - mapPos.x, SCREEN_SIZE_Y + 500 - mapPos.y, hatenaImage, true);
+	//DrawGraph(SCREEN_SIZE_X / 2 - mapPos.x, SCREEN_SIZE_Y + 500 - mapPos.y, hatenaImage, true);
 
 	//for (int x = 0; x < MAP_X; x++) {
 	//	for (int y = 0; y < MAP_Y; y++) {
