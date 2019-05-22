@@ -20,10 +20,10 @@
 
 #define ONEFRAME_WIRE_UP	  15    // 1フレームで上がるワイヤーの速度
 
-#define FURIKO_SPEED_DEF      1.8f	// 振り子の初速度
+#define FURIKO_SPEED_DEF      10.0f	// 振り子の初速度
 #define FURIKO_SPEED_MAX      3.0f	// 振り子の最大速度
 #define FURIKO_SPEED_MIN	  0.5f	// 振り子の最小速度
-#define FURIKO_ADD			  0.1f	// 振り子の加減算速度
+#define FURIKO_ADD			  0.4f	// 振り子の加減算速度
 
 //#define PAI 3.141592
 //#define JUMPSPEED 2
@@ -542,7 +542,7 @@ void PlayerDraw(void)
 
 		if (!player.visible && player.visible2)
 		{
-			if (player.moveDir == DIR_RIGHT)
+			if (player.right)
 			{
 				DrawGraph(player.pos.x  - mapPos.x - 56, player.pos.y - player.size.y - mapPos.y - 23, jumpImage[player.type], true);		   // キャラクタをおもりとして描画
 			}
@@ -839,6 +839,24 @@ void PlNormal(void)
 			}
 		}
 	}
+
+	// PlayerControlに入ってた　PlayerDraw下部にも追加あり
+	if ((player.dropFlag == false) && (itemBoxFlag == true))
+	{
+		if (player.pos.x - player.size.x / 2 + player.size.y < itemBoxPosX + CHIP_SIZE_X			
+			&& itemBoxPosX < player.pos.x - player.size.x / 2 + player.size.y
+			&& player.pos.y - player.size.y < itemBoxPosY + CHIP_SIZE_Y
+			&& itemBoxPosY < player.pos.y - player.size.y)
+		{
+			player.dropFlag = false;
+			itemBoxFlag = false;// ここに入ればhitがでる
+		}
+	}
+	if (itemBoxFlag == false)
+	{
+		itemBoxFlag = true;
+	}
+
 	if (newKey[P1_LEFT])
 	{
 		player.runFlag = true;
@@ -1078,7 +1096,7 @@ void PlWireAction(void)
 {
 	if (player.wireOkFlag)
 	{
-		if (WireTimeCnt < 200)
+		if (WireTimeCnt < 2000)
 		{
 
 			if (newKey[P2_B])
@@ -1142,21 +1160,10 @@ void AddRad(void)
 		{
 			// プレイヤーが右向き
 
-
-			if (player.nowDeg >= defDeg && furikoSpeed != FURIKO_SPEED_MIN)		// 現在の座標がdeFDeg(-90)より大きい = 中心より右側にいるとき
-			{
-				furikoSpeed = furikoSpeed - FURIKO_ADD;							// 減速
-			}
-
+			furikoSpeed = furikoSpeed - FURIKO_ADD;							// 加速
 			player.nowDeg = player.nowDeg - furikoSpeed;		// 1°ずつ引いてくやつ
 
-
-			if (player.nowDeg < defDeg && furikoSpeed != FURIKO_SPEED_MAX)			// 現在の座標がdeFDeg(-90)より小さい = 中心より左側にいるとき
-			{
-				furikoSpeed = furikoSpeed + FURIKO_ADD;							// 加速
-			}
-
-			if (player.nowDeg <= minDeg)
+			if (player.nowDeg >= defDeg)
 			{
 				player.moveDir = DIR_LEFT;
 			}
@@ -1164,22 +1171,10 @@ void AddRad(void)
 		else
 		{
 			// プレイヤーが左向き
+			furikoSpeed = furikoSpeed + FURIKO_ADD;							// 減速
+			player.nowDeg = player.nowDeg - furikoSpeed;		// 1°ずつ足してくやつ
 
-
-			if (player.nowDeg > defDeg && furikoSpeed != FURIKO_SPEED_MAX)			// 現在の座標がdeFDeg(-90)より大きい = 中心より右側にいるとき
-			{
-				furikoSpeed = furikoSpeed + FURIKO_ADD;							// 加速
-			}
-
-			player.nowDeg = player.nowDeg + furikoSpeed;		// 1°ずつ足してくやつ
-
-
-			if (player.nowDeg <= defDeg && furikoSpeed != FURIKO_SPEED_MIN)		// 現在の座標がdeFDeg(-90)より大きい = 中心より左側にいるとき
-			{
-				furikoSpeed = furikoSpeed - FURIKO_ADD;							// 減速
-			}
-
-			if (player.nowDeg >= MaxDeg)
+			if (player.nowDeg <= defDeg)
 			{
 				player.moveDir = DIR_RIGHT;
 			}
@@ -1191,22 +1186,10 @@ void AddRad(void)
 		if (player.moveDir == DIR_RIGHT)
 		{
 			// プレイヤーが右向き
+			furikoSpeed = furikoSpeed + FURIKO_ADD;							// 減速
 			player.nowDeg = player.nowDeg - furikoSpeed;		// 1°ずつ引いてくやつ
 
-
-			if (player.nowDeg >= defDeg && furikoSpeed != FURIKO_SPEED_MIN)		// 現在の座標がdeFDeg(-90)より大きい = 中心より右側にいるとき
-			{
-				furikoSpeed = furikoSpeed - FURIKO_ADD;							// 減速
-			}
-
-
-
-			if (player.nowDeg < defDeg && furikoSpeed != FURIKO_SPEED_MAX)			// 現在の座標がdeFDeg(-90)より小さい = 中心より左側にいるとき
-			{
-				furikoSpeed = furikoSpeed + FURIKO_ADD;							// 加速
-			}
-
-			if (player.nowDeg <= minDeg)
+			if (player.nowDeg <= defDeg)
 			{
 				player.moveDir = DIR_LEFT;
 			}
@@ -1214,22 +1197,9 @@ void AddRad(void)
 		else
 		{
 			// プレイヤーが左向き
-			if (player.nowDeg > defDeg && furikoSpeed != FURIKO_SPEED_MAX)			// 現在の座標がdeFDeg(-90)より大きい = 中心より右側にいるとき
-			{
-				furikoSpeed = furikoSpeed + FURIKO_ADD;							// 加速
-			}
-
-
-
-			if (player.nowDeg <= defDeg && furikoSpeed != FURIKO_SPEED_MIN)		// 現在の座標がdeFDeg(-90)より大きい = 中心より左側にいるとき
-			{
-				furikoSpeed = furikoSpeed - FURIKO_ADD;							// 減速
-			}
-
-			player.nowDeg = player.nowDeg + furikoSpeed;		// 1°ずつ足してくやつ
-
-
-			if (player.nowDeg >= MaxDeg)
+			furikoSpeed = furikoSpeed - FURIKO_ADD;							// 加速
+			player.nowDeg = player.nowDeg - furikoSpeed;		// 1°ずつ足してくやつ
+			if (player.nowDeg >= defDeg)
 			{
 				player.moveDir = DIR_RIGHT;
 			}
@@ -1438,3 +1408,20 @@ void ItemState(void)
 		break;
 	}
 }
+
+// PlayerControlに入ってた　PlayerDraw下部にも追加あり
+//if ((player.dropFlag == false) && (itemBoxFlag == true))
+//{
+//	if (player.pos.x < itemBoxPosX + CHIP_SIZE_X
+//		&& itemBoxPosX < player.pos.x
+//		&& player.pos.y < itemBoxPosY + CHIP_SIZE_Y
+//		&& itemBoxPosY < player.pos.y)
+//	{
+//		player.dropFlag = false;
+//		itemBoxFlag = false;// ここに入ればhitがでる
+//	}
+//}
+//if (itemBoxFlag == false)
+//{
+//	itemBoxFlag = true;
+//}
