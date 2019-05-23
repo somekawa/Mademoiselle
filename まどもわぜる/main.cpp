@@ -260,7 +260,6 @@ void GameMainDraw(void)
 	StageDraw();
 	BgControl();
 	PlayerDraw();
-	WireDraw();
 	DrawGraph(CHIP_SIZE_X * 5 - mapPos.x, CHIP_SIZE_Y * 23 - mapPos.y, maiImage, true);
 	DrawFormatString(0, 0, 0xffffff, "GameMain : %d", gameCnt);
 	//DrawLine(0, 0, 0, SCREEN_SIZE_Y, 0xffffff, cnt / 4);

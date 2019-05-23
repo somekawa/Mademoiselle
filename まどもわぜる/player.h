@@ -47,19 +47,12 @@ void ItemState(void);
 void AddRad(void);		// 角度の加減算
 
 
-// ワイヤーアクションについて
-void WireDraw(void);
 
 bool GetPlayerV(void);	// ﾌﾟﾚｲﾔｰ生存確認
 
-// 角度(ラジアン)を求めるためのやつ
-float getRadian(float old_x, float old_y, float now_x, float now_y);
 
 
-// ラジアンをsinとcosに分解するやつ
-//float Disassembly(float radian_cos , float radian_sin);
-float Disassembly_C(float radian_cos);					// x軸
-float Disassembly_S(float& radian_sin , float g);		// y軸
+
 
 
 

@@ -54,12 +54,6 @@ int WireTimeCnt;					// ワイヤーの表示時間
 bool _isPushJump;
 bool _isJumped;
 
-
-void OnMove(float& x, float& y, float vx, float vy);
-void OnAdjust();
-
-
-
 Position furiko_pos;
 float _g;
 float _v;
@@ -81,11 +75,6 @@ float radian;
 
 bool skyFlag;
 
-//float rot;
-
-//Position Maxrad;		// 最大の角度(-20)
-//Position minrad;		// 最小の角度(-160)
-
 float MaxDeg;
 float minDeg;
 float furikoSpeed;
@@ -93,6 +82,8 @@ float furikoSpeed;
 float jumpSpeed;
 
 float defDeg;
+
+int Segwey_Cnt;
 
 
 // アイテム関連 
@@ -148,7 +139,7 @@ void PlayerSystmInit(void)
 	shotImage[1] = LoadGraph("image/red_down_shot.png");
 
 	hatenaImage = LoadGraph("image/hatena.png");
-	segweyImage_icon = LoadGraph("image/segwey.png");
+	segweyImage_icon = LoadGraph("image/segway.png");
 
 
 }
@@ -160,7 +151,7 @@ void PlayerGameInit(void)
 	player.offsetSize = { -player.size.x / 2,-player.size.y };
 	player.hitPosE = { 20,0 };
 	player.hitPosS = { 20,62 };
-	player.pos = { CHIP_SIZE_X * 15, CHIP_SIZE_Y * 14 };
+	player.pos = { CHIP_SIZE_X * 12, CHIP_SIZE_Y * 14 };
 	player.moveSpeed = PLAYER_SPEED_NORMAL;
 	player.animCnt = 0;
 	player.moveDir = DIR_RIGHT;
@@ -229,8 +220,7 @@ void PlayerGameInit(void)
 
 	player.BlockFlag = false;
 
-
-	//rot = -rand() % 90;
+	Segwey_Cnt = 0;
 }
 
 void PlayerControl(void)
@@ -266,9 +256,10 @@ void PlayerControl(void)
 		{
 			player.dropFlag = true;												// ここをtrueにしているので、アイテムを使ってフラグをfalseにするまで次のアイテムは取得できない
 			itemBoxFlag = false;												// ここに入ればhitがでる
-			GetItemRand();
 		}
 	}
+
+	//GetItemRand();
 
 	//
 		//case GMODE_GAME:	// ｹﾞｰﾑ中
@@ -603,6 +594,8 @@ void PlayerDraw(void)
 		DrawBox(100, 80, 200, 95, 0x000000, true);
 		DrawBox(101, 81, 199, 94, 0x00ff00, true);
 
+		
+
 		//itemBoxDraw();
 		if (itemBoxFlag == true)
 		{
@@ -622,222 +615,28 @@ void PlayerDraw(void)
 			{
 				itemcnt++;
 			}
-			DrawString(SCREEN_SIZE_X / 2 - 40, SCREEN_SIZE_Y / 2 - 5, "HIT", 0xffffff);
+			//DrawString(SCREEN_SIZE_X / 2 - 40, SCREEN_SIZE_Y / 2 - 5, "HIT", 0xffffff);
 		}
+
+
+
+
+		if (player.dropFlag == true)
+		{
+			DrawGraph(20, 10, segweyImage_icon, true);
+		}
+
+		ItemSegwey();
 
 		break;
 	}
 
 }
 
-
-
-void WireDraw(void)
-{
-	// ワイヤーアクションをはじめたら、中心座標を固定
-
-	// WとFを同時に押したときのバグがえぐい
-
-
-
-	//if (player.wireFlag)
-	//{
-	//	
-
-	//	if (TimeCnt < 150)
-	//	{
-	//		skyFlag = true;
-
-	//		//ひもの支点を定義する
-	//		if (player.moveDir == DIR_RIGHT)
-	//		{
-	//			_endPoint.x = KeepPosX + CHIP_SIZE_X;
-	//		}
-	//		else
-	//		{
-	//			_endPoint.x = KeepPosX - CHIP_SIZE_X;
-	//		}
-	//		_endPoint.y = KeepPosY /*+ CHIP_SIZE_Y*/;
-
-	//		Vec2 v = (_pos - _endPoint);//振り子の支点から振り子の錘までのベクトル
-	//		v = v.normalized();//正規化する
-	//		//外積と内積を利用して角度を計算
-	//		float cost = Dot(v, Vec2(-1, 0));
-	//		float sint = Cross(v, Vec2(-1, 0));
-	//		float theta = atan2f(cost, sint);
-
-	//		_v += _g * cost;
-
-	//		
-
-	//		if (CheckHitKey(KEY_INPUT_F))				 // Fキーを押したら
-	//		{
-	//			XY movedPos = player.pos;
-	//			XY movedHitCheck = movedPos;
-	//			XY movedHitCheck2;
-	//			XY movedHitCheck3;
-	//			
-
-	//			movedPos = player.pos;
-	//			movedHitCheck.y = movedPos.y + player.offsetSize.y;
-	//			movedHitCheck2 = movedHitCheck;													// 左
-	//			movedHitCheck2.x = movedPos.x - player.hitPosS.x;
-	//			movedHitCheck3 = movedHitCheck;													// 右
-	//			movedHitCheck3.x = movedPos.x + player.hitPosE.x - 1;
-
-	//			
-
-	//			playerX_now = _pos.x + mapPos.x;		 // 切り離す瞬間
-	//			playerY_now = _pos.y + mapPos.y;		 // 切り離す瞬間
-
-	//			getRadian(playerX_old, playerY_old, playerX_now, playerY_now);					// 角度(ラジアン)を求めるためのやつ
-
-
-	//			// 地面に接触してる
-	//			//if (!(IsPass(movedHitCheck)) && (IsPass(movedHitCheck2)) && (IsPass(movedHitCheck3)))
-	//			//{		
-	//			//	PlayerDraw();
-	//			//	skyFlag = false;
-	//			//}
-	//			//else
-	//			//{
-	//			//	//playerX_now = _pos.x + mapPos.x;		 // 切り離す瞬間
-	//			//	//playerY_now = _pos.y + mapPos.y;		 // 切り離す瞬間
-
-	//			//	//getRadian(playerX_old, playerY_old, playerX_now, playerY_now);
-
-	//			//	while (skyFlag == true)
-	//			//	{
-	//			//		Disassembly_C(radian);			// x軸
-	//			//		Disassembly_S(radian, _g);		// y軸
-
-	//			//		DrawGraph(_pos.x + mapPos.x + Disassembly_C(radian), _pos.y + mapPos.y + Disassembly_S(radian, _g), stopJumpImage[player.type], true);
-	//			//	}
-	//			//	
-	//			//}
-	//			
-
-	//			
-	//				
-
-	//				//Disassembly_C(radian);			// x軸
-	//				//Disassembly_S(radian);			// y軸
-
-	//				player.visible = true;			// アニメーションするキャラが表示される
-	//				player.visible2 = false;		// ワイヤー中の静止画キャラが非表示になる
-	//				player.wireFlag = false;		// ワイヤーが非表示になる
-
-	//				// 着地地点の描画位置
-	//				player.pos.x = _pos.x + mapPos.x + player.offsetSize.x;
-	//				//player.pos.y = _pos.y + mapPos.y;
-
-	//				DrawGraph(Disassembly_C(radian), Disassembly_S(radian , _g), stopJumpImage[player.type], true);
-	//			
-	//				
-	//				// ここに二段ジャンプ用処理の追加が必要かも
-
-	//				
-
-	//				PlayerDraw();
-	//				
-	//			
-	//		}
-	//		else
-	//		{
-	//			// 更新前にoldに保存
-	//			playerX_old = _pos.x + mapPos.x;		// 1フレーム前
-	//			playerY_old = _pos.y + mapPos.y;		// 1フレーム前
-
-	//			playerX_now = 0;						// 切り離す瞬間だからまだ0
-	//			playerY_now = 0;						// 切り離す瞬間だからまだ0
-
-	//			player.visible = false;
-	//			player.visible2 = true;
-	//			player.wireFlag = true;
-	//			_isPushJump = false;
-	//		}
-
-
-
-
-
-	//		//あとは振り子の角度に従って、その時々の加速度を求め、
-	//		//速度(_v)に加算しよう
-	//		//それをX成分、Y成分に分けて
-	//		//OnMoveの第3第4引数に代入
-
-	//		
-	//		OnMove(_pos.x, _pos.y, _v * sint, _v * cost);
-	//		OnAdjust();		// これがないとひもが伸びていく
-	//	
-	//	//DrawLine(KeepPos, player.pos.y, KeepPos+100, 0, 0xffffffff, 1);		// 動かないけどキャラに固定されるひも
-
-	//	//DrawLine(_pos.x, _pos.y, KeepPosX + CHIP_SIZE_X, KeepPosY + CHIP_SIZE_Y, 0xffffffff, 2);			// 動くけどキャラに固定されないひも
-
-	//	//DrawGraph(_pos.x, _pos.y, playerImage, true);						// キャラクタをおもりとして描画
-
-	//		TimeCnt++;
-	//	}
-	//	else
-	//	{
-	//		player.wireFlag = false;
-	//		player.visible = true;
-	//		player.visible2 = false;
-	//		skyFlag = false;
-	//	}
-
-	//}
-}
-
-
-
-void OnMove(float& x, float& y, float vx, float vy) {
-	// 移動のための処理
-	x += vx;
-	y += vy;
-
-}
-
-void OnAdjust() {
-	//Vec2 v = (furiko_pos - _endPoint);
-	//if (v.Length() > _length) {
-	//	furiko_pos = _endPoint + v.normalized() * _length;
-	//}
-}
-
 bool GetPlayerV(void)
 {
 	return player.visible;
 }
-
-float getRadian(float old_x, float old_y, float now_x, float now_y)
-{
-	radian = atan2f(now_y - old_y, now_x - old_x);
-	return radian;
-}
-
-
-float Disassembly_C(float radian_cos)		// x軸
-{
-	//radian_cos = radian;
-	return cosf(radian_cos);
-}
-
-float Disassembly_S(float& radian_sin, float g)		// y軸
-{
-	//radian_sin = radian;
-	//g = _g;
-	radian_sin = radian_sin - g;		// 減算処理?
-	return sinf(radian_sin);
-}
-
-
-//float Disassembly(float radian_cos , float radian_sin)
-//{
-//	/*radian_cos = radian;
-//	radian_sin = radian;*/
-//	return (cosf(radian) , sinf(radian));
-//}
 
 void PlNormal(void)
 {
@@ -1073,26 +872,12 @@ void PlWirePrepare(void)
 			player_state = PLAYER_W_ACTION;
 			return;		// 1つ目に見つけたブロックでいいのでreturnで抜ける
 		}
-		//else
-		//{
-		//	// 指定範囲外 & 指定ブロックがある
-		//	//player.visible = true;
-		//	//player.visible2 = false;
-		//	//WirePreTimeCnt = 0;
-		//	//player.wireFlag = false;
-		//	//player.wireOkFlag = false;
-		//	//player_state = PLAYER_NORMAL;
-		//}
+		
 
 	}
 	else
 	{
-		// 背景以外がある
 		WirePreTimeCnt = 0;
-		//player.pos.x = furiko_RU.x - player.size.x / 2;
-		//player.pos.y = furiko_RU.y + player.size.y  - mapPos.y;
-		//player.visible = true;
-		//player.visible2 = false;
 		player.wireFlag = false;
 		player.wireOkFlag = false;
 		player_state = PLAYER_NORMAL;
@@ -1123,19 +908,6 @@ void PlWireAction(void)
 				return;
 			}
 
-
-			//Vec2 v = (furiko_pos - player.pos);//振り子の支点から振り子の錘までのベクトル
-			//v = v.normalized();//正規化する
-
-			////外積と内積を利用して角度を計算
-			//float cost = Dot(v, Vec2(-1, 0));
-			//float sint = Cross(v, Vec2(-1, 0));
-			//float theta = atan2f(cost, sint);
-
-			//_v += _g * cost;
-
-			//OnMove(player.pos.x, player.pos.y, _v * sint, _v * cost);
-			//OnAdjust();		// これがないとひもが伸びていく
 
 			AddRad();
 
@@ -1478,17 +1250,44 @@ void PlayerState(void)
 
 void GetItemRand(void)
 {
-	if (player.dropFlag == true)
-	{
-		//取得アイテムをランダムで決めて、item_stateをどれかに切り替える
-		//item_state = ITEM_SEGWEY;
-		//DrawString(SCREEN_SIZE_X / 2 - 60, SCREEN_SIZE_Y / 2 - 5, "Drop", 0xffffff);
-
-	}
+	//if (player.dropFlag)
+	//{
+	//	//取得アイテムをランダムで決めて、item_stateをどれかに切り替える
+	//	//どれかといわれても今はセグウェイしかない
+	//	//DrawGraph(20, 10, segweyImage_icon, true);
+	//	if (trgKey[P2_A])
+	//	{
+	//		ItemSegwey();
+	//		item_state = ITEM_SEGWEY;
+	//	}
+	//	
+	//}
 }
 
 void ItemSegwey(void)
 {
+	if (trgKey[P2_A])
+	{
+		player.segweyFlag = true;
+	}
+
+	if (player.segweyFlag == true)
+	{
+		player.moveSpeed = PLAYER_SPEED_SEGWEY;
+
+		if (Segwey_Cnt == 80)
+		{
+			player.segweyFlag = false;
+			player.dropFlag = false;
+			Segwey_Cnt = 0;
+			player.moveSpeed = PLAYER_SPEED_NORMAL;
+		}
+		else
+		{
+			Segwey_Cnt++;
+		}
+	}
+	
 }
 
 void ItemKabosu(void)
