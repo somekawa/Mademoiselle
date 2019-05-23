@@ -1,9 +1,9 @@
 #include "Dxlib.h"	//DxLibﾗｲﾌﾞﾗﾘを使用する　独自で準備したﾍｯﾀﾞｰﾌｧｲﾙは""で指定する
-#include "keycheck.h"
-#include "main.h"
-#include "player.h"
-#include "stage.h"
-
+#include"keycheck.h"
+#include"main.h"
+#include"player.h"
+#include"stage.h"
+#include"effect.h"
 // ----------変数定義----------
 
 GAME_MODE  gameMode;
@@ -16,16 +16,13 @@ bool fadeOut;
 // ﾀｲﾄﾙ
 int selectImage1;
 int selectImage2;
-int titleImage;// ﾀｲﾄﾙ画像
+int titleImage;
 
 // ｷｬﾗｸﾀｰｾﾚｸﾄ
-int charaSeleTitle; // ｷｬﾗｾﾚ画面全体
-int wakImage;	// 枠
+int charaSeleTitle;
+int wakImage;
 
-// ｽﾃｰｼﾞｾﾚｸﾄ
-int stageImage1;
-
-XY mapPos;
+Position mapPos;
 int maiImage;
 int cnt;
 
@@ -35,8 +32,6 @@ void GameTitle(void);
 void GameTitleDraw(void);
 void GameCharasere(void);
 void GameCharasereDraw(void);
-void StageSelect(void);
-void StageSelectDarw(void);
 void GameMain(void);
 void GameMainDraw(void);
 void GameOver(void);
@@ -45,7 +40,6 @@ void HitCheck(void);
 
 bool FadeInScreen(int fadeStep);
 bool FadeOutScreen(int fadeStep);
-
 
 // ==========WinMain関数
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
@@ -66,15 +60,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			break;
 
 		case GMODE_TITLE:	// ﾀｲﾄﾙ
-			if (fadeIn)
-			{
+			if (fadeIn) {
 				if (!FadeInScreen(5))fadeIn = false;
 			}
-			else if (fadeOut) 
-			{
-				if (!FadeOutScreen(5))
-				{
-					gameMode = GMODE_CHARASERE; // ｷｬﾗｾﾚにとぶ
+			else if (fadeOut) {
+				if (!FadeOutScreen(5)) {
+					//gameMode = GMODE_GAME;
+					gameMode = GMODE_CHARASERE;
 					fadeOut = false;
 					fadeIn = true;
 				}
@@ -85,45 +77,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 			// ｷｬﾗｾﾚｸﾄ
 		case GMODE_CHARASERE:
-			if (fadeIn) 
-			{
+			if (fadeIn) {
 				if (!FadeInScreen(5))fadeIn = false;
 			}
-			else if (fadeOut)
-			{
-				if (!FadeOutScreen(5)) 
-				{
-					gameMode = GMODE_STAGESERE;
-					fadeOut = false;
-					fadeIn = true;
-				}
-			}
-			else if (trgKey[START]) fadeOut = true;
-			GameCharasere();
-			break;
+			else if (fadeOut) {
+				if (!FadeOutScreen(5)) {
 
-			// ｽﾃｰｼﾞｾﾚｸﾄ
-		case GMODE_STAGESERE:
-			if (fadeIn) 
-			{
-				if (!FadeInScreen(5))fadeIn = false;
-			}
-			else if (fadeOut) 
-			{
-				if (!FadeOutScreen(5)) 
-				{
 					gameMode = GMODE_GAME;
 					fadeOut = false;
 					fadeIn = true;
 				}
 			}
-			else if (trgKey[START]) fadeOut = true;
-			StageSelect();
+			else if ((trgKey[START]) && (GetPlayerV())) fadeOut = true;
+			GameCharasere();
 			break;
 
 		case GMODE_GAME:	// ｹﾞｰﾑ中
-			if (fadeIn) 
-			{
+			if (fadeIn) {
 				if (!FadeInScreen(5))fadeIn = false;
 			}
 			else if (trgKey[START]) gameMode = GMODE_OVER;
@@ -131,14 +101,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			break;
 
 		case GMODE_OVER:	// ｹﾞｰﾑｵｰﾊﾞｰ
-			if (fadeIn) 
-			{
+			if (fadeIn) {
 				if (!FadeInScreen(5))fadeIn = false;
 			}
-			else if (fadeOut) 
-			{
-				if (!FadeOutScreen(5)) 
-				{
+			else if (fadeOut) {
+				if (!FadeOutScreen(5)) {
 					gameMode = GMODE_INIT;
 					fadeOut = false;
 					fadeIn = true;
@@ -147,7 +114,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			else if (trgKey[START]) fadeOut = true;
 			GameOver();
 			break;
-
 		default:
 			break;
 		}
@@ -177,37 +143,39 @@ int SystmInit(void)
 	maiImage = LoadGraph("image/bollI.png");
 	PlayerSystmInit();
 	StageSystmInit();
+	EffectSystmInit();
 
 	selectImage1 = LoadGraph("image/1player.png");
 	selectImage2 = LoadGraph("image/4player.png");
 	titleImage = LoadGraph("image/title2.png");
+
 	// ｷｬﾗｾﾚｸﾄ
 	charaSeleTitle = LoadGraph("image/CharacterSelect.png");
 	wakImage = LoadGraph("image/wak0.png");
-	// ｽﾃｰｼﾞｾﾚｸﾄ
-	stageImage1=LoadGraph("image/map1_ps.bmp");
 
 	return 1;
+
 }
 
 void GameInit(void)
 {
-	fadeIn	= true;
-	fadeOut	= false;
+	fadeIn = true;
+	fadeOut = false;
 	pauseFlag = 0;
 	cnt = 0;
 	PlayerGameInit();
 	StageGameInit();
+	EffectGameInit();
 	gameMode = GMODE_TITLE;
 }
 
 void GameTitle(void)
 {
-	if (cnt > 2500) 
+	if (cnt > 2500)
 	{
 		cnt = 2500;
 	}
-	else 
+	else
 	{
 		cnt++;
 	}
@@ -220,11 +188,11 @@ void GameTitleDraw(void)
 	DrawLine(0, 0, SCREEN_SIZE_X, 0, 0xffffff, cnt / 6);
 	DrawLine(SCREEN_SIZE_X, 0, SCREEN_SIZE_X, SCREEN_SIZE_Y, 0xffffff, cnt / 4);
 	DrawLine(0, SCREEN_SIZE_Y, SCREEN_SIZE_X, SCREEN_SIZE_Y, 0xffffff, cnt / 6);
+	DrawLine(0, 0, cnt * 3, cnt * 3, 0xffffff, 3);
 	DrawString(0, 0, "GameTitle", 0xffffff);
-
 	// でかすぎ
 	DrawGraph(0, 0, titleImage, false);
-	DrawGraph(100,0,selectImage1, true);
+	DrawGraph(100, 0, selectImage1, true);
 	DrawGraph(0, 100, selectImage2, true);
 }
 
@@ -240,44 +208,28 @@ void GameCharasereDraw(void)
 	DrawLine(0, SCREEN_SIZE_Y / 2 + 60, SCREEN_SIZE_X, SCREEN_SIZE_Y / 2 + 60, 0xffffff, true);
 	DrawLine(SCREEN_SIZE_X / 2, 120, SCREEN_SIZE_X / 2, SCREEN_SIZE_Y, 0xffffff, true);
 	DrawGraph(150, 20, charaSeleTitle, true);
-	for (int x = 0; x < 2; x++) 
+	for (int x = 0; x < 2; x++)
 	{
-		for (int y = 0; y < 2; y++) 
+		for (int y = 0; y < 2; y++)
 		{
 			DrawGraph((SCREEN_SIZE_X / 2 + 1)*x, 120 + (341 * y), wakImage, true);
 		}
 	}
+	DrawBox(40, 120 + 40, 40 + 260, 160 + 260, 0xffffff, true);
 	PlayerDraw();
-
 	DrawString(0, 0, "Charasere", 0xffffff);
-}
-
-void StageSelect(void) 
-{
-	StageSelectDarw();
-}
-
-void StageSelectDarw(void)
-{
-	DrawBox(150, 20, SCREEN_SIZE_X - 150, 120, 0xffffff, false);
-
-	DrawGraph(0, 125, stageImage1, true);// 選べるｽﾃｰｼﾞ1
-	DrawLine(0, SCREEN_SIZE_Y / 2 + 60, SCREEN_SIZE_X, SCREEN_SIZE_Y / 2 + 60, 0xffffff, true);
-	DrawLine(SCREEN_SIZE_X / 2, 120, SCREEN_SIZE_X / 2, SCREEN_SIZE_Y, 0xffffff, true);
-
-	DrawString(0, 0, "Stagesere", 0xffffff);
 }
 
 void GameMain(void)
 {
-		/*if (cnt > 2500) {
+	/*if (cnt > 2500) {
 		cnt = 2500;
 	}
 	else {
 		cnt++;
 	}*/
 
-	if (trgKey[P1_PAUSE]) 
+	if (trgKey[P1_PAUSE])
 	{
 		pauseFlag = !pauseFlag;
 	}
@@ -285,15 +237,16 @@ void GameMain(void)
 	{
 		SetDrawBright(128, 128, 128);
 	}
-	else 
+	else
 	{
 		gameCnt++;
 		PlayerControl();
 		StageControl();
+		EffectControl();
 		HitCheck();
 	}
 	GameMainDraw();
-	if (pauseFlag) 
+	if (pauseFlag)
 	{
 		SetDrawBright(255, 255, 255);
 		DrawString(SCREEN_SIZE_X / 2 - 40, SCREEN_SIZE_Y / 2 - 5, "P A U S E", 0xffffff);
@@ -302,7 +255,7 @@ void GameMain(void)
 
 void GameMainDraw(void)
 {
-	StageDraw();// ｽﾃｰｼﾞの描画
+	StageDraw();
 	BgControl();
 	PlayerDraw();
 	WireDraw();
@@ -314,10 +267,12 @@ void GameMainDraw(void)
 	//DrawLine(0, SCREEN_SIZE_Y, SCREEN_SIZE_X, SCREEN_SIZE_Y, 0xffffff, cnt / 6);
 	//DrawLine(SCREEN_SIZE_X / 2, 0, SCREEN_SIZE_X / 2, SCREEN_SIZE_Y, 0xffffff, true);
 	//DrawLine(0, SCREEN_SIZE_Y / 2, SCREEN_SIZE_X, SCREEN_SIZE_Y / 2, 0xffffff, true);
+	EffectDraw();
 }
 
 void GameOver(void)
 {
+
 	GameOverDraw();
 }
 
