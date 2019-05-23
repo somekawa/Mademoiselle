@@ -154,7 +154,7 @@ XY MapPosToIndex(Position pos)	// pos = mvedPos
 
 bool IsPass(Position pos)
 {
-	bool ret = true; // “®‚¯‚é‚©‚Ç‚¤‚©@true‚È‚ç“®‚¯‚È‚¢@false“®‚¯‚é
+	bool ret = true; // “®‚¯‚é‚©‚Ç‚¤‚©@true‚È‚ç“®‚¯‚é false‚È‚ç“®‚¯‚È‚¢
 	int mapNo;
 	bool block = true;
 	XY mapIndex;

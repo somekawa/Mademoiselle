@@ -118,6 +118,8 @@ typedef struct {
 	bool left;				// 左向き
 	float nowDeg;			// 今のプレイヤーの角度
 	bool dropFlag;			// アイテムを取得しているかどうか
+	float JumpDeg;			// 打ち出し角
+	bool BlockFlag;			// ブロック内にプレイヤーがいるとき = true
 }CHARACTER;
 
 extern Position mapPos;

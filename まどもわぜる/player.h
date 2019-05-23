@@ -28,6 +28,8 @@ void PlWireJump(void);
 void PlWall_R(void);	// 壁を走る(右)
 void PlWall_L(void);	// 壁を走る(左)
 
+
+void GetItemRand(void);	// player.dropFlagがtrueになったときにアイテムをランダムで決定させる
 void ItemSegwey(void);
 void ItemKabosu(void);
 void ItemUFO(void);

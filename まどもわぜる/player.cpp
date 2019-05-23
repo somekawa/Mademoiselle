@@ -21,8 +21,6 @@
 #define ONEFRAME_WIRE_UP	  15    // 1フレームで上がるワイヤーの速度
 
 #define FURIKO_SPEED_DEF      10.0f	// 振り子の初速度
-#define FURIKO_SPEED_MAX      3.0f	// 振り子の最大速度
-#define FURIKO_SPEED_MIN	  0.5f	// 振り子の最小速度
 #define FURIKO_ADD			  0.4f	// 振り子の加減算速度
 
 //#define PAI 3.141592
@@ -92,13 +90,18 @@ float MaxDeg;
 float minDeg;
 float furikoSpeed;
 
+float jumpSpeed;
+
 float defDeg;
 
+
 // アイテム関連 
+int itemcnt;
 bool itemBoxFlag = true;
-int itemBoxPosX = CHIP_SIZE_X * 15 - mapPos.x;
-int itemBoxPosY = CHIP_SIZE_Y * 16 - mapPos.y;
+int itemBoxPosX = CHIP_SIZE_X * 15 ;
+int itemBoxPosY = CHIP_SIZE_Y * 16 ;
 int hatenaImage;		// ？ﾎﾞｯｸｽ画像
+int segweyImage_icon;
 
 
 
@@ -145,6 +148,7 @@ void PlayerSystmInit(void)
 	shotImage[1] = LoadGraph("image/red_down_shot.png");
 
 	hatenaImage = LoadGraph("image/hatena.png");
+	segweyImage_icon = LoadGraph("image/segwey.png");
 
 
 }
@@ -214,9 +218,16 @@ void PlayerGameInit(void)
 	minDeg = 0.0f;
 	player.nowDeg = 0.0f;
 	furikoSpeed = 0.0f;
+	jumpSpeed = 0.0f;
 	defDeg = 0.0f;
 
 	player.dropFlag = false;
+
+	itemcnt = 0;
+
+	player.JumpDeg = 0;
+
+	player.BlockFlag = false;
 
 
 	//rot = -rand() % 90;
@@ -243,6 +254,20 @@ void PlayerControl(void)
 	case GMODE_GAME:
 		PlayerState();
 		break;
+	}
+
+	// アイテム取得
+	if ((player.dropFlag == false) && (itemBoxFlag == true))
+	{
+		if (player.pos.x - player.hitPosS.x < itemBoxPosX + CHIP_SIZE_X		    // player左 < box右	
+			&& itemBoxPosX < player.pos.x + player.hitPosS.x					// box左    < player右
+			&& player.pos.y - player.size.y < itemBoxPosY + CHIP_SIZE_Y			// player上 < box下
+			&& itemBoxPosY < player.pos.y)										// box上    < player下
+		{
+			player.dropFlag = true;												// ここをtrueにしているので、アイテムを使ってフラグをfalseにするまで次のアイテムは取得できない
+			itemBoxFlag = false;												// ここに入ればhitがでる
+			GetItemRand();
+		}
 	}
 
 	//
@@ -587,7 +612,17 @@ void PlayerDraw(void)
 		}
 		else
 		{
-			DrawString(SCREEN_SIZE_X / 2 - 40, SCREEN_SIZE_Y / 2 - 5, "HIT", 0x00000);
+
+			if (itemcnt == 200)
+			{
+				itemBoxFlag = true;
+				itemcnt = 0;
+			}
+			else
+			{
+				itemcnt++;
+			}
+			DrawString(SCREEN_SIZE_X / 2 - 40, SCREEN_SIZE_Y / 2 - 5, "HIT", 0xffffff);
 		}
 
 		break;
@@ -812,6 +847,10 @@ void PlNormal(void)
 	Position player_RD = { player.pos.x + player.moveSpeed + player.hitPosE.x , player.pos.y - 1 };
 	Position player_LD = { player.pos.x - player.moveSpeed - player.hitPosS.x - 1 , player.pos.y - 1 };
 
+	if (player.pos.y > SCREEN_SIZE_Y)mapPos.y += ACC_G / 3;	// 下がる
+	if (player.pos.y < SCREEN_SIZE_Y + 200)mapPos.y -= ACC_G / 2;// 上がる
+	
+
 	if (newKey[P1_RIGHT])
 	{
 		player.runFlag = true;
@@ -829,7 +868,6 @@ void PlNormal(void)
 				{
 					mapPos.x += player.moveSpeed;
 				}
-
 			}
 			else
 			{
@@ -839,23 +877,7 @@ void PlNormal(void)
 			}
 		}
 	}
-
-	// PlayerControlに入ってた　PlayerDraw下部にも追加あり
-	if ((player.dropFlag == false) && (itemBoxFlag == true))
-	{
-		if (player.pos.x - player.size.x / 2 + player.size.y < itemBoxPosX + CHIP_SIZE_X			
-			&& itemBoxPosX < player.pos.x - player.size.x / 2 + player.size.y
-			&& player.pos.y - player.size.y < itemBoxPosY + CHIP_SIZE_Y
-			&& itemBoxPosY < player.pos.y - player.size.y)
-		{
-			player.dropFlag = false;
-			itemBoxFlag = false;// ここに入ればhitがでる
-		}
-	}
-	if (itemBoxFlag == false)
-	{
-		itemBoxFlag = true;
-	}
+	
 
 	if (newKey[P1_LEFT])
 	{
@@ -877,6 +899,10 @@ void PlNormal(void)
 				//{
 				//	mapPos.x -= player.moveSpeed;
 				//}
+				if (player.pos.x < PLAY_SIZE_X - SCREEN_SIZE_X / 2)//カメラが左に行く
+				{
+					mapPos.x -= player.moveSpeed;
+				}
 
 			}
 			else
@@ -914,8 +940,8 @@ void PlNormal(void)
 
 void PlJumpUp(void)
 {
-	Position player_RU = { player.pos.x + player.hitPosE.x - 1 , player.pos.y - player.moveSpeed - player.hitPosS.y };	// 左上
-	Position player_LU = { player.pos.x - player.hitPosS.x , player.pos.y - player.moveSpeed - player.hitPosS.y };	// 右上
+	Position player_RU = { player.pos.x + player.hitPosE.x - 1 , player.pos.y - player.moveSpeed - player.hitPosS.y };	// 右上
+	Position player_LU = { player.pos.x - player.hitPosS.x , player.pos.y - player.moveSpeed - player.hitPosS.y };	// 左上
 
 	player.UpDownSpeed += player.AddUpDownSpeed;
 
@@ -1035,20 +1061,6 @@ void PlWirePrepare(void)
 
 			furikoSpeed = FURIKO_SPEED_DEF;
 
-			// 最大
-			//Maxrad.x = (-20.0f * PI / 180.0f) + furiko_pos.x;
-			//Maxrad.y = (-20.0f * PI / 180.0f) + furiko_pos.y;
-
-			//Maxrad.x = (-20 * PI / 180) + _length.x + furiko_pos.x;
-			//Maxrad.y = (-20 * PI / 180) + _length.y + furiko_pos.y;
-
-			// 最小
-			//minrad.x = (-160.0f * PI / 180.0f) + furiko_pos.x;
-			//minrad.y = (-160.0f * PI / 180.0f) + furiko_pos.y;
-
-			//minrad.x = (-160 * PI / 180) + _length.x + furiko_pos.x;
-			//minrad.y = (-160 * PI / 180) + _length.y + furiko_pos.y;
-
 
 			// 指定範囲以内 & 指定ブロックがある
 			// 指定ブロックにワイヤーを繋げる
@@ -1101,6 +1113,12 @@ void PlWireAction(void)
 
 			if (newKey[P2_B])
 			{
+				if (!IsPass({ player.pos.x , player.pos.y }))			// ここでそもそも壁の中でワイヤーを切り離したときの処置を書いとく
+				{
+					player.pos.y = GetWorldPos_Map(player.pos, DIR_DOWN).y + player.hitPosS.y + player.size.y;
+				}
+				jumpSpeed = FURIKO_SPEED_DEF;
+				player.BlockFlag = true;
 				player_state = PLAYER_W_JUMP;
 				return;
 			}
@@ -1211,24 +1229,107 @@ void AddRad(void)
 
 void PlWireJump(void)
 {
+
+
+	Position player_RU = { player.pos.x + player.hitPosE.x - 1 , player.pos.y - player.moveSpeed - player.hitPosS.y };	// 右上
+	Position player_LU = { player.pos.x - player.hitPosS.x , player.pos.y - player.moveSpeed - player.hitPosS.y };		// 左上
+
+	Position player_RD = { player.pos.x + player.hitPosE.x - 1, player.pos.y - 1 };										// 右下
+	Position player_LD = { player.pos.x - player.hitPosS.x , player.pos.y - 1 };										// 左下
+
 	player.visible = true;			// アニメーションするキャラが表示される
 	player.visible2 = false;		// ワイヤー中の静止画キャラが非表示になる
 	player.wireFlag = false;		// ワイヤーが非表示になる
 
-	// 着地地点の描画位置
-	/*if (player.moveDir == DIR_RIGHT)
+	//player.JumpDeg = 180 - (player.nowDeg + 90);		// 打ち出し角
+
+	if (player.right == true)
 	{
-		player.pos.x = furiko_pos.x + mapPos.x - player.size.x / 2;
+		player.moveDir = DIR_RIGHT;
+
+		player.JumpDeg = 180 - (player.nowDeg + 90);		// 打ち出し角
+
+		if (player.BlockFlag == true)
+		{
+			player.pos.x += PLAYER_SPEED_NORMAL;
+
+			if (player.pos.y >= player.JumpDeg - player.pos.y)
+			{
+				player.pos.y -= jumpSpeed;
+
+			}
+			if (player.pos.y > SCREEN_SIZE_Y)mapPos.y += ACC_G / 3;	// 下がる
+			if (player.pos.y < SCREEN_SIZE_Y + 200)mapPos.y -= ACC_G / 2;// 上がる
+
+			if (player.pos.x > SCREEN_SIZE_X / 2)//カメラが右に行く
+			{
+				mapPos.x += player.moveSpeed;
+			}
+
+			jumpSpeed = jumpSpeed - FURIKO_ADD;
+		}
+
 	}
-	else
+	if (player.left == true)
 	{
-		player.pos.x = furiko_pos.x - mapPos.x + player.size.x / 2;
+		player.moveDir = DIR_LEFT;
 
-	}*/
-	//player.pos.x = furiko_pos.x + mapPos.x - player.size.x / 2;
-	//player.pos.y = furiko_pos.y + mapPos.y + player.size.y;
+		player.JumpDeg = -(180 - (player.nowDeg + 90));		// 打ち出し角
+		if (player.BlockFlag == true)
+		{
+			player.pos.x -= PLAYER_SPEED_NORMAL;
 
-	player_state = PLAYER_NORMAL;
+			if (player.pos.y >= player.JumpDeg - player.pos.y)
+			{
+				player.pos.y -= jumpSpeed;
+
+			}
+			if (player.pos.y > SCREEN_SIZE_Y)mapPos.y += ACC_G / 3;	// 下がる
+			if (player.pos.y < SCREEN_SIZE_Y + 200)mapPos.y -= ACC_G / 2;// 上がる
+
+			if (player.pos.x < PLAY_SIZE_X - SCREEN_SIZE_X / 2)//カメラが左に行く
+			{
+				mapPos.x -= player.moveSpeed;
+			}
+
+			jumpSpeed = jumpSpeed - FURIKO_ADD;
+		}
+
+	}
+
+	//if (player.BlockFlag == true)
+	//{
+	//	player.pos.x += PLAYER_SPEED_NORMAL;
+
+	//	if (player.pos.y >= player.JumpDeg - player.pos.y)
+	//	{
+	//		player.pos.y -= jumpSpeed;
+
+	//	}
+	//	if (player.pos.y > SCREEN_SIZE_Y)mapPos.y += ACC_G / 3;	// 下がる
+	//	if (player.pos.y < SCREEN_SIZE_Y + 200)mapPos.y -= ACC_G / 2;// 上がる
+
+	//	if (player.pos.x > SCREEN_SIZE_X / 2)//カメラが右に行く
+	//	{
+	//		mapPos.x += player.moveSpeed;
+	//	}
+
+	//	jumpSpeed = jumpSpeed - FURIKO_ADD;
+	//}
+
+
+	if (!IsPass({ player_RU.x , player_RU.y }) || !IsPass({ player_LU.x , player_LU.y }) || !IsPass({ player_RD.x , player_RD.y }) || !IsPass({ player_LD.x , player_LD.y }))
+	{
+		player.BlockFlag = false;
+	}
+
+	if (player.BlockFlag == false)
+	{
+		if (IsPass({ player_RU.x , player_RU.y }) || IsPass({ player_LU.x , player_LU.y }) || IsPass({ player_RD.x , player_RD.y }) || IsPass({ player_LD.x , player_LD.y }))
+		{
+			player_state = PLAYER_DOWN;
+		}
+	}
 
 }
 
@@ -1242,6 +1343,9 @@ void PlWall_R(void)
 	player.pos.x = GetWorldPos_Map({ player.pos.x + player.moveSpeed + player.hitPosE.x , player.pos.y - 1 }, DIR_LEFT).x;
 
 	Position player_RU = { player.pos.x - 1, player.pos.y - player.wallRunSpeed - player.hitPosE.x };
+
+	if (player.pos.y < SCREEN_SIZE_Y + 200)mapPos.y -= ACC_G / 2;// 上がる
+
 
 	// 専用の壁か？
 	if (WallBlockPass(player.pos)) {
@@ -1288,6 +1392,9 @@ void PlWall_L(void)
 	player.pos.x = GetWorldPos_Map({ player.pos.x - player.moveSpeed - player.hitPosS.x - 1 , player.pos.y - 1 }, DIR_RIGHT).x;
 
 	Position player_LU = { player.pos.x, player.pos.y - player.moveSpeed - player.hitPosE.x };
+
+	if (player.pos.y < SCREEN_SIZE_Y + 200)mapPos.y -= ACC_G / 2;// 上がる
+
 
 	// 専用の壁か？
 	if (WallBlockPass({ player.pos.x - 1,player.pos.y })) {
@@ -1369,6 +1476,17 @@ void PlayerState(void)
 
 }
 
+void GetItemRand(void)
+{
+	if (player.dropFlag == true)
+	{
+		//取得アイテムをランダムで決めて、item_stateをどれかに切り替える
+		//item_state = ITEM_SEGWEY;
+		//DrawString(SCREEN_SIZE_X / 2 - 60, SCREEN_SIZE_Y / 2 - 5, "Drop", 0xffffff);
+
+	}
+}
+
 void ItemSegwey(void)
 {
 }
@@ -1408,20 +1526,3 @@ void ItemState(void)
 		break;
 	}
 }
-
-// PlayerControlに入ってた　PlayerDraw下部にも追加あり
-//if ((player.dropFlag == false) && (itemBoxFlag == true))
-//{
-//	if (player.pos.x < itemBoxPosX + CHIP_SIZE_X
-//		&& itemBoxPosX < player.pos.x
-//		&& player.pos.y < itemBoxPosY + CHIP_SIZE_Y
-//		&& itemBoxPosY < player.pos.y)
-//	{
-//		player.dropFlag = false;
-//		itemBoxFlag = false;// ここに入ればhitがでる
-//	}
-//}
-//if (itemBoxFlag == false)
-//{
-//	itemBoxFlag = true;
-//}
