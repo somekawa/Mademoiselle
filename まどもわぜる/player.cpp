@@ -36,6 +36,9 @@ enum PLAYER_SPEED {
 	PLAYER_SPEED_SEGWEY = 12
 };
 int p1Wak[2];
+int p2Wak[2];
+int p3Wak[2];
+int p4Wak[2];
 int yazirusiImage[2];
 
 int playerImage[PLAYER_MAX];
@@ -116,6 +119,12 @@ void PlayerSystmInit(void)
 {
 	p1Wak[0] = LoadGraph("image/p1CSWak.png");
 	p1Wak[1] = LoadGraph("image/p1GWak.png");
+	p2Wak[0] = LoadGraph("image/p2CSWak.png");
+	p2Wak[1] = LoadGraph("image/p2GWak.png");
+	p3Wak[0] = LoadGraph("image/p3CSWak.png");
+	p3Wak[1] = LoadGraph("image/p3GWak.png");
+	p4Wak[0] = LoadGraph("image/p4CSWak.png");
+	p4Wak[1] = LoadGraph("image/p4GWak.png");
 	for (int i = 0; i < 2; i++) {
 		yazirusiImage[i] = LoadGraph("image/yazirusi.png");
 	}
@@ -135,10 +144,6 @@ void PlayerSystmInit(void)
 	stopJumpImage[PLAYER_BLUE] = LoadGraph("image/playerB_stop_jump.png");
 	LoadDivGraph("image/playerB_run.png", 10, 5, 2, 72, 72, runImage[PLAYER_BLUE], true);
 	LoadDivGraph("image/playerB_segway.png", 2, 2, 1, 72, 72, segweyImage[PLAYER_BLUE], true);
-
-	downImage = LoadGraph("image/red_down.png");
-	shotImage[0] = LoadGraph("image/red_stop_shot.png");
-	shotImage[1] = LoadGraph("image/red_down_shot.png");
 
 	hatenaImage = LoadGraph("image/hatena.png");
 	segweyImage_icon = LoadGraph("image/segway.png");
@@ -505,13 +510,47 @@ void PlayerDraw(void)
 	case GMODE_CHARASERE:
 		DrawGraph(0, 120, p1Wak[0], true);
 		if (player.visible) {
-			DrawRotaGraph(160, 300, 3, 0, runImage[player.type][(player.animCnt / 3) % 10], true);
+			//DrawRotaGraph(160, 300, 3, 0, runImage[player.type][(player.animCnt / 3) % 10], true);
+			//DrawString(120, 180, "キャラ決定！", 0x000000);
+			// PL1
+			DrawRotaGraph(160, 300, 3, 0,
+				runImage[player.type][(player.animCnt / 3) % 10], true);
 			DrawString(120, 180, "キャラ決定！", 0x000000);
+			// PL2
+			DrawRotaGraph(760, 300, 3, 0,
+				runImage[player.type][(player.animCnt / 3) % 10], true);
+			DrawString(720, 180, "キャラ決定！", 0x000000);
+
+			// PL3
+			//DrawRotaGraph(160, 600, 3, 0,
+			//	runImage[player.type][(player.animCnt / 3) % 10], true);
+			//DrawString(120, 420, "キャラ決定！", 0x000000);
+			// PL4
+			//DrawRotaGraph(760, 600, 3, 0,
+			//	runImage[player.type][(player.animCnt / 3) % 10], true);
+			//DrawString(720, 420, "キャラ決定！", 0x000000);
+
 		}
 		else {
 			DrawRotaGraph(160, 300, 3, 0, playerImage[player.type], true);
 			DrawTurnGraph(0, 240, yazirusiImage[0], true);
 			DrawGraph(260, 240, yazirusiImage[1], true);
+			// PL1
+			DrawRotaGraph(160, 300, 3, 0, playerImage[player.type], true);
+			DrawTurnGraph(0, 240, yazirusiImage[0], true);
+			DrawGraph(260, 240, yazirusiImage[1], true);
+			// PL2
+			DrawRotaGraph(760, 300, 3, 0, playerImage[player.type], true);
+			DrawTurnGraph(600, 240, yazirusiImage[0], true);
+			DrawGraph(860, 240, yazirusiImage[1], true);
+			// PL3
+			//DrawRotaGraph(160, 600, 3, 0, playerImage[player.type], true);
+			//DrawTurnGraph(0, 540, yazirusiImage[0], true);
+			//DrawGraph(260, 540, yazirusiImage[1], true);
+			// PL4
+			//DrawRotaGraph(760, 600, 3, 0, playerImage[player.type], true);
+			//DrawTurnGraph(500, 540, yazirusiImage[0], true);
+			//DrawGraph(660, 540, yazirusiImage[1], true);
 
 		}
 
@@ -598,18 +637,39 @@ void PlayerDraw(void)
 
 			}
 		}
-
 		// ｱｲｺﾝ
+		// PL1
 		DrawGraph(50, 40, p1Wak[1], true);
 		DrawGraph(58, 74, playerIcon[player.type], true);
+		// PL2
+		DrawGraph(250, 40, p2Wak[1], true);
+		DrawGraph(258, 74, playerIcon[player.type], true);
+		// PL3
+		DrawGraph(450, 40, p3Wak[1], true);
+		//DrawGraph(458, 74, playerIcon[player.type], true);
+		// PL4
+		DrawGraph(650, 40, p4Wak[1], true);
+		//DrawGraph(658, 74, playerIcon[player.type], true);
+
+		// 所持アイテムが描画される枠
 		DrawBox(20, 5, 86, 71, 0xffffff, true);
 		DrawBox(20, 5, 86, 71, 0x000000, false);
+
+		// ｷｬﾗステータスが描画される枠
+		// PL1
 		DrawBox(100, 80, 200, 95, 0x000000, true);
 		DrawBox(101, 81, 199, 94, 0x00ff00, true);
+		// PL2
+		DrawBox(300, 80, 400, 95, 0x000000, true);
+		DrawBox(301, 81, 399, 94, 0x00ff00, true);
+		// PL3
+		DrawBox(500, 80, 600, 95, 0x000000, true);
+		DrawBox(501, 81, 599, 94, 0x00ff00, true);
+		// PL4
+		DrawBox(700, 80, 800, 95, 0x000000, true);
+		DrawBox(701, 81, 799, 94, 0x00ff00, true);
 
 		
-
-		//itemBoxDraw();
 		if (itemBoxFlag == true)
 		{
 			DrawGraph(CHIP_SIZE_X * 15 - mapPos.x, CHIP_SIZE_X * 16 - mapPos.y, hatenaImage, true);// 左上1つ
