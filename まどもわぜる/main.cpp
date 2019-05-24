@@ -203,7 +203,7 @@ int SystmInit(void)
 
 void GameInit(void)
 {
-	titleBGM = LoadSoundMem("BGM/title_bgm.mp3");		// ‰æ–ÊØ‚è‘Ö‚¦‚É–ˆ‰ñˆê“x—¬‚µ‚Ä‚¢‚½BGM‚ğíœ‚·‚é‚½‚ßGameInit‚É“ü‚ê‚Ä‚¢‚é
+	titleBGM = LoadSoundMem("BGM/bgm_maoudamashii_8bit11.ogg");		// ‰æ–ÊØ‚è‘Ö‚¦‚É–ˆ‰ñˆê“x—¬‚µ‚Ä‚¢‚½BGM‚ğíœ‚·‚é‚½‚ßGameInit‚É“ü‚ê‚Ä‚¢‚é
 
 	fadeIn = true;
 	fadeOut = false;
