@@ -1062,8 +1062,8 @@ void AddRad(void)
 		if (player.moveDir == DIR_RIGHT)
 		{
 			// プレイヤーが右向き
-			furikoSpeed = furikoSpeed + FURIKO_ADD;							// 減速
-			player.nowDeg = player.nowDeg - furikoSpeed;		// 1°ずつ引いてくやつ
+			furikoSpeed = furikoSpeed - FURIKO_ADD;							// 減速
+			player.nowDeg = player.nowDeg + furikoSpeed;		// 1°ずつ引いてくやつ
 
 			if (player.nowDeg <= defDeg)
 			{
@@ -1073,8 +1073,8 @@ void AddRad(void)
 		else
 		{
 			// プレイヤーが左向き
-			furikoSpeed = furikoSpeed - FURIKO_ADD;							// 加速
-			player.nowDeg = player.nowDeg - furikoSpeed;		// 1°ずつ足してくやつ
+			furikoSpeed = furikoSpeed + FURIKO_ADD;							// 加速
+			player.nowDeg = player.nowDeg + furikoSpeed;		// 1°ずつ足してくやつ
 			if (player.nowDeg >= defDeg)
 			{
 				player.moveDir = DIR_RIGHT;
