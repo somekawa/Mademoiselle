@@ -207,8 +207,8 @@ int SystmInit(void)
 void GameInit(void)
 {
 	titleBGM = LoadSoundMem("BGM/bgm_maoudamashii_8bit11.ogg");		// ‰æ–ÊØ‚è‘Ö‚¦‚É–ˆ‰ñˆê“x—¬‚µ‚Ä‚¢‚½BGM‚ğíœ‚·‚é‚½‚ßGameInit‚É“ü‚ê‚Ä‚¢‚é
-	sousaBGM = LoadSoundMem("BGM/loop001.mp3");
-	charselBGM = LoadSoundMem("BGM/loop007.mp3");
+	sousaBGM = LoadSoundMem("BGM/loop001.ogg");
+	charselBGM = LoadSoundMem("BGM/loop007.ogg");
 	gameBGM = LoadSoundMem("BGM/map_bgm.mp3");
 
 	fadeIn = true;
