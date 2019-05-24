@@ -27,7 +27,7 @@ int charaSeleTitle;
 int wakImage;
 
 // 説明
-int setumei[DATA_MAX];
+int data[DATA_MAX];
 int dataType;
 
 int nowKey;
@@ -193,9 +193,10 @@ int SystmInit(void)
 	selectImage2 = LoadGraph("image/4player.png");
 	titleImage = LoadGraph("image/title2.png");
 
-	setumei[DATA_BUTTON] = LoadGraph("image/data_button.png");
-	setumei[DATA_BLOCK] = LoadGraph("image/data_block.png");
-	setumei[DATA_ICON] = LoadGraph("image/data_icon.png");
+	data[DATA_BUTTON] = LoadGraph("image/data_button.png");
+	data[DATA_BLOCK] = LoadGraph("image/data_block.png");
+	data[DATA_ITEM] = LoadGraph("image/data_item.png");
+	data[DATA_ICON] = LoadGraph("image/data_icon.png");
 
 	// ｷｬﾗｾﾚｸﾄ
 	charaSeleTitle = LoadGraph("image/CharacterSelect.png");
@@ -293,11 +294,12 @@ void GameSetumeiDraw(void)
 {
 	PlaySoundMem(sousaBGM, DX_PLAYTYPE_LOOP, false);
 	StopSoundMem(titleBGM);
-	DrawGraph(0, 0, setumei[dataType], true);
+	DrawGraph(0, 0, data[dataType], true);
 	DrawFormatString(0, 0, 0xff0000, "%d / 4", dataType + 1);
 	if (dataType < DATA_MAX - 1) DrawString(1000, 0, "右 : 次へ", 0xff0000, true);
-	DrawString(1000, 20, "左 : 戻る", 0xff0000, true);
-	if(dataType==DATA_MAX - 1) DrawString(1000, 0, "スペースキー : 説明終了", 0xff0000, true);
+	if (dataType > 0) DrawString(1000, 20, "左 : 戻る", 0xff0000, true);
+	if (dataType == DATA_MAX - 1) DrawString(1000, 0, "スペースキー : 説明終了", 0xff0000, true);
+	if (dataType == 0) DrawString(1000, 20, "左 : タイトルに戻る", 0xff0000, true);
 }
 
 void GameCharasere(void)
