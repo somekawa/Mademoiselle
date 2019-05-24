@@ -18,7 +18,7 @@
 
 #define KEEPPOSX_CORRECTION  120	// posの値の補正用数値
 
-#define ONEFRAME_WIRE_UP	  15    // 1フレームで上がるワイヤーの速度
+#define ONEFRAME_WIRE_UP	  30    // 1フレームで上がるワイヤーの速度
 
 #define FURIKO_SPEED_DEF      10.0f	// 振り子の初速度
 #define FURIKO_ADD			  0.4f	// 振り子の加減算速度
@@ -925,7 +925,7 @@ void PlWirePrepare(void)
 	Position furiko_RU = { furiko_pos.x + player.size.x / 2, furiko_pos.y };
 	Position furiko_LU = { furiko_pos.x - player.size.x / 2, furiko_pos.y };
 
-	if (player.pos.y - furiko_pos.y <= 300)	// 指定範囲
+	if (player.pos.y - furiko_pos.y <= 350	&&	player.pos.y > 350)	// 指定範囲 && 上のほうでmap外に出たらエラーがでるのを防ぐ
 	{
 		if (!(WireBlockPass({ furiko_RU.x , furiko_RU.y })) || !(WireBlockPass({ furiko_LU.x , furiko_LU.y })))
 		{
@@ -1087,6 +1087,26 @@ void AddRad(void)
 
 void PlWireJump(void)
 {
+	if (trgKey[P2_UP])
+	{
+		if (player.moveDir == DIR_RIGHT)
+		{
+			player.right = true;
+			player.left = false;
+		}
+
+		if (player.moveDir == DIR_LEFT)
+		{
+			player.right = false;
+			player.left = true;
+		}
+
+
+		furiko_pos = { player.pos.x , player.pos.y - player.size.y };
+		player.wireFlag = true;
+
+		player_state = PLAYER_W_PRE;
+	}
 
 
 	Position player_RU = { player.pos.x + player.hitPosE.x - 1 , player.pos.y - player.moveSpeed - player.hitPosS.y };	// 右上

@@ -253,6 +253,7 @@ void GameTitleDraw(void)
 	
 	PlaySoundMem(titleBGM, DX_PLAYTYPE_LOOP, false);
 
+	DrawString(SCREEN_SIZE_X/2 - CHIP_SIZE_X, SCREEN_SIZE_Y/2, "Plase Space Key", 0x000000);
 
 }
 
