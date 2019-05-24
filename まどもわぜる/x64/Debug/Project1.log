@@ -1,0 +1,57 @@
+﻿  effect.cpp
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\main.h(78): warning C4091: 'typedef ': 変数が何も宣言されていないときは、'<unnamed-enum-DATA_BUTTON>' の左辺を無視します。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\effect.cpp(47): warning C4244: '=': 'int' から 'float' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\effect.cpp(48): warning C4244: '=': 'double' から 'float' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\effect.cpp(49): warning C4244: '=': 'double' から 'float' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\effect.cpp(67): warning C4244: '=': 'double' から 'float' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\effect.cpp(68): warning C4244: '=': 'double' から 'float' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\effect.cpp(83): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+  keycheck.cpp
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\keycheck.cpp(54): warning C4804: '~': 演算中の 'bool' 型の使用方法が安全ではありません
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\keycheck.cpp(54): warning C4805: '&': 演算中の 'bool' 型と 'int' 型の混用は安全ではありません
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\keycheck.cpp(55): warning C4804: '~': 演算中の 'bool' 型の使用方法が安全ではありません
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\keycheck.cpp(55): warning C4805: '&': 演算中の 'int' 型と 'bool' 型の混用は安全ではありません
+  main.cpp
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\main.h(78): warning C4091: 'typedef ': 変数が何も宣言されていないときは、'<unnamed-enum-DATA_BUTTON>' の左辺を無視します。
+  player.cpp
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\main.h(78): warning C4091: 'typedef ': 変数が何も宣言されていないときは、'<unnamed-enum-DATA_BUTTON>' の左辺を無視します。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(530): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(529): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(534): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(533): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(539): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(543): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(548): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(552): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(558): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(557): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(562): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(561): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(566): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(565): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(568): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(567): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(576): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(580): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(589): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(595): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(615): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(616): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(617): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(864): warning C4244: '=': 'double' から 'float' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(865): warning C4244: '=': 'double' から 'float' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(957): warning C4244: '=': 'double' から 'float' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\player.cpp(958): warning C4244: '=': 'double' から 'float' への変換です。データが失われる可能性があります。
+  stage.cpp
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\main.h(78): warning C4091: 'typedef ': 変数が何も宣言されていないときは、'<unnamed-enum-DATA_BUTTON>' の左辺を無視します。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\stage.cpp(68): warning C4244: '=': 'unsigned int' から 'float' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\stage.cpp(73): warning C4244: '=': 'unsigned int' から 'float' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\stage.cpp(94): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\stage.cpp(95): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\stage.cpp(97): warning C4018: '<': signed と unsigned の数値を比較しようとしました。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\stage.cpp(99): warning C4018: '<': signed と unsigned の数値を比較しようとしました。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\stage.cpp(101): warning C4244: '引数': 'float' から 'int' への変換です。データが失われる可能性があります。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\stage.cpp(128): warning C4018: '<': signed と unsigned の数値を比較しようとしました。
+c:\users\1816026\desktop\mademoiselle\まどもわぜる\stage.cpp(136): warning C4018: '<': signed と unsigned の数値を比較しようとしました。
+  コードを生成中...
+  Project1.vcxproj -> C:\Users\1816026\Desktop\Mademoiselle\まどもわぜる\x64\Debug\Project1.exe

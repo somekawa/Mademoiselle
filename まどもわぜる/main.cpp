@@ -99,19 +99,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			}
 			else if (fadeOut) {
 				if (!FadeOutScreen(5)) {
-					if(nowKey == P1_A) gameMode = GMODE_CHARASERE;
-					if (nowKey == P1_B) gameMode = GMODE_TITLE;
+					if(nowKey == START) gameMode = GMODE_CHARASERE;
+					if (nowKey == P1_LEFT) gameMode = GMODE_TITLE;
 					fadeOut = false;
 					fadeIn = true;
 				}
 			}
 			else {
-				if ((trgKey[P1_A]) && (dataType >= DATA_MAX - 1)) {
-					nowKey = P1_A;
+				if ((trgKey[START]) && (dataType == DATA_MAX - 1)) {
+					nowKey = START;
 					fadeOut = true;
 				}
-				else if ((trgKey[P1_B])&&(dataType==0)) {
-					nowKey = P1_B;
+				else if ((trgKey[P1_LEFT])&&(dataType==0)) {
+					nowKey = P1_LEFT;
 					fadeOut = true;
 				}
 			}
@@ -250,27 +250,33 @@ void GameTitleDraw(void)
 // 説明
 void GameSetumei(void)
 {
-	if (fadeIn) {
+	/*if (fadeIn) {
 		if (!FadeInScreen(5))fadeIn = false;
 	}
 	else if (fadeOut) {
 		if (!FadeOutScreen(5)) {
-			if(nowKey == P1_A) dataType++;
-			if (nowKey == P1_B) dataType--;
+			if(nowKey == P1_RIGHT) dataType++;
+			if (nowKey == P1_LEFT) dataType--;
 			fadeOut = false;
 			fadeIn = true;
 		}
 	}
 	else  {
-		if ((trgKey[P1_A])&&(dataType < DATA_MAX - 1)) {
+		if ((trgKey[P1_RIGHT])&&(dataType < DATA_MAX - 1)) {
 			fadeOut = true;
-			nowKey = P1_A;
+			nowKey = P1_RIGHT;
 		}
-		else if((trgKey[P1_B])&&(dataType > 0)) {
+		else if((trgKey[P1_LEFT])&&(dataType > 0)) {
 			fadeOut = true;
-			nowKey = P1_B;
+			nowKey = P1_LEFT;
 		}
-	}
+	}*/
+
+	if (trgKey[P1_RIGHT]) dataType++;
+	if (trgKey[P1_LEFT]) dataType--;
+
+	if (dataType >= DATA_MAX - 1) dataType = DATA_MAX - 1;
+	if (dataType <= 0) dataType = 0;
 
 	GameSetumeiDraw();
 }
@@ -280,6 +286,9 @@ void GameSetumeiDraw(void)
 	DeleteSoundMem(titleBGM);
 	DrawGraph(0, 0, setumei[dataType], true);
 	DrawFormatString(0, 0, 0xff0000, "%d / 4", dataType + 1);
+	if (dataType < DATA_MAX - 1) DrawString(1000, 0, "右 : 次へ", 0xff0000, true);
+	DrawString(1000, 20, "左 : 戻る", 0xff0000, true);
+	if(dataType==DATA_MAX - 1) DrawString(1000, 0, "スペースキー : 説明終了", 0xff0000, true);
 }
 
 void GameCharasere(void)
