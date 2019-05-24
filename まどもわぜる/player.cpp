@@ -148,7 +148,7 @@ void PlayerSystmInit(void)
 	shotImage[1] = LoadGraph("image/red_down_shot.png");
 
 	hatenaImage = LoadGraph("image/hatena.png");
-	segweyImage_icon = LoadGraph("image/segway.png");
+	segweyImage_icon = LoadGraph("image/segwey.png");
 
 	
 }

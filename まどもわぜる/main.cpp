@@ -55,6 +55,9 @@ bool FadeOutScreen(int fadeStep);
 
 // BGM & SE
 int titleBGM;
+int sousaBGM;
+int charselBGM;
+int gameBGM;
 
 
 
@@ -204,6 +207,9 @@ int SystmInit(void)
 void GameInit(void)
 {
 	titleBGM = LoadSoundMem("BGM/bgm_maoudamashii_8bit11.ogg");		// ‰æ–ÊØ‚è‘Ö‚¦Žž‚É–ˆ‰ñˆê“x—¬‚µ‚Ä‚¢‚½BGM‚ðíœ‚·‚é‚½‚ßGameInit‚É“ü‚ê‚Ä‚¢‚é
+	sousaBGM = LoadSoundMem("BGM/loop001.mp3");
+	charselBGM = LoadSoundMem("BGM/loop007.mp3");
+	gameBGM = LoadSoundMem("BGM/map_bgm.mp3");
 
 	fadeIn = true;
 	fadeOut = false;
@@ -283,6 +289,7 @@ void GameSetumei(void)
 
 void GameSetumeiDraw(void)
 {
+	PlaySoundMem(sousaBGM, DX_PLAYTYPE_LOOP, false);
 	DeleteSoundMem(titleBGM);
 	DrawGraph(0, 0, setumei[dataType], true);
 	DrawFormatString(0, 0, 0xff0000, "%d / 4", dataType + 1);
@@ -293,12 +300,17 @@ void GameSetumeiDraw(void)
 
 void GameCharasere(void)
 {
+	DeleteSoundMem(sousaBGM);
+
 	PlayerControl();
 	GameCharasereDraw();
 }
 
 void GameCharasereDraw(void)
 {
+	ChangeVolumeSoundMem(255 * 60 / 100, charselBGM);
+	PlaySoundMem(charselBGM, DX_PLAYTYPE_LOOP, false);
+
 	DrawBox(150, 20, SCREEN_SIZE_X - 150, 120, 0xffffff, false);
 	DrawLine(0, SCREEN_SIZE_Y / 2 + 60, SCREEN_SIZE_X, SCREEN_SIZE_Y / 2 + 60, 0xffffff, true);
 	DrawLine(SCREEN_SIZE_X / 2, 120, SCREEN_SIZE_X / 2, SCREEN_SIZE_Y, 0xffffff, true);
@@ -315,6 +327,8 @@ void GameCharasereDraw(void)
 
 void GameMain(void)
 {
+	DeleteSoundMem(charselBGM);
+
 	/*if (cnt > 2500) {
 		cnt = 2500;
 	}
@@ -341,6 +355,9 @@ void GameMain(void)
 
 void GameMainDraw(void)
 {
+	ChangeVolumeSoundMem(255 * 70 / 100, gameBGM);
+	PlaySoundMem(gameBGM, DX_PLAYTYPE_LOOP, false);
+
 	StageDraw();
 	BgControl();
 	PlayerDraw();
@@ -362,6 +379,7 @@ void GameMainDraw(void)
 
 void GameOver(void)
 {
+	DeleteSoundMem(gameBGM);
 
 	GameOverDraw();
 }
