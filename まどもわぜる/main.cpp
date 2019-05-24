@@ -237,6 +237,8 @@ void GameTitle(void)
 
 void GameTitleDraw(void)
 {
+	StopSoundMem(sousaBGM);
+
 	DrawLine(0, 0, 0, SCREEN_SIZE_Y, 0xffffff, cnt / 4);
 	DrawLine(0, 0, SCREEN_SIZE_X, 0, 0xffffff, cnt / 6);
 	DrawLine(SCREEN_SIZE_X, 0, SCREEN_SIZE_X, SCREEN_SIZE_Y, 0xffffff, cnt / 4);
@@ -290,7 +292,7 @@ void GameSetumei(void)
 void GameSetumeiDraw(void)
 {
 	PlaySoundMem(sousaBGM, DX_PLAYTYPE_LOOP, false);
-	DeleteSoundMem(titleBGM);
+	StopSoundMem(titleBGM);
 	DrawGraph(0, 0, setumei[dataType], true);
 	DrawFormatString(0, 0, 0xff0000, "%d / 4", dataType + 1);
 	if (dataType < DATA_MAX - 1) DrawString(1000, 0, "‰E : ŽŸ‚Ö", 0xff0000, true);
@@ -300,6 +302,7 @@ void GameSetumeiDraw(void)
 
 void GameCharasere(void)
 {
+	DeleteSoundMem(titleBGM);
 	DeleteSoundMem(sousaBGM);
 
 	PlayerControl();
