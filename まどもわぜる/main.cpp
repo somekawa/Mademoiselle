@@ -26,14 +26,22 @@ int titleImage;
 int charaSeleTitle;
 int wakImage;
 
+// 説明
+int setumei[DATA_MAX];
+int dataType;
+
+int nowKey;
+
 Position mapPos;
-int maiImage;
+int setumeiImage;
 int cnt;
 
 int SystmInit(void);
 void GameInit(void);
 void GameTitle(void);
 void GameTitleDraw(void);
+void GameSetumei(void);
+void GameSetumeiDraw(void);
 void GameCharasere(void);
 void GameCharasereDraw(void);
 void GameMain(void);
@@ -72,8 +80,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			}
 			else if (fadeOut) {
 				if (!FadeOutScreen(5)) {
-					//gameMode = GMODE_GAME;
-					gameMode = GMODE_CHARASERE;
+					gameMode = GMODE_SETUMEI;
 					fadeOut = false;
 					fadeIn = true;
 				}
@@ -81,6 +88,31 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			else if (trgKey[START]) fadeOut = true;
 
 			GameTitle();
+			break;
+		// 説明
+		case GMODE_SETUMEI:
+			if (fadeIn) {
+				if (!FadeInScreen(5))fadeIn = false;
+			}
+			else if (fadeOut) {
+				if (!FadeOutScreen(5)) {
+					if(nowKey == P1_A) gameMode = GMODE_CHARASERE;
+					if (nowKey == P1_B) gameMode = GMODE_TITLE;
+					fadeOut = false;
+					fadeIn = true;
+				}
+			}
+			else {
+				if ((trgKey[P1_A]) && (dataType >= DATA_MAX - 1)) {
+					nowKey = P1_A;
+					fadeOut = true;
+				}
+				else if ((trgKey[P1_B])&&(dataType==0)) {
+					nowKey = P1_B;
+					fadeOut = true;
+				}
+			}
+			GameSetumei();
 			break;
 			// ｷｬﾗｾﾚｸﾄ
 		case GMODE_CHARASERE:
@@ -146,7 +178,7 @@ int SystmInit(void)
 	gameCnt = 0;
 	fadeCnt = 0;
 	//----------グラフィックの登録----------
-	maiImage = LoadGraph("image/bollI.png");
+	setumeiImage = LoadGraph("image/data_button_2.png");
 	PlayerSystmInit();
 	StageSystmInit();
 	EffectSystmInit();
@@ -154,6 +186,10 @@ int SystmInit(void)
 	selectImage1 = LoadGraph("image/1player.png");
 	selectImage2 = LoadGraph("image/4player.png");
 	titleImage = LoadGraph("image/title2.png");
+
+	setumei[DATA_BUTTON] = LoadGraph("image/data_button.png");
+	setumei[DATA_BLOCK] = LoadGraph("image/data_block.png");
+	setumei[DATA_ICON] = LoadGraph("image/data_icon.png");
 
 	// ｷｬﾗｾﾚｸﾄ
 	charaSeleTitle = LoadGraph("image/CharacterSelect.png");
@@ -172,6 +208,7 @@ void GameInit(void)
 	StageGameInit();
 	EffectGameInit();
 	gameMode = GMODE_TITLE;
+	dataType = DATA_BUTTON;
 
 }
 
@@ -202,6 +239,40 @@ void GameTitleDraw(void)
 	
 
 
+}
+
+// 説明
+void GameSetumei(void)
+{
+	if (fadeIn) {
+		if (!FadeInScreen(5))fadeIn = false;
+	}
+	else if (fadeOut) {
+		if (!FadeOutScreen(5)) {
+			if(nowKey == P1_A) dataType++;
+			if (nowKey == P1_B) dataType--;
+			fadeOut = false;
+			fadeIn = true;
+		}
+	}
+	else  {
+		if ((trgKey[P1_A])&&(dataType < DATA_MAX - 1)) {
+			fadeOut = true;
+			nowKey = P1_A;
+		}
+		else if((trgKey[P1_B])&&(dataType > 0)) {
+			fadeOut = true;
+			nowKey = P1_B;
+		}
+	}
+
+	GameSetumeiDraw();
+}
+
+void GameSetumeiDraw(void)
+{
+	DrawGraph(0, 0, setumei[dataType], true);
+	DrawFormatString(0, 0, 0xff0000, "%d / 4", dataType + 1);
 }
 
 void GameCharasere(void)
@@ -249,10 +320,7 @@ void GameMain(void)
 		HitCheck();
 	}
 	GameMainDraw();
-	if (pauseFlag) {
-		SetDrawBright(255, 255, 255);
-		DrawString(SCREEN_SIZE_X / 2 - 40, SCREEN_SIZE_Y / 2 - 5, "P A U S E", 0xffffff);
-	}
+
 }
 
 void GameMainDraw(void)
@@ -260,7 +328,7 @@ void GameMainDraw(void)
 	StageDraw();
 	BgControl();
 	PlayerDraw();
-	DrawGraph(CHIP_SIZE_X * 5 - mapPos.x, CHIP_SIZE_Y * 23 - mapPos.y, maiImage, true);
+	WireDraw();
 	DrawFormatString(0, 0, 0xffffff, "GameMain : %d", gameCnt);
 	//DrawLine(0, 0, 0, SCREEN_SIZE_Y, 0xffffff, cnt / 4);
 	//DrawLine(0, 0, SCREEN_SIZE_X, 0, 0xffffff, cnt / 6);
@@ -269,6 +337,12 @@ void GameMainDraw(void)
 	//DrawLine(SCREEN_SIZE_X / 2, 0, SCREEN_SIZE_X / 2, SCREEN_SIZE_Y, 0xffffff, true);
 	//DrawLine(0, SCREEN_SIZE_Y / 2, SCREEN_SIZE_X, SCREEN_SIZE_Y / 2, 0xffffff, true);
 	EffectDraw();
+
+	if (pauseFlag) {
+		SetDrawBright(255, 255, 255);
+		DrawString(SCREEN_SIZE_X / 2 - 40, 100, "P A U S E", 0xffffff);
+		DrawRotaGraph(SCREEN_SIZE_X / 2, SCREEN_SIZE_Y / 2, 0.6 , 0, setumeiImage, true,false);
+	}
 }
 
 void GameOver(void)

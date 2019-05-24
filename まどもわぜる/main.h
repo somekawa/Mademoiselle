@@ -60,11 +60,22 @@ typedef enum
 {
 	GMODE_INIT,
 	GMODE_TITLE,
+	GMODE_SETUMEI,	// ê‡ñæ
 	GMODE_CHARASERE,
 	GMODE_GAME,
 	GMODE_OVER,
 	GMODE_MAX
 }GAME_MODE;
+
+// ê‡ñæ
+typedef enum
+{
+	DATA_BUTTON,
+	DATA_BLOCK,
+	DATA_ITEM,
+	DATA_ICON,
+	DATA_MAX
+};
 
 // ï˚å¸
 enum MOVE_DIR {
