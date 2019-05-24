@@ -99,6 +99,8 @@ int segweyImage_icon;
 // BGM & SE
 int charsel_ok;
 int charsel_no;
+int item_get;
+int seg;
 
 
 typedef Position Vec2;
@@ -158,6 +160,8 @@ void PlayerGameInit(void)
 	// BGM & SE
 	charsel_ok = LoadSoundMem("BGM/charok_se.mp3");
 	charsel_no = LoadSoundMem("BGM/charno_se.mp3");
+	item_get = LoadSoundMem("BGM/itemget_se.mp3");
+	seg = LoadSoundMem("BGM/car-horn1.mp3");
 
 	player.type = PLAYER_RED;
 	player.size = { 72,72 };
@@ -287,6 +291,7 @@ void PlayerControl(void)
 		{
 			item_state = ITEM_SEGWEY;
 			player.dropFlag = true;												// ここをtrueにしているので、アイテムを使ってフラグをfalseにするまで次のアイテムは取得できない
+			PlaySoundMem(item_get, DX_PLAYTYPE_BACK, true);
 			itemBoxFlag = false;												// ここに入ればhitがでる
 		}
 	}
@@ -1378,6 +1383,7 @@ void ItemSegwey(void)
 	if (trgKey[P2_A])
 	{
 		player.segweyFlag = true;
+		PlaySoundMem(seg, DX_PLAYTYPE_BACK, true);
 	}
 
 	if (player.segweyFlag == true)
