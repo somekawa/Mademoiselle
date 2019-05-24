@@ -226,6 +226,7 @@ void PlayerGameInit(void)
 	defDeg = 0.0f;
 
 	player.dropFlag = false;
+	item_state = ITEM_NON;
 
 	itemcnt = 0;
 
@@ -272,6 +273,7 @@ void PlayerControl(void)
 		DeleteSoundMem(charsel_ok);
 		DeleteSoundMem(charsel_no);
 		PlayerState();
+		ItemState();
 		break;
 	}
 
@@ -283,6 +285,7 @@ void PlayerControl(void)
 			&& player.pos.y - player.size.y < itemBoxPosY + CHIP_SIZE_Y			// player上 < box下
 			&& itemBoxPosY < player.pos.y)										// box上    < player下
 		{
+			item_state = ITEM_SEGWEY;
 			player.dropFlag = true;												// ここをtrueにしているので、アイテムを使ってフラグをfalseにするまで次のアイテムは取得できない
 			itemBoxFlag = false;												// ここに入ればhitがでる
 		}
@@ -712,7 +715,7 @@ void PlayerDraw(void)
 			DrawGraph(20, 10, segweyImage_icon, true);
 		}
 
-		ItemSegwey();
+		//ItemSegwey();
 
 		break;
 	}
@@ -1387,6 +1390,7 @@ void ItemSegwey(void)
 			player.dropFlag = false;
 			Segwey_Cnt = 0;
 			player.moveSpeed = PLAYER_SPEED_NORMAL;
+			item_state = ITEM_NON;
 		}
 		else
 		{
@@ -1413,7 +1417,7 @@ void ItemState(void)
 	switch (item_state)
 	{
 	case ITEM_NON:
-		PlNormal();
+		//PlNormal();
 		break;
 	case ITEM_SEGWEY:
 		ItemSegwey();
