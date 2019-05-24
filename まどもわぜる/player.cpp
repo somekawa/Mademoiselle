@@ -94,7 +94,9 @@ int itemBoxPosY = CHIP_SIZE_Y * 16 ;
 int hatenaImage;		// ÅHŒﬁØ∏ΩâÊëú
 int segweyImage_icon;
 
-
+// BGM & SE
+int charsel_ok;
+int charsel_no;
 
 
 typedef Position Vec2;
@@ -141,11 +143,15 @@ void PlayerSystmInit(void)
 	hatenaImage = LoadGraph("image/hatena.png");
 	segweyImage_icon = LoadGraph("image/segway.png");
 
-
+	
 }
 
 void PlayerGameInit(void)
 {
+	// BGM & SE
+	charsel_ok = LoadSoundMem("BGM/charok_se.mp3");
+	charsel_no = LoadSoundMem("BGM/charno_se.mp3");
+
 	player.type = PLAYER_RED;
 	player.size = { 72,72 };
 	player.offsetSize = { -player.size.x / 2,-player.size.y };
@@ -229,6 +235,9 @@ void PlayerControl(void)
 	{
 	case GMODE_CHARASERE:	// ∑¨◊æ⁄∏ƒ
 		if (!player.visible) {
+			PlaySoundMem(charsel_ok, DX_PLAYTYPE_BACK, true);
+
+
 			if (trgKey[P1_RIGHT]) player.type++;
 			if (trgKey[P1_LEFT]) player.type--;
 
@@ -236,12 +245,16 @@ void PlayerControl(void)
 			if (player.type <= -1)player.type = PLAYER_MAX - 1;
 		}
 		else {
+			PlaySoundMem(charsel_no, DX_PLAYTYPE_BACK, true);
+
 			player.animCnt++;
 		}
 		if (trgKey[P1_A]) player.visible = !player.visible;
 
 		break;
 	case GMODE_GAME:
+		DeleteSoundMem(charsel_ok);
+		DeleteSoundMem(charsel_no);
 		PlayerState();
 		break;
 	}

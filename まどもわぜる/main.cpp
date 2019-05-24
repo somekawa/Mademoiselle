@@ -53,6 +53,9 @@ void HitCheck(void);
 bool FadeInScreen(int fadeStep);
 bool FadeOutScreen(int fadeStep);
 
+// BGM & SE
+int titleBGM;
+
 
 
 
@@ -200,6 +203,8 @@ int SystmInit(void)
 
 void GameInit(void)
 {
+	titleBGM = LoadSoundMem("BGM/title_bgm.mp3");		// ‰æ–ÊØ‚è‘Ö‚¦‚É–ˆ‰ñˆê“x—¬‚µ‚Ä‚¢‚½BGM‚ğíœ‚·‚é‚½‚ßGameInit‚É“ü‚ê‚Ä‚¢‚é
+
 	fadeIn = true;
 	fadeOut = false;
 	pauseFlag = 0;
@@ -237,6 +242,7 @@ void GameTitleDraw(void)
 	DrawGraph(100, 0, selectImage1, true);
 	DrawGraph(0, 100, selectImage2, true);
 	
+	PlaySoundMem(titleBGM, DX_PLAYTYPE_LOOP, false);
 
 
 }
@@ -271,6 +277,7 @@ void GameSetumei(void)
 
 void GameSetumeiDraw(void)
 {
+	DeleteSoundMem(titleBGM);
 	DrawGraph(0, 0, setumei[dataType], true);
 	DrawFormatString(0, 0, 0xff0000, "%d / 4", dataType + 1);
 }
@@ -328,7 +335,6 @@ void GameMainDraw(void)
 	StageDraw();
 	BgControl();
 	PlayerDraw();
-	WireDraw();
 	DrawFormatString(0, 0, 0xffffff, "GameMain : %d", gameCnt);
 	//DrawLine(0, 0, 0, SCREEN_SIZE_Y, 0xffffff, cnt / 4);
 	//DrawLine(0, 0, SCREEN_SIZE_X, 0, 0xffffff, cnt / 6);
