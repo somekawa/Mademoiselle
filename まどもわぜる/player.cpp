@@ -1012,6 +1012,10 @@ void PlWireAction(void)
 				{
 					player.pos.y = GetWorldPos_Map(player.pos, DIR_DOWN).y + player.hitPosS.y + player.size.y*2;		// ЧvТ▓Ро
 					player.pos.x = furiko_pos.x;
+					player.visible = true;
+					player.visible2 = false;
+					player_state = PLAYER_NORMAL;
+					return;
 				}
 				jumpSpeed = FURIKO_SPEED_DEF;
 				player.BlockFlag = true;
