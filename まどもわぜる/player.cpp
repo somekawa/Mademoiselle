@@ -1010,7 +1010,7 @@ void PlWireAction(void)
 				trgKey[P2_A] = !trgKey[P2_A];
 			}
 
-			if (newKey[P2_B])
+			if (trgKey[P2_UP])
 			{
 				if (!IsPass({ player.pos.x , player.pos.y - player.size.y}))			// ‚±‚±‚Å‚»‚à‚»‚à•Ç‚Ì’†‚ÅƒƒCƒ„[‚ğØ‚è—£‚µ‚½‚Æ‚«‚Ìˆ’u‚ğ‘‚¢‚Æ‚­
 				{
