@@ -99,8 +99,10 @@ int segweyImage_icon;
 // BGM & SE
 int charsel_ok;
 int charsel_no;
+int charsel;
 int item_get;
 int seg;
+int wire;
 
 
 typedef Position Vec2;
@@ -152,16 +154,19 @@ void PlayerSystmInit(void)
 	hatenaImage = LoadGraph("image/hatena.png");
 	segweyImage_icon = LoadGraph("image/segwey.png");
 
+	// BGM & SE
+	charsel_ok = LoadSoundMem("BGM/charok_se.mp3");
+	charsel_no = LoadSoundMem("BGM/charno_se.mp3");
+	charsel = LoadSoundMem("BGM/charsel_se.mp3");
+	item_get = LoadSoundMem("BGM/itemget_se.mp3");
+	seg = LoadSoundMem("BGM/car-horn1.mp3");
+	wire = LoadSoundMem("BGM/wirehook_se.mp3");
 	
 }
 
 void PlayerGameInit(void)
 {
-	// BGM & SE
-	charsel_ok = LoadSoundMem("BGM/charok_se.mp3");
-	charsel_no = LoadSoundMem("BGM/charno_se.mp3");
-	item_get = LoadSoundMem("BGM/itemget_se.mp3");
-	seg = LoadSoundMem("BGM/car-horn1.mp3");
+	
 
 	player.type = PLAYER_RED;
 	player.size = { 72,72 };
@@ -247,8 +252,18 @@ void PlayerControl(void)
 	{
 	case GMODE_CHARASERE:	// ｷｬﾗｾﾚｸﾄ
 		if (!player.visible) {
-			if (trgKey[P1_RIGHT]) player.type++;
-			if (trgKey[P1_LEFT]) player.type--;
+			if (trgKey[P1_RIGHT]) 
+			{
+				player.type++;
+				PlaySoundMem(charsel, DX_PLAYTYPE_BACK, true);
+			}
+
+			if (trgKey[P1_LEFT])
+			{
+				player.type--;
+				PlaySoundMem(charsel, DX_PLAYTYPE_BACK, true);
+
+			}
 
 			if (player.type >= PLAYER_MAX) player.type = 0;
 			if (player.type <= -1)player.type = PLAYER_MAX - 1;
@@ -274,8 +289,6 @@ void PlayerControl(void)
 
 		break;
 	case GMODE_GAME:
-		DeleteSoundMem(charsel_ok);
-		DeleteSoundMem(charsel_no);
 		PlayerState();
 		ItemState();
 		break;
@@ -930,11 +943,14 @@ void PlWirePrepare(void)
 {
 	furiko_pos.y = furiko_pos.y - ONEFRAME_WIRE_UP;
 
+
 	Position furiko_RU = { furiko_pos.x + player.size.x / 2, furiko_pos.y };
 	Position furiko_LU = { furiko_pos.x - player.size.x / 2, furiko_pos.y };
 
 	if (player.pos.y - furiko_pos.y <= 350	&&	player.pos.y > 350)	// 指定範囲 && 上のほうでmap外に出たらエラーがでるのを防ぐ
 	{
+		PlaySoundMem(wire, DX_PLAYTYPE_BACK, true);
+
 		if (!(WireBlockPass({ furiko_RU.x , furiko_RU.y })) || !(WireBlockPass({ furiko_LU.x , furiko_LU.y })))
 		{
 			// 長さを出す

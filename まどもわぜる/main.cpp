@@ -58,6 +58,8 @@ int titleBGM;
 int sousaBGM;
 int charselBGM;
 int gameBGM;
+int start_se;
+int setumei_se;
 
 
 
@@ -110,6 +112,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			}
 			else {
 				if ((trgKey[START]) && (dataType == DATA_MAX - 1)) {
+					PlaySoundMem(setumei_se, DX_PLAYTYPE_BACK, true);
 					nowKey = START;
 					fadeOut = true;
 				}
@@ -127,13 +130,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			}
 			else if (fadeOut) {
 				if (!FadeOutScreen(5)) {
-
 					gameMode = GMODE_GAME;
 					fadeOut = false;
 					fadeIn = true;
 				}
 			}
-			else if ((trgKey[START]) && (GetPlayerV())) fadeOut = true;
+			else if ((trgKey[START]) && (GetPlayerV()))
+			{
+				PlaySoundMem(start_se, DX_PLAYTYPE_BACK, true);
+				fadeOut = true;
+			}
 
 			GameCharasere();
 			break;
@@ -201,6 +207,9 @@ int SystmInit(void)
 	// ·¬×¾Ú¸Ä
 	charaSeleTitle = LoadGraph("image/CharacterSelect.png");
 	wakImage = LoadGraph("image/wak0.png");
+
+	start_se = LoadSoundMem("BGM/gamestart_se.mp3");
+	setumei_se = LoadSoundMem("BGM/setumei_se.mp3");
 	return 1;
 
 }
@@ -282,8 +291,17 @@ void GameSetumei(void)
 		}
 	}*/
 
-	if (trgKey[P1_RIGHT]) dataType++;
-	if (trgKey[P1_LEFT]) dataType--;
+	if (trgKey[P1_RIGHT])
+	{
+		PlaySoundMem(setumei_se, DX_PLAYTYPE_BACK, true);
+		dataType++;
+	}
+
+	if (trgKey[P1_LEFT])
+	{
+		PlaySoundMem(setumei_se, DX_PLAYTYPE_BACK, true);
+		dataType--;
+	}
 
 	if (dataType >= DATA_MAX - 1) dataType = DATA_MAX - 1;
 	if (dataType <= 0) dataType = 0;
