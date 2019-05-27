@@ -43,7 +43,7 @@ void KeyCheck()
 	if (CheckHitKey(KEY_INPUT_D)) newKey[P2_RIGHT] = true;
 	if (CheckHitKey(KEY_INPUT_S)) newKey[P2_DOWN] = true;
 	if (CheckHitKey(KEY_INPUT_A)) newKey[P2_LEFT] = true;
-	if (CheckHitKey(KEY_INPUT_LCONTROL)) newKey[P2_A] = true;
+	if (CheckHitKey(KEY_INPUT_LCONTROL) || (Pad1 & PAD_INPUT_5) || (Pad1 & PAD_INPUT_6)) newKey[P2_A] = true;
 	if ((CheckHitKey(KEY_INPUT_F))||(Pad1 & PAD_INPUT_4)) newKey[P2_B] = true;
 	if (CheckHitKey(KEY_INPUT_P)) newKey[P2_PAUSE] = true;
 

@@ -1005,6 +1005,10 @@ void PlWireAction(void)
 	{
 		if (WireTimeCnt < 2000)
 		{
+			if (trgKey[P2_A])		// ワイヤーを伸ばしてぶらぶらしている間はアイテムは使えないようにする処理
+			{
+				trgKey[P2_A] = !trgKey[P2_A];
+			}
 
 			if (newKey[P2_B])
 			{
