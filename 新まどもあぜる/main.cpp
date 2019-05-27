@@ -22,14 +22,22 @@ int titleImage;
 int charaSeleTitle;
 int wakImage;
 
+// 説明
+int data[DATA_MAX];
+int dataType;
+
+int nowKey;
+
 Position mapPos;
-int maiImage;
+int setumeiImage;
 int cnt;
 
 int SystmInit(void);
 void GameInit(void);
 void GameTitle(void);
 void GameTitleDraw(void);
+void GameSetumei(void);
+void GameSetumeiDraw(void);
 void GameCharasere(void);
 void GameCharasereDraw(void);
 void GameMain(void);
@@ -41,16 +49,24 @@ void HitCheck(void);
 bool FadeInScreen(int fadeStep);
 bool FadeOutScreen(int fadeStep);
 
+// BGM & SE
+int titleBGM;
+int sousaBGM;
+int charselBGM;
+int gameBGM;
+
 // ==========WinMain関数
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
 	SystmInit();
 
 	//----------ｹﾞｰﾑﾙｰﾌﾟ
-	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0)
+	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0 )
 	{
 		ClsDrawScreen();	// 画面消去
-		KeyCheck();
+		
+		KeyCheck(0);
+		KeyCheck(1);
 
 		switch (gameMode)
 		{
@@ -60,58 +76,129 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			break;
 
 		case GMODE_TITLE:	// ﾀｲﾄﾙ
-			if (fadeIn) {
-				if (!FadeInScreen(5))fadeIn = false;
+			if (fadeIn)
+			{
+				if (!FadeInScreen(5))
+				{
+					fadeIn = false;
+				}
 			}
-			else if (fadeOut) {
-				if (!FadeOutScreen(5)) {
-					//gameMode = GMODE_GAME;
-					gameMode = GMODE_CHARASERE;
+			else if (fadeOut) 
+			{
+				if (!FadeOutScreen(5)) 
+				{
+					gameMode = GMODE_SETUMEI;
 					fadeOut = false;
 					fadeIn = true;
 				}
 			}
-			else if (trgKey[START]) fadeOut = true;
+			else if (pad[0].trgKey[PAD_TBL_START])
+			{
+				fadeOut = true;
+			}
+			//else
+			//{
+			//}
+			// []内の数字で使えるコントローラーが変わる　０はPL1　１はPL2
 			GameTitle();
+			break;
+
+			// 説明
+		case GMODE_SETUMEI:
+			if (fadeIn)
+			{
+				if (!FadeInScreen(5))fadeIn = false;
+			}
+			else if (fadeOut) 
+			{
+				if (!FadeOutScreen(5)) 
+				{
+					if (nowKey == PAD_TBL_START)
+					{
+						gameMode = GMODE_CHARASERE;
+					}
+					if (nowKey == PAD_TBL_LEFT)
+					{
+						gameMode = GMODE_TITLE;
+					}
+					fadeOut = false;
+					fadeIn = true;
+				}
+			}
+			else 
+			{
+				if ((pad[0].trgKey[PAD_TBL_START]) && (dataType == DATA_MAX - 1))
+				{
+					nowKey = PAD_TBL_START;
+					fadeOut = true;
+				}
+				else if ((pad[0].trgKey[PAD_TBL_LEFT]) && (dataType == 0)) 
+				{
+					nowKey = PAD_TBL_LEFT;
+					fadeOut = true;
+				}
+			}
+			GameSetumei();
 			break;
 
 			// ｷｬﾗｾﾚｸﾄ
 		case GMODE_CHARASERE:
-			if (fadeIn) {
+			if (fadeIn) 
+			{
 				if (!FadeInScreen(5))fadeIn = false;
 			}
-			else if (fadeOut) {
-				if (!FadeOutScreen(5)) {
-
+			else if (fadeOut)
+			{
+				if (!FadeOutScreen(5))
+				{
 					gameMode = GMODE_GAME;
 					fadeOut = false;
 					fadeIn = true;
 				}
 			}
-			else if ((trgKey[START]) && (GetPlayerV())) fadeOut = true;
+			else if ((pad[0].trgKey[PAD_TBL_START]) && (GetPlayerV()))
+			{
+				fadeOut = true;
+			}
 			GameCharasere();
 			break;
 
 		case GMODE_GAME:	// ｹﾞｰﾑ中
-			if (fadeIn) {
-				if (!FadeInScreen(5))fadeIn = false;
+			if (fadeIn)
+			{
+				if (!FadeInScreen(5))
+				{
+					fadeIn = false;
+				}
 			}
-			else if (trgKey[START]) gameMode = GMODE_OVER;
+			else if (pad[0].trgKey[PAD_TBL_START])
+			{
+				gameMode = GMODE_OVER;
+			}
 			GameMain();
 			break;
 
 		case GMODE_OVER:	// ｹﾞｰﾑｵｰﾊﾞｰ
-			if (fadeIn) {
-				if (!FadeInScreen(5))fadeIn = false;
+			if (fadeIn) 
+			{
+				if (!FadeInScreen(5))
+				{
+					fadeIn = false;
+				}
 			}
-			else if (fadeOut) {
-				if (!FadeOutScreen(5)) {
+			else if (fadeOut)
+			{
+				if (!FadeOutScreen(5)) 
+				{
 					gameMode = GMODE_INIT;
 					fadeOut = false;
 					fadeIn = true;
 				}
 			}
-			else if (trgKey[START]) fadeOut = true;
+			else if (pad[0].trgKey[PAD_TBL_START])
+			{
+				fadeOut = true;
+			}
 			GameOver();
 			break;
 		default:
@@ -140,7 +227,7 @@ int SystmInit(void)
 	gameCnt = 0;
 	fadeCnt = 0;
 	//----------グラフィックの登録----------
-	maiImage = LoadGraph("image/bollI.png");
+	setumeiImage = LoadGraph("image/data_button_2.png");
 	PlayerSystmInit();
 	StageSystmInit();
 	EffectSystmInit();
@@ -148,6 +235,11 @@ int SystmInit(void)
 	selectImage1 = LoadGraph("image/1player.png");
 	selectImage2 = LoadGraph("image/4player.png");
 	titleImage = LoadGraph("image/title2.png");
+
+	data[DATA_BUTTON] = LoadGraph("image/data_button.png");
+	data[DATA_BLOCK] = LoadGraph("image/data_block.png");
+	data[DATA_ITEM] = LoadGraph("image/data_item.png");
+	data[DATA_ICON] = LoadGraph("image/data_icon.png");
 
 	// ｷｬﾗｾﾚｸﾄ
 	charaSeleTitle = LoadGraph("image/CharacterSelect.png");
@@ -159,6 +251,11 @@ int SystmInit(void)
 
 void GameInit(void)
 {
+	titleBGM = LoadSoundMem("BGM/bgm_maoudamashii_8bit11.ogg");		// 画面切り替え時に毎回一度流していたBGMを削除するためGameInitに入れている
+	sousaBGM = LoadSoundMem("BGM/loop001.ogg");
+	charselBGM = LoadSoundMem("BGM/loop007.ogg");
+	gameBGM = LoadSoundMem("BGM/map_bgm.mp3");
+
 	fadeIn = true;
 	fadeOut = false;
 	pauseFlag = 0;
@@ -167,6 +264,7 @@ void GameInit(void)
 	StageGameInit();
 	EffectGameInit();
 	gameMode = GMODE_TITLE;
+	dataType = DATA_BUTTON;
 }
 
 void GameTitle(void)
@@ -175,7 +273,7 @@ void GameTitle(void)
 	{
 		cnt = 2500;
 	}
-	else
+	else 
 	{
 		cnt++;
 	}
@@ -184,6 +282,8 @@ void GameTitle(void)
 
 void GameTitleDraw(void)
 {
+	StopSoundMem(sousaBGM);
+
 	DrawLine(0, 0, 0, SCREEN_SIZE_Y, 0xffffff, cnt / 4);
 	DrawLine(0, 0, SCREEN_SIZE_X, 0, 0xffffff, cnt / 6);
 	DrawLine(SCREEN_SIZE_X, 0, SCREEN_SIZE_X, SCREEN_SIZE_Y, 0xffffff, cnt / 4);
@@ -194,34 +294,117 @@ void GameTitleDraw(void)
 	DrawGraph(0, 0, titleImage, false);
 	DrawGraph(100, 0, selectImage1, true);
 	DrawGraph(0, 100, selectImage2, true);
+
+	PlaySoundMem(titleBGM, DX_PLAYTYPE_LOOP, false);
+}
+
+// 説明
+void GameSetumei(void)
+{
+	/*if (fadeIn) {
+		if (!FadeInScreen(5))fadeIn = false;
+	}
+	else if (fadeOut) {
+		if (!FadeOutScreen(5)) {
+			if(nowKey == P1_RIGHT) dataType++;
+			if (nowKey == P1_LEFT) dataType--;
+			fadeOut = false;
+			fadeIn = true;
+		}
+	}
+	else  {
+		if ((trgKey[P1_RIGHT])&&(dataType < DATA_MAX - 1)) {
+			fadeOut = true;
+			nowKey = P1_RIGHT;
+		}
+		else if((trgKey[P1_LEFT])&&(dataType > 0)) {
+			fadeOut = true;
+			nowKey = P1_LEFT;
+		}
+	}*/
+
+	if (pad[0].trgKey[PAD_TBL_RIGHT])
+	{
+		dataType++;
+	}
+	if (pad[0].trgKey[PAD_TBL_LEFT])
+	{
+		dataType--;
+	}
+	if (dataType >= DATA_MAX - 1)
+	{
+		dataType = DATA_MAX - 1;
+	}
+	if (dataType <= 0)
+	{
+		dataType = 0;
+	}
+	GameSetumeiDraw();
+}
+
+void GameSetumeiDraw(void)
+{
+	PlaySoundMem(sousaBGM, DX_PLAYTYPE_LOOP, false);
+	StopSoundMem(titleBGM);
+	DrawGraph(0, 0, data[dataType], true);
+	DrawFormatString(0, 0, 0xff0000, "%d / 4", dataType + 1);
+	if (dataType < DATA_MAX - 1)
+	{
+		DrawString(1000, 0, "右 : 次へ", 0xff0000, true);
+	}
+	if (dataType > 0)
+	{
+		DrawString(1000, 20, "左 : 戻る", 0xff0000, true);
+	}
+	if (dataType == DATA_MAX - 1)
+	{
+		DrawString(1000, 0, "スペースキー : 説明終了", 0xff0000, true);
+	}
+	if (dataType == 0)
+	{
+		DrawString(1000, 20, "左 : タイトルに戻る", 0xff0000, true);
+	}
 }
 
 void GameCharasere(void)
 {
-	PlayerControl();
+	DeleteSoundMem(titleBGM);
+	DeleteSoundMem(sousaBGM);
+	for (int j = 0; j < PLAYER_MAX; j++)
+	{
+		PlayerControl(j);
+	}
 	GameCharasereDraw();
 }
 
 void GameCharasereDraw(void)
 {
+	ChangeVolumeSoundMem(255 * 60 / 100, charselBGM);
+	PlaySoundMem(charselBGM, DX_PLAYTYPE_LOOP, false);
+
 	DrawBox(150, 20, SCREEN_SIZE_X - 150, 120, 0xffffff, false);
 	DrawLine(0, SCREEN_SIZE_Y / 2 + 60, SCREEN_SIZE_X, SCREEN_SIZE_Y / 2 + 60, 0xffffff, true);
 	DrawLine(SCREEN_SIZE_X / 2, 120, SCREEN_SIZE_X / 2, SCREEN_SIZE_Y, 0xffffff, true);
 	DrawGraph(150, 20, charaSeleTitle, true);
-	for (int x = 0; x < 2; x++)
+	for (int x = 0; x < 2; x++) 
 	{
-		for (int y = 0; y < 2; y++)
+		for (int y = 0; y < 2; y++) 
 		{
 			DrawGraph((SCREEN_SIZE_X / 2 + 1)*x, 120 + (341 * y), wakImage, true);
 		}
 	}
 	DrawBox(40, 120 + 40, 40 + 260, 160 + 260, 0xffffff, true);
-	PlayerDraw();
+	for (int j = 0; j < PLAYER_MAX; j++)
+	{
+		PlayerDraw(j);
+	}
 	DrawString(0, 0, "Charasere", 0xffffff);
 }
 
 void GameMain(void)
 {
+	DeleteSoundMem(charselBGM);
+
 	/*if (cnt > 2500) {
 		cnt = 2500;
 	}
@@ -229,7 +412,7 @@ void GameMain(void)
 		cnt++;
 	}*/
 
-	if (trgKey[P1_PAUSE])
+	if (pad[0].trgKey[PAD_TBL_PAUSE])
 	{
 		pauseFlag = !pauseFlag;
 	}
@@ -237,29 +420,32 @@ void GameMain(void)
 	{
 		SetDrawBright(128, 128, 128);
 	}
-	else
+	else 
 	{
 		gameCnt++;
-		PlayerControl();
+		for (int j = 0; j < PLAYER_MAX; j++)
+		{
+			PlayerControl(j);
+		}
 		StageControl();
 		EffectControl();
 		HitCheck();
 	}
 	GameMainDraw();
-	if (pauseFlag)
-	{
-		SetDrawBright(255, 255, 255);
-		DrawString(SCREEN_SIZE_X / 2 - 40, SCREEN_SIZE_Y / 2 - 5, "P A U S E", 0xffffff);
-	}
 }
 
 void GameMainDraw(void)
 {
+	ChangeVolumeSoundMem(255 * 70 / 100, gameBGM);
+	PlaySoundMem(gameBGM, DX_PLAYTYPE_LOOP, false);
+
 	StageDraw();
 	BgControl();
-	PlayerDraw();
-	WireDraw();
-	DrawGraph(CHIP_SIZE_X * 5 - mapPos.x, CHIP_SIZE_Y * 23 - mapPos.y, maiImage, true);
+	for (int j = 0; j < PLAYER_MAX; j++)
+	{
+		PlayerDraw(j);
+	}
+	//DrawGraph(CHIP_SIZE_X * 5 - mapPos.x, CHIP_SIZE_Y * 23 - mapPos.y, maiImage, true);
 	DrawFormatString(0, 0, 0xffffff, "GameMain : %d", gameCnt);
 	//DrawLine(0, 0, 0, SCREEN_SIZE_Y, 0xffffff, cnt / 4);
 	//DrawLine(0, 0, SCREEN_SIZE_X, 0, 0xffffff, cnt / 6);
@@ -268,10 +454,18 @@ void GameMainDraw(void)
 	//DrawLine(SCREEN_SIZE_X / 2, 0, SCREEN_SIZE_X / 2, SCREEN_SIZE_Y, 0xffffff, true);
 	//DrawLine(0, SCREEN_SIZE_Y / 2, SCREEN_SIZE_X, SCREEN_SIZE_Y / 2, 0xffffff, true);
 	EffectDraw();
+
+	if (pauseFlag)
+	{
+		SetDrawBright(255, 255, 255);
+		DrawString(SCREEN_SIZE_X / 2 - 40, 100, "P A U S E", 0xffffff);
+		DrawRotaGraph(SCREEN_SIZE_X / 2, SCREEN_SIZE_Y / 2, 0.6, 0, setumeiImage, true, false);
+	}
 }
 
 void GameOver(void)
 {
+	DeleteSoundMem(gameBGM);
 
 	GameOverDraw();
 }

@@ -52,14 +52,23 @@ void StageGameInit(void)
 void StageControl(void)
 {
 	// X方向
-	if (mapPos.x < 0) mapPos.x = 0;
-	if (mapPos.x > expData.mapWidth *CHIP_SIZE_X - SCREEN_SIZE_X) mapPos.x
-		= expData.mapWidth * CHIP_SIZE_X - SCREEN_SIZE_X;
-
+	if (mapPos.x < 0)
+	{
+		mapPos.x = 0;
+	}
+	if (mapPos.x > expData.mapWidth *CHIP_SIZE_X - SCREEN_SIZE_X)
+	{
+		mapPos.x = expData.mapWidth * CHIP_SIZE_X - SCREEN_SIZE_X;
+	}
 	//// y方向
-	if (mapPos.y < 0) mapPos.y = 0;
-	if (mapPos.y > expData.mapHeight*CHIP_SIZE_Y - SCREEN_SIZE_Y) mapPos.y
-		= expData.mapHeight * CHIP_SIZE_Y - SCREEN_SIZE_Y;
+	if (mapPos.y < 0)
+	{
+		mapPos.y = 0;
+	}
+	if (mapPos.y > expData.mapHeight*CHIP_SIZE_Y - SCREEN_SIZE_Y)
+	{
+		mapPos.y = expData.mapHeight * CHIP_SIZE_Y - SCREEN_SIZE_Y;
+	}
 }
 
 void BgControl(void)
@@ -155,11 +164,11 @@ bool IsPass(Position pos)
 	XY mapIndex;
 
 	mapIndex = MapPosToIndex(pos);
-
+	
 	int mapNo;
 	mapNo = mapData[mapIndex.y][mapIndex.x];
 
-	switch (mapNo)
+	switch (mapNo) 
 	{
 	case MAP_ID::MAP_ID_CAGUHT:		// ワイヤーが引っかかるところ
 	case MAP_ID::MAP_ID_UG:			// 地中
@@ -171,29 +180,8 @@ bool IsPass(Position pos)
 		break;
 	}
 	return block;
-
-	//for (int y = 0; y < expData.mapHeight; y++)
-	//{
-	//	for (int x = 0; x < expData.chipWidth; x++)
-	//	{
-	//		MAP_ID mapNo = mapData[y][x];
-	//		switch (mapNo) // enumに
-	//		{
-	//		case MAP_ID::MAP_ID_CAGUHT:		// ワイヤーが引っかかるところ
-	//		case MAP_ID::MAP_ID_UG:			// 地中
-	//		case MAP_ID::MAP_ID_WALL:		// 主な壁、地面
-	//		case MAP_ID::MAP_ID_WALL_KICK:	// 壁蹴りジャンプ
-	//			block = false;			// 触れるようにする
-	//			break;
-	//		case MAP_ID::MAP_ID_BACK:		  // 背景
-	//			break;
-	//		}
-	//	}
-	//}
-	//		return block;
-
 }
-
+ 
 bool WireBlockPass(Position pos)
 {
 	bool blueblock = true;		// ワイヤーをかけれるブロックがあるかの判定: true = ない　false = ある

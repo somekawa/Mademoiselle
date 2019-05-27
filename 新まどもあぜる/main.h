@@ -14,6 +14,8 @@
 #define PI 3.141592f
 #define ACC_G 9.8f
 
+#define PLAYER_MAX 2
+
 struct Position {
 	Position(float ix, float iy) { x = ix; y = iy; }
 	Position()
@@ -31,15 +33,15 @@ struct Position {
 	{
 		return Position(x / Length(), y / Length());
 	}
-	Position operator+(const Position & in)
+	Position operator+(const Position & in) 
 	{
 		return Position(x + in.x, y + in.y);
 	}
-	Position operator-(const Position & in)
+	Position operator-(const Position & in) 
 	{
 		return Position(x - in.x, y - in.y);
 	}
-	Position operator*(float s)
+	Position operator*(float s) 
 	{
 		return Position(x * s, y * s);
 	}
@@ -57,14 +59,24 @@ typedef struct {
 }XY;
 
 // ｹﾞｰﾑﾓｰﾄﾞ
-typedef enum {
+typedef enum{
 	GMODE_INIT,
 	GMODE_TITLE,
+	GMODE_SETUMEI,	// 説明
 	GMODE_CHARASERE,
 	GMODE_GAME,
 	GMODE_OVER,
 	GMODE_MAX
 }GAME_MODE;
+
+// 説明
+typedef enum{
+	DATA_BUTTON,
+	DATA_BLOCK,
+	DATA_ITEM,
+	DATA_ICON,
+	DATA_MAX
+};
 
 // 方向
 enum MOVE_DIR {
@@ -119,6 +131,8 @@ typedef struct {
 	bool left;				// 左向き
 	float nowDeg;		// 今のプレイヤーの角度
 	bool dropFlag;			// アイテムを取得しているかどうか
+	float JumpDeg;			// 打ち出し角
+	bool BlockFlag;			// ブロック内にプレイヤーがいるとき = true
 }CHARACTER;
 
 extern Position mapPos;

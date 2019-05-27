@@ -19,46 +19,32 @@ enum ITEM_STATE {
 	ITEM_SPECIAL,		// 必殺技1回プラス
 };
 
-void PlNormal(void);
-void PlDown(void);
-void PlJumpUp(void);
-void PlWirePrepare(void);
-void PlWireAction(void);
-void PlWireJump(void);
-void PlWall_R(void);	// 壁を走る(右)
-void PlWall_L(void);	// 壁を走る(左)
+void PlayerSystmInit(void);
+void PlayerGameInit(void);
+void PlayerControl(int padNo);
+void PlayerDraw(int padNo);
+
+void AddRad(int padNo);
+
+void PlNormal(int padNo);
+void PlJumpUp(int padNo);
+void PlDown(int padNo);
+void PlWirePrepare(int padNo);
+void PlWireAction(int padNo);
+void PlWireJump(int padNo);
+void PlWall_R(int padNo);	// 壁を走る(右)
+void PlWall_L(int padNo);	// 壁を走る(左)
 
 // アイテム関連
-void ItemSegwey(void);
+void GetItemRand(void);	// player.dropFlagがtrueになったときにアイテムをランダムで決定させる
+void ItemSegwey(int padNo);
 void ItemKabosu(void);
 void ItemUFO(void);
 void ItemSP(void);
 
-void PlayerSystmInit(void);
-void PlayerGameInit(void);
-void PlayerControl(void);
-void PlayerDraw(void);
 
-void PlayerState(void);
-void ItemState(void);
+void PlayerState(int padNo);
+void ItemState(int padNo);
 
-void AddRad(void);
-
-
-// ワイヤーアクションについて
-void WireDraw(void);
-//ジャンプキー押されたイベント
-//void OnPushJumpKey(float& vx, float& vy);
-//着地イベント
-//void OnGround(float& x, float& y, float& vx, float& vy);
 
 bool GetPlayerV(void);	// ﾌﾟﾚｲﾔｰ生存確認
-
-// 角度(ラジアン)を求めるためのやつ
-float getRadian(float old_x, float old_y, float now_x, float now_y);
-
-
-// ラジアンをsinとcosに分解するやつ
-//float Disassembly(float radian_cos , float radian_sin);
-float Disassembly_C(float radian_cos);					// x軸
-float Disassembly_S(float& radian_sin, float g);		// y軸
