@@ -216,10 +216,6 @@ void PlayerSystmInit(void)
 
 void PlayerGameInit(void)
 {
-	// BGM & SE
-	charsel_ok = LoadSoundMem("BGM/charok_se.mp3");
-	charsel_no = LoadSoundMem("BGM/charno_se.mp3");
-
 	for (int j = 0; j < PLAYER_MAX; j++)
 	{	
 		player[j].size = { 72,72 }; // プレイヤーの画像サイズ
@@ -339,6 +335,8 @@ void PlayerControl(int padNo)
 		{
 			if (pad[padNo].trgKey[PAD_TBL_RIGHT])
 			{
+				PlaySoundMem(charsel, DX_PLAYTYPE_BACK, true);
+
 				player[padNo].type = (CHARA_TYPE)(player[padNo].type + 1);
 				if (player[padNo].type > CHARA_ORANGE)
 				{
@@ -347,6 +345,8 @@ void PlayerControl(int padNo)
 			}
 			if (pad[padNo].trgKey[PAD_TBL_LEFT])
 			{
+				PlaySoundMem(charsel, DX_PLAYTYPE_BACK, true);
+
 				player[padNo].type = (CHARA_TYPE)(player[padNo].type - 1);
 				if (player[padNo].type < CHARA_RED)
 				{
@@ -366,17 +366,17 @@ void PlayerControl(int padNo)
 
 		if (pad[padNo].trgKey[PAD_TBL_JUMP])
 		{
-			player[padNo].visible = !player[padNo].visible;
-		//	if (!player[padNo].visible)
-		//	{
-		//		PlaySoundMem(charsel_ok, DX_PLAYTYPE_BACK, true);
-		//		player[padNo].visible = true;
-		//	}
-		//	else
-		//	{
-		//		PlaySoundMem(charsel_no, DX_PLAYTYPE_BACK, true);
-		//		player[padNo].visible = false;
-		//	}
+			//player[padNo].visible = !player[padNo].visible;
+			if (!player[padNo].visible)
+			{
+				PlaySoundMem(charsel_ok, DX_PLAYTYPE_BACK, true);
+				player[padNo].visible = true;
+			}
+			else
+			{
+				PlaySoundMem(charsel_no, DX_PLAYTYPE_BACK, true);
+				player[padNo].visible = false;
+			}
 		}
 		break;
 

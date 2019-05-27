@@ -54,6 +54,8 @@ int titleBGM;
 int sousaBGM;
 int charselBGM;
 int gameBGM;
+int start_se;
+int setumei_se;
 
 // ==========WinMainŠÖ”
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
@@ -158,6 +160,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			}
 			else if ((pad[0].trgKey[PAD_TBL_START]) && (GetPlayerV()))
 			{
+				PlaySoundMem(start_se, DX_PLAYTYPE_BACK, true);
 				fadeOut = true;
 			}
 			GameCharasere();
@@ -245,6 +248,9 @@ int SystmInit(void)
 	charaSeleTitle = LoadGraph("image/CharacterSelect.png");
 	wakImage = LoadGraph("image/wak0.png");
 
+	start_se = LoadSoundMem("BGM/gamestart_se.mp3");
+	setumei_se = LoadSoundMem("BGM/setumei_se.mp3");
+
 	return 1;
 
 }
@@ -325,10 +331,12 @@ void GameSetumei(void)
 
 	if (pad[0].trgKey[PAD_TBL_RIGHT])
 	{
+		PlaySoundMem(setumei_se, DX_PLAYTYPE_BACK, true);
 		dataType++;
 	}
 	if (pad[0].trgKey[PAD_TBL_LEFT])
 	{
+		PlaySoundMem(setumei_se, DX_PLAYTYPE_BACK, true);
 		dataType--;
 	}
 	if (dataType >= DATA_MAX - 1)
