@@ -33,7 +33,8 @@ ITEM_STATE	 item_state;
 // ﾌﾟﾚｲﾔｰｽﾋﾟｰﾄﾞ
 enum PLAYER_SPEED {
 	PLAYER_SPEED_NORMAL = 8,
-	PLAYER_SPEED_SEGWEY = 12
+	PLAYER_SPEED_SEGWEY = 12,
+	PLAYER_SPEED_WIRE   = 14
 };
 int p1Wak[2];
 int p2Wak[2];
@@ -1152,8 +1153,6 @@ void PlWireJump(void)
 	player.visible2 = false;		// ワイヤー中の静止画キャラが非表示になる
 	player.wireFlag = false;		// ワイヤーが非表示になる
 
-	//player.JumpDeg = 180 - (player.nowDeg + 90);		// 打ち出し角
-
 	if (player.right == true)
 	{
 		player.moveDir = DIR_RIGHT;
@@ -1162,7 +1161,7 @@ void PlWireJump(void)
 
 		if (player.BlockFlag == true)
 		{
-			player.pos.x += PLAYER_SPEED_NORMAL;
+			player.pos.x += PLAYER_SPEED_WIRE;
 
 			if (player.pos.y >= player.JumpDeg - player.pos.y)
 			{
@@ -1174,7 +1173,7 @@ void PlWireJump(void)
 
 			if (player.pos.x > SCREEN_SIZE_X / 2)//カメラが右に行く
 			{
-				mapPos.x += player.moveSpeed;
+				mapPos.x += PLAYER_SPEED_WIRE;
 			}
 
 			jumpSpeed = jumpSpeed - FURIKO_ADD;
@@ -1188,7 +1187,7 @@ void PlWireJump(void)
 		player.JumpDeg = -(180 - (player.nowDeg + 90));		// 打ち出し角
 		if (player.BlockFlag == true)
 		{
-			player.pos.x -= PLAYER_SPEED_NORMAL;
+			player.pos.x -= PLAYER_SPEED_WIRE;
 
 			if (player.pos.y >= player.JumpDeg - player.pos.y)
 			{
@@ -1200,7 +1199,7 @@ void PlWireJump(void)
 
 			if (player.pos.x < PLAY_SIZE_X - SCREEN_SIZE_X / 2)//カメラが左に行く
 			{
-				mapPos.x -= player.moveSpeed;
+				mapPos.x -= PLAYER_SPEED_WIRE;
 			}
 
 			jumpSpeed = jumpSpeed - FURIKO_ADD;
