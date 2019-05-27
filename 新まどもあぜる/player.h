@@ -1,23 +1,23 @@
 #pragma once
 
-enum PLAYER_STATE {
-	PLAYER_NORMAL,		// 左右移動 
-	PLAYER_DOWN,	    // ジャンプ下降
-	PLAYER_JUMP_UP,		// ジャンプの上昇
-	PLAYER_W_PRE,		// ﾜｲﾔｰｱｸｼｮﾝの準備(ワイヤーを伸ばす)
-	PLAYER_W_ACTION,	// ﾜｲﾔｰｱｸｼｮﾝ
-	PLAYER_W_JUMP,		// ﾜｲﾔｰｼﾞｬﾝﾌﾟ
-	PLAYER_WALL_RIGHT,	// 壁(右)を走る
-	PLAYER_WALL_LEFT,	// 壁(左)を走る
-};
+//enum PLAYER_STATE {
+//	PLAYER_NORMAL,		// 左右移動 
+//	PLAYER_DOWN,	    // ジャンプ下降
+//	PLAYER_JUMP_UP,		// ジャンプの上昇
+//	PLAYER_W_PRE,		// ﾜｲﾔｰｱｸｼｮﾝの準備(ワイヤーを伸ばす)
+//	PLAYER_W_ACTION,	// ﾜｲﾔｰｱｸｼｮﾝ
+//	PLAYER_W_JUMP,		// ﾜｲﾔｰｼﾞｬﾝﾌﾟ
+//	PLAYER_WALL_RIGHT,	// 壁(右)を走る
+//	PLAYER_WALL_LEFT,	// 壁(左)を走る
+//};
 
-enum ITEM_STATE {
-	ITEM_NON,			// アイテムを取得していない状態(なにもなし)
-	ITEM_SEGWEY,		// セグウェイ
-	ITEM_KABOSU,		// かぼす(大分県産)
-	ITEM_UFO,			// UFO
-	ITEM_SPECIAL,		// 必殺技1回プラス
-};
+//enum ITEM_STATE {
+//	ITEM_NON,			// アイテムを取得していない状態(なにもなし)
+//	ITEM_SEGWEY,		// セグウェイ
+//	ITEM_KABOSU,		// かぼす(大分県産)
+//	ITEM_UFO,			// UFO
+//	ITEM_SPECIAL,		// 必殺技1回プラス
+//};
 
 void PlayerSystmInit(void);
 void PlayerGameInit(void);
@@ -32,6 +32,7 @@ void PlDown(int padNo);
 void PlWirePrepare(int padNo);
 void PlWireAction(int padNo);
 void PlWireJump(int padNo);
+void PlWall_Check(int padNo); // 壁走りできる壁であるかどうか
 void PlWall_R(int padNo);	// 壁を走る(右)
 void PlWall_L(int padNo);	// 壁を走る(左)
 

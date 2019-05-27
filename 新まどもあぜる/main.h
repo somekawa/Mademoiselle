@@ -97,6 +97,25 @@ enum CHARA_TYPE {
 	CHARA_MAX
 };
 
+enum PLAYER_STATE {
+	PLAYER_NORMAL,		// 左右移動 
+	PLAYER_DOWN,	    // ジャンプ下降
+	PLAYER_JUMP_UP,		// ジャンプの上昇
+	PLAYER_W_PRE,		// ﾜｲﾔｰｱｸｼｮﾝの準備(ワイヤーを伸ばす)
+	PLAYER_W_ACTION,	// ﾜｲﾔｰｱｸｼｮﾝ
+	PLAYER_W_JUMP,		// ﾜｲﾔｰｼﾞｬﾝﾌﾟ
+	PLAYER_WALL_RIGHT,	// 壁(右)を走る
+	PLAYER_WALL_LEFT,	// 壁(左)を走る
+};
+
+enum ITEM_STATE {
+	ITEM_NON,			// アイテムを取得していない状態(なにもなし)
+	ITEM_SEGWEY,		// セグウェイ
+	ITEM_KABOSU,		// かぼす(大分県産)
+	ITEM_UFO,			// UFO
+	ITEM_SPECIAL,		// 必殺技1回プラス
+};
+
 typedef struct {
 	int type;				//ﾌﾟﾚｲﾔｰｶﾗｰ
 	bool visible;
@@ -133,6 +152,10 @@ typedef struct {
 	bool dropFlag;			// アイテムを取得しているかどうか
 	float JumpDeg;			// 打ち出し角
 	bool BlockFlag;			// ブロック内にプレイヤーがいるとき = true
+	Position furiko_pos;
+	PLAYER_STATE state;
+	ITEM_STATE	 item_state;
+	int Segwey_Cnt;
 }CHARACTER;
 
 extern Position mapPos;

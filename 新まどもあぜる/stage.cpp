@@ -150,12 +150,7 @@ bool MapLoad(void)
 
 XY MapPosToIndex(Position pos)	// pos = mvedPos
 {
-	XY mapIndex;
-
-	//mapIndex = { (int)pos.x / CHIP_SIZE_X, (int)pos.y / CHIP_SIZE_Y };
-	mapIndex = { (int)pos.x / expData.chipWidth, (int)pos.y / expData.chipHeight };
-
-	return mapIndex;
+	return { (int)pos.x / expData.chipWidth, (int)pos.y / expData.chipHeight };
 }
 
 bool IsPass(Position pos)
@@ -164,6 +159,15 @@ bool IsPass(Position pos)
 	XY mapIndex;
 
 	mapIndex = MapPosToIndex(pos);
+
+	// �͈͊O
+	if (mapIndex.x < 0 ||
+		mapIndex.x >= expData.mapWidth ||
+		mapIndex.y < 0 ||
+		mapIndex.y >= expData.mapHeight)
+	{
+		return false;
+	}
 	
 	int mapNo;
 	mapNo = mapData[mapIndex.y][mapIndex.x];
@@ -189,6 +193,16 @@ bool WireBlockPass(Position pos)
 	XY mapIndex;
 
 	mapIndex = MapPosToIndex(pos);
+
+	// �͈͊O
+	if (mapIndex.x < 0 ||
+		mapIndex.x >= expData.mapWidth ||
+		mapIndex.y < 0 ||
+		mapIndex.y >= expData.mapHeight)
+	{
+		return false;
+	}
+
 	mapNo = mapData[mapIndex.y][mapIndex.x];
 
 	switch (mapNo)
@@ -209,6 +223,16 @@ bool WallBlockPass(Position pos)
 	XY mapIndex;
 
 	mapIndex = MapPosToIndex(pos);
+
+	// �͈͊O
+	if (mapIndex.x < 0 ||
+		mapIndex.x >= expData.mapWidth ||
+		mapIndex.y < 0 ||
+		mapIndex.y >= expData.mapHeight)
+	{
+		return false;
+	}
+
 	mapNo = mapData[mapIndex.y][mapIndex.x];
 
 	switch (mapNo)

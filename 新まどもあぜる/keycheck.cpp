@@ -106,10 +106,8 @@ void KeyCheck(int padNo)
 	// -----trgKey & upKey & oldKey
 	for (int i = 0; i < PAD_TBL_MAX; i++) 
 	{
-		for (int j = 0; j < PLAYER_MAX; j++)
-		{
-			pad[j].trgKey[i] = pad[j].newKey[i] & ~pad[j].oldKey[i];	// trgKey
-			pad[j].upKey[i] = ~pad[j].newKey[i] & pad[j].oldKey[i];	// upKey
+			pad[padNo].trgKey[i] = pad[padNo].newKey[i] & ~pad[padNo].oldKey[i];	// trgKey
+			pad[padNo].upKey[i] = ~pad[padNo].newKey[i] & pad[padNo].oldKey[i];	// upKey
 
 
 			/*
@@ -123,6 +121,5 @@ void KeyCheck(int padNo)
 			upKey[i] = true;
 			}
 			*/
-		}
 	}
 }

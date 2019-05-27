@@ -24,8 +24,8 @@
 //#define PAI 3.141592
 //#define JUMPSPEED 2
 
-PLAYER_STATE player_state;
-ITEM_STATE	 item_state;
+//PLAYER_STATE player_state;
+//ITEM_STATE	 item_state;
 
 // ﾌﾟﾚｲﾔｰｽﾋﾟｰﾄﾞ
 enum PLAYER_SPEED {
@@ -48,6 +48,7 @@ enum IMAGE_TYPE {
 };
 #define RUN_ANIM_MAX  10			// ｺﾏ数
 #define SEGWAY_ANIM_MAX 2
+
 typedef struct {
 	int playerImage;					// 止まった画像//int playerImage[2];
 	int runImage[RUN_ANIM_MAX];			// 走っている画像//int runImage[2][10];
@@ -74,7 +75,7 @@ int WireTimeCnt;					// ワイヤーの表示時間
 bool _isPushJump;
 bool _isJumped;
 
-Position furiko_pos;
+//Position furiko_pos;
 float _g;
 float _v;
 Position _length;
@@ -102,7 +103,7 @@ float jumpSpeed;
 
 float defDeg;
 
-int Segwey_Cnt;
+//int Segwey_Cnt;
 
 // アイテム関連 
 int itemcnt;
@@ -178,7 +179,7 @@ void PlayerSystmInit(void)
 		// ｾｸﾞｳｪｲ
 		LoadDivGraph(fileNameList[j][IMAGE_TYPE_SEGWAY],
 			SEGWAY_ANIM_MAX,			// 全体枚数	
-			SEGWAY_ANIM_MAX/2, SEGWAY_ANIM_MAX,			// 横ｺﾏ数、縦ｺﾏ数
+			SEGWAY_ANIM_MAX, SEGWAY_ANIM_MAX/2,			// 横ｺﾏ数、縦ｺﾏ数
 			72, 72,							// 縦サイズ、横ｻｲｽﾞ
 			&charImage[j].segwayImage[0]);
 	}
@@ -303,8 +304,12 @@ void PlayerGameInit(void)
 
 	skyFlag = false;
 
-	player_state = PLAYER_NORMAL;
-	item_state = ITEM_NON;
+	player[0].state = PLAYER_NORMAL;
+	player[1].state = PLAYER_NORMAL;
+
+	player[0].item_state = ITEM_NON;
+	player[1].item_state = ITEM_NON;
+
 
 	WirePreTimeCnt = 0;
 
@@ -322,7 +327,8 @@ void PlayerGameInit(void)
 
 	//player[0].JumpDeg = 0;
 
-	Segwey_Cnt = 0;
+	player[0].Segwey_Cnt = 0;
+	player[1].Segwey_Cnt = 0;
 }
 
 void PlayerControl(int padNo)
@@ -394,7 +400,7 @@ void PlayerControl(int padNo)
 			&& player[padNo].pos.y - player[padNo].size.y < itemBoxPosY + CHIP_SIZE_Y			// player上 < box下
 			&& itemBoxPosY < player[padNo].pos.y)										// box上    < player下
 		{
-			item_state = ITEM_SEGWEY;
+			player[padNo].item_state = ITEM_SEGWEY;
 			player[padNo].dropFlag = true;												// ここをtrueにしているので、アイテムを使ってフラグをfalseにするまで次のアイテムは取得できない
 			PlaySoundMem(item_get, DX_PLAYTYPE_BACK, true);
 			itemBoxFlag = false;												// ここに入ればhitがでる
@@ -484,14 +490,14 @@ void PlayerDraw(int padNo)
 			}
 			//if (player.segweyFlag) img = segweyImage[player.type][(player.animCnt / 5) % 2];
 
-			if (player_state == PLAYER_WALL_RIGHT)
+			if (player[padNo].state == PLAYER_WALL_RIGHT)
 			{
 				DrawBox(player[padNo].pos.x - player[padNo].hitPosS.y - mapPos.x,
 					player[padNo].pos.y - player[padNo].hitPosE.x - mapPos.y,
 					player[padNo].pos.x - mapPos.x, player[padNo].pos.y + player[padNo].hitPosS.x - mapPos.y,
 					0x00ffff, false);
 			}
-			else if (player_state == PLAYER_WALL_LEFT)
+			else if (player[padNo].state == PLAYER_WALL_LEFT)
 			{
 				DrawBox(player[padNo].pos.x - mapPos.x,
 					player[padNo].pos.y - player[padNo].hitPosE.x - mapPos.y,
@@ -501,7 +507,7 @@ void PlayerDraw(int padNo)
 
 			if (player[padNo].moveDir == DIR_RIGHT)
 			{
-				if (player_state == PLAYER_WALL_RIGHT)
+				if (player[padNo].state == PLAYER_WALL_RIGHT)
 				{
 					DrawRotaGraph(player[padNo].pos.x - 36 - mapPos.x, player[padNo].pos.y - mapPos.y,
 						1, -PI / 2, img, true, false);
@@ -514,7 +520,7 @@ void PlayerDraw(int padNo)
 			}
 			else if (player[padNo].moveDir == DIR_LEFT)
 			{
-				if (player_state == PLAYER_WALL_LEFT)
+				if (player[padNo].state == PLAYER_WALL_LEFT)
 				{
 					DrawRotaGraph(player[padNo].pos.x + 36 - mapPos.x, player[padNo].pos.y - mapPos.y,
 						1, PI / 2, img, true, true);
@@ -526,7 +532,7 @@ void PlayerDraw(int padNo)
 				}
 			}
 
-			if ((player_state != PLAYER_WALL_RIGHT) && (player_state != PLAYER_WALL_LEFT))
+			if ((player[padNo].state != PLAYER_WALL_RIGHT) && (player[padNo].state != PLAYER_WALL_LEFT))
 			{
 				DrawBox(player[padNo].pos.x - player[padNo].offsetSize.x - mapPos.x,
 					player[padNo].pos.y + player[padNo].offsetSize.y - mapPos.y,
@@ -575,7 +581,7 @@ void PlayerDraw(int padNo)
 					charImage[player[padNo].type].jumpImage, true);
 			}
 		}
-		if (player_state == PLAYER_W_PRE || player_state == PLAYER_W_ACTION)
+		if (player[padNo].state == PLAYER_W_PRE || player[padNo].state == PLAYER_W_ACTION)
 		{
 			// 指定ブロックがとりあえず自分より上にある状態なら
 			if (player[padNo].wireOkFlag)
@@ -583,16 +589,16 @@ void PlayerDraw(int padNo)
 				// ワイヤー
 				DrawLine(player[padNo].pos.x - mapPos.x,
 					player[padNo].pos.y - player[padNo].size.y - mapPos.y,
-					furiko_pos.x - mapPos.x, furiko_pos.y - mapPos.y, 0xffffffff, 2);
+					player[padNo].furiko_pos.x - mapPos.x, player[padNo].furiko_pos.y - mapPos.y, 0xffffffff, 2);
 			}
 			else
 			{
-				if (WirePreTimeCnt <= furiko_pos.y)
+				if (WirePreTimeCnt <= player[padNo].furiko_pos.y)
 				{
 					// ワイヤー
 					DrawLine(player[padNo].pos.x - mapPos.x,
 						player[padNo].pos.y - player[padNo].size.y - mapPos.y,
-						furiko_pos.x - mapPos.x, furiko_pos.y - mapPos.y, 0xffffffff, 2);
+						player[padNo].furiko_pos.x - mapPos.x, player[padNo].furiko_pos.y - mapPos.y, 0xffffffff, 2);
 					WirePreTimeCnt++;
 				}
 			}
@@ -706,9 +712,9 @@ void PlNormal(int padNo)
 		player[padNo].moveDir = DIR_RIGHT;
 
 		// 壁確認
-		if ((WallBlockPass(player_RD)) && (player[padNo].wallRunSpeed == player[padNo].moveSpeed) && (pad[padNo].oldKey[PAD_TBL_JUMP]))
+		if ((WallBlockPass(player_RD)) && (player[padNo].wallRunSpeed == player[padNo].moveSpeed) /*&& (pad[padNo].oldKey[PAD_TBL_JUMP])*/)
 		{
-			player_state = PLAYER_WALL_RIGHT;
+			player[padNo].state = PLAYER_WALL_RIGHT;
 		}
 		else
 		{
@@ -734,11 +740,11 @@ void PlNormal(int padNo)
 		player[padNo].moveDir = DIR_LEFT;
 
 		// 壁確認
-		if ((WallBlockPass(player_LD)) && (player[padNo].wallRunSpeed == player[padNo].moveSpeed) && (pad[padNo].oldKey[PAD_TBL_JUMP]))
+		if ((WallBlockPass(player_LD)) && (player[padNo].wallRunSpeed == player[padNo].moveSpeed) /*&& (pad[padNo].oldKey[PAD_TBL_JUMP])*/)
 		{
 			if (player[padNo].wallRunSpeed == player[padNo].moveSpeed)
 			{
-				player_state = PLAYER_WALL_LEFT;
+				player[padNo].state = PLAYER_WALL_LEFT;
 			}
 		}
 		else
@@ -772,10 +778,10 @@ void PlNormal(int padNo)
 			player[padNo].right = false;
 			player[padNo].left = true;
 		}
-		furiko_pos = { player[padNo].pos.x , player[padNo].pos.y - player[padNo].size.y };
+		player[padNo].furiko_pos = { player[padNo].pos.x , player[padNo].pos.y - player[padNo].size.y };
 		player[padNo].wireFlag = true;
 
-		player_state = PLAYER_W_PRE;
+		player[padNo].state = PLAYER_W_PRE;
 	}
 }
 
@@ -792,7 +798,7 @@ void PlJumpUp(int padNo)
 	if (IsPass({ player_RU.x , player_RU.y - 1 }) && IsPass({ player_LU.x , player_LU.y - 1 }))
 	{
 		// 上に何もない
-		player_state = PLAYER_JUMP_UP;
+		player[padNo].state = PLAYER_JUMP_UP;
 		player[padNo].jumpFlag = true;
 	}
 	else
@@ -800,7 +806,7 @@ void PlJumpUp(int padNo)
 		// 上にブロックがある
 		player[padNo].UpDownSpeed = DOWN_SPEED_DEF;
 		player[padNo].AddUpDownSpeed = 0.5f;
-		player_state = PLAYER_DOWN;
+		player[padNo].state = PLAYER_DOWN;
 	}
 
 	// 上昇の処理(ある一定値を超えそうになると落下に切り替わるようにする)
@@ -818,38 +824,38 @@ void PlJumpUp(int padNo)
 	}
 	else
 	{
-		player_state = PLAYER_DOWN;
+		player[padNo].state = PLAYER_DOWN;
 	}
 }
 
 void PlDown(int padNo)
 {
-	Position player_RD = { player[0].pos.x + player[0].hitPosE.x - 1, player[0].pos.y - 1 };	// 右下
-	Position player_LD = { player[0].pos.x - player[0].hitPosS.x , player[0].pos.y - 1 };		// 左下
+	Position player_RD = { player[padNo].pos.x + player[padNo].hitPosE.x - 1, player[padNo].pos.y - 1 };	// 右下
+	Position player_LD = { player[padNo].pos.x - player[padNo].hitPosS.x , player[padNo].pos.y - 1 };		// 左下
 
 	//　RD と LD の y座標に+1して下のブロック情報を得る
 	if (IsPass({ player_RD.x , player_RD.y + 1 }) && IsPass({ player_LD.x , player_LD.y + 1 }))
 	{
-		if (player_state == PLAYER_NORMAL)
+		if (player[padNo].state == PLAYER_NORMAL)
 		{
-			player[0].UpDownSpeed = DOWN_SPEED_DEF;
-			player[0].AddUpDownSpeed = 0.8f;
-			player_state = PLAYER_DOWN;
+			player[padNo].UpDownSpeed = DOWN_SPEED_DEF;
+			player[padNo].AddUpDownSpeed = 0.8f;
+			player[padNo].state = PLAYER_DOWN;
 		}
 	}
 	else
 	{
-		if (pad[0].trgKey[PAD_TBL_JUMP])
+		if (pad[padNo].trgKey[PAD_TBL_JUMP])
 		{
-			player[0].UpDownSpeed = UP_SPEED_DEF;
-			player[0].AddUpDownSpeed = 0.8f;
-			player_state = PLAYER_JUMP_UP;
+			player[padNo].UpDownSpeed = UP_SPEED_DEF;
+			player[padNo].AddUpDownSpeed = 0.8f;
+			player[padNo].state = PLAYER_JUMP_UP;
 		}
 		else
 		{
-			if (player_state != PLAYER_W_ACTION)
+			if (player[padNo].state != PLAYER_W_ACTION)
 			{
-				player_state = PLAYER_NORMAL;
+				player[padNo].state = PLAYER_NORMAL;
 			}
 		}
 		return;	
@@ -874,22 +880,22 @@ void PlDown(int padNo)
 
 void PlWirePrepare(int padNo)
 {
-	furiko_pos.y = furiko_pos.y - ONEFRAME_WIRE_UP;
+	player[padNo].furiko_pos.y = player[padNo].furiko_pos.y - ONEFRAME_WIRE_UP;
 
-	Position furiko_RU = { furiko_pos.x + player[padNo].size.x / 2, furiko_pos.y };
-	Position furiko_LU = { furiko_pos.x - player[padNo].size.x / 2, furiko_pos.y };
-	if (player[padNo].pos.y - furiko_pos.y <= 350 && player[padNo].pos.y > 350)	// 指定範囲 && 上のほうでmap外に出たらエラーがでるのを防ぐ
+	Position furiko_RU = { player[padNo].furiko_pos.x + player[padNo].size.x / 2, player[padNo].furiko_pos.y };
+	Position furiko_LU = { player[padNo].furiko_pos.x - player[padNo].size.x / 2, player[padNo].furiko_pos.y };
+	if (player[padNo].pos.y - player[padNo].furiko_pos.y <= 350 && player[padNo].pos.y > 350)	// 指定範囲 && 上のほうでmap外に出たらエラーがでるのを防ぐ
 	{
 		PlaySoundMem(wire, DX_PLAYTYPE_BACK, true);
 		if (!(WireBlockPass({ furiko_RU.x , furiko_RU.y }))
 		|| !(WireBlockPass({ furiko_LU.x , furiko_LU.y })))
 		{
 			// 長さを出す
-			_length = furiko_pos - player[padNo].pos;
+			_length = player[padNo].furiko_pos - player[padNo].pos;
 
 			// プレイヤーの座標を-90°で設定?
-			player[padNo].pos.x = cos((-90.0f * PI) / 180.0f) * _length.y + furiko_pos.x;
-			player[padNo].pos.y = sin((-90.0f * PI) / 180.0f) * _length.y + furiko_pos.y;
+			player[padNo].pos.x = cos((-90.0f * PI) / 180.0f) * _length.y + player[padNo].furiko_pos.x;
+			player[padNo].pos.y = sin((-90.0f * PI) / 180.0f) * _length.y + player[padNo].furiko_pos.y;
 
 			MaxDeg = -20.0f;
 			minDeg = -160.0f;
@@ -923,7 +929,7 @@ void PlWirePrepare(int padNo)
 			player[padNo].visible2 = true;
 			player[padNo].wireFlag = false;
 			player[padNo].wireOkFlag = true;
-			player_state = PLAYER_W_ACTION;
+			player[padNo].state = PLAYER_W_ACTION;
 			return;		// 1つ目に見つけたブロックでいいのでreturnで抜ける
 		}
 		//else
@@ -948,7 +954,7 @@ void PlWirePrepare(int padNo)
 		//player.visible2 = false;
 		player[padNo].wireFlag = false;
 		player[padNo].wireOkFlag = false;
-		player_state = PLAYER_NORMAL;
+		player[padNo].state = PLAYER_NORMAL;
 	}
 
 	//player.wireOkFlag = true;
@@ -962,24 +968,25 @@ void PlWireAction(int padNo)
 	{
 		if (WireTimeCnt < 2000)
 		{
-			if (pad[padNo].trgKey[PAD_TBL_WIRE])		// ワイヤーを伸ばしてぶらぶらしている間はアイテムは使えないようにする処理
+			if (pad[padNo].trgKey[PAD_TBL_ITEM_L])		// ワイヤーを伸ばしてぶらぶらしている間はアイテムは使えないようにする処理
 			{
-				pad[padNo].trgKey[PAD_TBL_WIRE] = !pad[padNo].trgKey[PAD_TBL_WIRE];
+				pad[padNo].trgKey[PAD_TBL_ITEM_L] = !pad[padNo].trgKey[PAD_TBL_ITEM_L];
 			}
-			if (pad[padNo].trgKey[PAD_TBL_JUMP])
+
+			if (pad[padNo].trgKey[PAD_TBL_WIRE])
 			{
 				if (!IsPass({ player[padNo].pos.x , player[padNo].pos.y - player[padNo].size.y }))			// ここでそもそも壁の中でワイヤーを切り離したときの処置を書いとく
 				{
 					player[padNo].pos.y = GetWorldPos_Map(player[padNo].pos, DIR_DOWN).y + player[padNo].hitPosS.y + player[padNo].size.y * 2;		// 要調整
-					player[padNo].pos.x = furiko_pos.x;
+					player[padNo].pos.x = player[padNo].furiko_pos.x;
 					player[padNo].visible = true;
 					player[padNo].visible2 = false;
-					player_state = PLAYER_NORMAL;
+					player[padNo].state = PLAYER_NORMAL;
 					return;
 				}
 				jumpSpeed = FURIKO_SPEED_DEF;
 				player[padNo].BlockFlag = true;
-				player_state = PLAYER_W_JUMP;
+				player[padNo].state = PLAYER_W_JUMP;
 				return;
 			}
 			AddRad(padNo);
@@ -991,14 +998,14 @@ void PlWireAction(int padNo)
 			player[padNo].wireOkFlag = false;
 			player[padNo].visible = true;
 			player[padNo].visible2 = false;
-			player_state = PLAYER_NORMAL;
+			player[padNo].state = PLAYER_NORMAL;
 
 			// ワイヤー表示時間の初期化
 			WireTimeCnt = 0;
 
 			// 振り子スタート位置の初期化
 			_v = 0;
-			furiko_pos = { 0,0 };
+			player[padNo].furiko_pos = { 0,0 };
 
 			furikoSpeed = FURIKO_SPEED_DEF;
 		}
@@ -1009,8 +1016,8 @@ void AddRad(int padNo)
 {
 	// 角度を足すんだよぉぉぉぉ!!!!!!
 
-	player[padNo].pos.x = cos((player[padNo].nowDeg * PI) / 180.0f) * _length.y + furiko_pos.x;
-	player[padNo].pos.y = sin((player[padNo].nowDeg * PI) / 180.0f) * _length.y + furiko_pos.y;
+	player[padNo].pos.x = cos((player[padNo].nowDeg * PI) / 180.0f) * _length.y + player[padNo].furiko_pos.x;
+	player[padNo].pos.y = sin((player[padNo].nowDeg * PI) / 180.0f) * _length.y + player[padNo].furiko_pos.y;
 
 	if (player[padNo].right == true)
 	{
@@ -1075,9 +1082,9 @@ void PlWireJump(int padNo)
 			player[padNo].right = false;
 			player[padNo].left = true;
 		}
-		furiko_pos = { player[padNo].pos.x , player[padNo].pos.y - player[padNo].size.y };
+		player[padNo].furiko_pos = { player[padNo].pos.x , player[padNo].pos.y - player[padNo].size.y };
 		player[padNo].wireFlag = true;
-		player_state = PLAYER_W_PRE;
+		player[padNo].state = PLAYER_W_PRE;
 	}
 
 	Position player_RU = { player[padNo].pos.x + player[padNo].hitPosE.x - 1 ,
@@ -1101,7 +1108,7 @@ void PlWireJump(int padNo)
 		player[padNo].JumpDeg = 180 - (player[padNo].nowDeg + 90);		// 打ち出し角
 		if (player[padNo].BlockFlag == true)
 		{
-			player[padNo].pos.x += PLAYER_SPEED_NORMAL;
+			player[padNo].pos.x += PLAYER_SPEED_WIRE;
 			if (player[padNo].pos.y >= player[padNo].JumpDeg - player[padNo].pos.y)
 			{
 				player[padNo].pos.y -= jumpSpeed;
@@ -1116,7 +1123,7 @@ void PlWireJump(int padNo)
 			}
 			if (player[padNo].pos.x > SCREEN_SIZE_X / 2)//カメラが右に行く
 			{
-				mapPos.x += player[padNo].moveSpeed;
+				mapPos.x += PLAYER_SPEED_WIRE;
 			}
 			jumpSpeed = jumpSpeed - FURIKO_ADD;
 		}
@@ -1128,7 +1135,7 @@ void PlWireJump(int padNo)
 		player[padNo].JumpDeg = -(180 - (player[padNo].nowDeg + 90));		// 打ち出し角
 		if (player[padNo].BlockFlag == true)
 		{
-			player[padNo].pos.x -= PLAYER_SPEED_NORMAL;
+			player[padNo].pos.x -= PLAYER_SPEED_WIRE;
 			if (player[padNo].pos.y >= player[padNo].JumpDeg - player[padNo].pos.y)
 			{
 				player[padNo].pos.y -= jumpSpeed;
@@ -1143,7 +1150,7 @@ void PlWireJump(int padNo)
 			}
 			if (player[padNo].pos.x < PLAY_SIZE_X - SCREEN_SIZE_X / 2)//カメラが左に行く
 			{
-				mapPos.x -= player[padNo].moveSpeed;
+				mapPos.x -= PLAYER_SPEED_WIRE;
 			}
 			jumpSpeed = jumpSpeed - FURIKO_ADD;
 		}
@@ -1174,7 +1181,7 @@ void PlWireJump(int padNo)
 	{
 		if (IsPass({ player_RU.x , player_RU.y }) || IsPass({ player_LU.x , player_LU.y }) || IsPass({ player_RD.x , player_RD.y }) || IsPass({ player_LD.x , player_LD.y }))
 		{
-			player_state = PLAYER_DOWN;
+			player[padNo].state = PLAYER_DOWN;
 		}
 	}
 }
@@ -1186,12 +1193,9 @@ void PlWall_R(int padNo)
 	player[padNo].runFlag = false;
 	player[padNo].jumpFlag = false;
 
-	for (int j = 0; j < PLAYER_MAX; j++)
+	if (player[padNo].pos.y < SCREEN_SIZE_Y + 200)
 	{
-		if (player[j].pos.y < SCREEN_SIZE_Y + 200)
-		{
-			mapPos.y -= ACC_G / 2;// 上がる
-		}
+		mapPos.y -= ACC_G / 2;// 上がる
 	}
 
 	// 位置修正
@@ -1211,11 +1215,11 @@ void PlWall_R(int padNo)
 			if (pad[padNo].oldKey[PAD_TBL_LEFT])
 			{
 				player[padNo].wallRunSpeed = player[padNo].moveSpeed;
-				player_state = PLAYER_WALL_LEFT;
+				player[padNo].state = PLAYER_WALL_LEFT;
 			}
 			else
 			{
-				player_state = PLAYER_NORMAL;		// 通常に戻す
+				player[padNo].state = PLAYER_NORMAL;		// 通常に戻す
 			}
 		}
 		else if (player[padNo].wallRunSpeed >= 0)
@@ -1240,7 +1244,7 @@ void PlWall_R(int padNo)
 	}
 	else
 	{
-		player_state = PLAYER_NORMAL;		// 通常に戻す
+		player[padNo].state = PLAYER_NORMAL;		// 通常に戻す
 	}
 }
 
@@ -1250,9 +1254,10 @@ void PlWall_L(int padNo)
 	player[padNo].runFlag = false;
 	player[padNo].jumpFlag = false;
 
-	for (int j = 0; j < PLAYER_MAX; j++)
+	
+	if (player[padNo].pos.y < SCREEN_SIZE_Y + 200)
 	{
-		if (player[j].pos.y < SCREEN_SIZE_Y + 200)mapPos.y -= ACC_G / 2;// 上がる
+		mapPos.y -= ACC_G / 2;// 上がる
 	}
 
 	// 位置修正
@@ -1273,11 +1278,11 @@ void PlWall_L(int padNo)
 			{
 				player[padNo].wallRunSpeed = player[padNo].moveSpeed;
 				// 右壁に変更
-				player_state = PLAYER_WALL_RIGHT;
+				player[padNo].state = PLAYER_WALL_RIGHT;
 			}
 			else 
 			{
-				player_state = PLAYER_NORMAL;		// 通常に戻す
+				player[padNo].state = PLAYER_NORMAL;		// 通常に戻す
 			}
 		}
 		else if (player[padNo].wallRunSpeed >= 0)
@@ -1303,25 +1308,25 @@ void PlWall_L(int padNo)
 	else
 	{
 		// 通常に戻す
-		player_state = PLAYER_NORMAL;
+		player[padNo].state = PLAYER_NORMAL;
 	}
 }
 
 void PlayerState(int padNo)
 {
-	switch (player_state)
+	switch (player[padNo].state)
 	{
 	case PLAYER_NORMAL:			// 左右移動 
 	case PLAYER_DOWN:	        // ジャンプ下降
 		PlNormal(padNo);
-		if (player_state != PLAYER_W_PRE)
+		if (player[padNo].state != PLAYER_W_PRE)
 		{
 			PlDown(padNo);
 		}
 		break;
 	case PLAYER_JUMP_UP:		// ジャンプの上昇
 		PlNormal(padNo);
-		if (player_state != PLAYER_W_PRE)
+		if (player[padNo].state != PLAYER_W_PRE)
 		{
 			PlJumpUp(padNo);
 		}
@@ -1375,17 +1380,17 @@ void ItemSegwey(int padNo)
 	{
 		player[padNo].moveSpeed = PLAYER_SPEED_SEGWEY;
 
-		if (Segwey_Cnt == 80)
+		if (player[padNo].Segwey_Cnt == 80)
 		{
 			player[padNo].segweyFlag = false;
 			player[padNo].dropFlag = false;
-			Segwey_Cnt = 0;
+			player[padNo].Segwey_Cnt = 0;
 			player[padNo].moveSpeed = PLAYER_SPEED_NORMAL;
-			item_state = ITEM_NON;
+			player[padNo].item_state = ITEM_NON;
 		}
 		else
 		{
-			Segwey_Cnt++;
+			player[padNo].Segwey_Cnt++;
 		}
 	}
 }
@@ -1404,7 +1409,7 @@ void ItemSP(void)
 
 void ItemState(int padNo)
 {
-	switch (item_state)
+	switch (player[padNo].item_state)
 	{
 	case ITEM_NON:
 		//PlNormal();
