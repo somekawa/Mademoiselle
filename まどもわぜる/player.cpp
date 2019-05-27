@@ -992,9 +992,10 @@ void PlWireAction(void)
 
 			if (newKey[P2_B])
 			{
-				if (!IsPass({ player.pos.x , player.pos.y }))			// ここでそもそも壁の中でワイヤーを切り離したときの処置を書いとく
+				if (!IsPass({ player.pos.x , player.pos.y - player.size.y}))			// ここでそもそも壁の中でワイヤーを切り離したときの処置を書いとく
 				{
-					player.pos.y = GetWorldPos_Map(player.pos, DIR_DOWN).y + player.hitPosS.y + player.size.y;
+					player.pos.y = GetWorldPos_Map(player.pos, DIR_DOWN).y + player.hitPosS.y + player.size.y*2;		// 要調整
+					player.pos.x = furiko_pos.x;
 				}
 				jumpSpeed = FURIKO_SPEED_DEF;
 				player.BlockFlag = true;
