@@ -67,10 +67,15 @@ int p1Wak[2];
 int p2Wak[2];
 int p3Wak[2];
 int p4Wak[2];
+// 枠
+int* pWak[PLAYER_MAX] = {
+	p1Wak,p2Wak/*,p3Wak,p4Wak*/
+};
+
 int yazirusiImage[2];
 
-int WirePreTimeCnt;					// ワイヤーを少しずつ伸ばして途中で途切れるまでの時間
-int WireTimeCnt;					// ワイヤーの表示時間
+//int WirePreTimeCnt;					// ワイヤーを少しずつ伸ばして途中で途切れるまでの時間
+//int WireTimeCnt;					// ワイヤーの表示時間
 
 bool _isPushJump;
 bool _isJumped;
@@ -127,12 +132,12 @@ int wire;
 typedef Position Vec2;
 
 
-inline float Dot(const Vec2 & a, const Vec2 & b) 
+inline float Dot(const Vec2 & a, const Vec2 & b)
 {
 	return a.x* b.x + a.y * b.y;
 }
 
-inline float Cross(const Vec2 & a, const Vec2 & b) 
+inline float Cross(const Vec2 & a, const Vec2 & b)
 {
 	return a.x* b.y - b.x * a.y;
 }
@@ -179,7 +184,7 @@ void PlayerSystmInit(void)
 		// ｾｸﾞｳｪｲ
 		LoadDivGraph(fileNameList[j][IMAGE_TYPE_SEGWAY],
 			SEGWAY_ANIM_MAX,			// 全体枚数	
-			SEGWAY_ANIM_MAX, SEGWAY_ANIM_MAX/2,			// 横ｺﾏ数、縦ｺﾏ数
+			SEGWAY_ANIM_MAX, SEGWAY_ANIM_MAX / 2,			// 横ｺﾏ数、縦ｺﾏ数
 			72, 72,							// 縦サイズ、横ｻｲｽﾞ
 			&charImage[j].segwayImage[0]);
 	}
@@ -218,7 +223,7 @@ void PlayerSystmInit(void)
 void PlayerGameInit(void)
 {
 	for (int j = 0; j < PLAYER_MAX; j++)
-	{	
+	{
 		player[j].size = { 72,72 }; // プレイヤーの画像サイズ
 		player[j].offsetSize = { -player[j].size.x / 2,-player[j].size.y };
 		player[j].hitPosE = { 20,0 };
@@ -282,7 +287,9 @@ void PlayerGameInit(void)
 
 	//ひもの支点の初期化
 	_v = 0;			// 振り子のふり幅
-	WireTimeCnt = 0;
+
+	player[0].WireTimeCnt = 0;
+	player[1].WireTimeCnt = 0;
 
 	_g = 2.0f;		//重力の定義
 	player[0]._length = { 0 , 0 };	//紐の長さの計算
@@ -313,7 +320,9 @@ void PlayerGameInit(void)
 	player[1].item_state = ITEM_NON;
 
 
-	WirePreTimeCnt = 0;
+	player[0].WirePreTimeCnt = 0;
+	player[1].WirePreTimeCnt = 0;
+
 
 	//Maxrad = { 0,0 };
 	//minrad = { 0,0 };
@@ -339,7 +348,7 @@ void PlayerGameInit(void)
 void UIDraw(int padNo)
 {
 	// ｱｲｺﾝ
-	// オフセット
+	// オフセット( 画面上で一番左に描画される <所持アイテムが描画される枠> を基準に設定 )
 	int offset_x[PLAYER_MAX] = {
 	20,220/*,420,620*/
 	};
@@ -348,9 +357,6 @@ void UIDraw(int padNo)
 	5,5/*,5,5*/
 	};
 
-	int* pWak[PLAYER_MAX] = {
-		p1Wak,p2Wak/*,p3Wak,p4Wak*/
-	};
 
 	// プレイヤーステータスの枠
 	DrawGraph(30 + offset_x[padNo], 35 + offset_y[padNo], pWak[padNo][1], true);
@@ -361,15 +367,49 @@ void UIDraw(int padNo)
 	// 所持アイテムが描画される枠
 	DrawBox(offset_x[padNo], offset_y[padNo], 66 + offset_x[padNo], 66 + offset_y[padNo], 0xffffff, true);
 	DrawBox(offset_x[padNo], offset_y[padNo], 66 + offset_x[padNo], 66 + offset_y[padNo], 0x000000, false);
-	
+
 	// プレイヤーステータスのHPバー
 	DrawBox(80 + offset_x[padNo], 75 + offset_y[padNo], 180 + offset_x[padNo], 90 + offset_y[padNo], 0x000000, true);
 	DrawBox(81 + offset_x[padNo], 76 + offset_y[padNo], 179 + offset_x[padNo], 89 + offset_y[padNo], 0x00ff00, true);
-	
+
 	// プレイヤーのアイテムドロップ
 	if (player[padNo].dropFlag == true)
 	{
 		DrawGraph(offset_x[padNo], 5 + offset_y[padNo], segweyImage_icon, true);
+	}
+}
+
+void UIDrawSel(int padNo)
+{
+	int selOffset_x[PLAYER_MAX] = {
+		0,600,//0,600,
+	};
+	int selOffset_y[PLAYER_MAX] = {
+		120,120,//420,420,
+	};
+
+	// ｷｬﾗｾﾚｸﾄ時のプレイヤーの枠
+	DrawGraph(selOffset_x[padNo], selOffset_y[padNo], pWak[padNo][0], true);
+
+	if (player[padNo].visible)
+	{
+		// 決定
+		// ｷｬﾗ決定！
+		DrawString(120 + selOffset_x[padNo], 60 + selOffset_y[padNo], "キャラ決定！", 0x000000);
+		//　キャラクター
+		DrawRotaGraph(160 + selOffset_x[padNo], 180 + selOffset_y[padNo], 3, 0,
+			charImage[player[padNo].type].runImage[(player[padNo].animCnt / 3) % 10], true);
+	}
+	else
+	{
+		// 選択中
+		// 矢印
+		DrawTurnGraph(selOffset_x[padNo], 120 + selOffset_y[padNo], yazirusiImage[0], true);
+		DrawGraph(260 + selOffset_x[padNo], 120 + selOffset_y[padNo], yazirusiImage[1], true);
+
+		// キャラクター
+		DrawRotaGraph(160 + selOffset_x[padNo], 180 + selOffset_y[padNo],
+			3, 0, charImage[player[padNo].type].playerImage, true);
 	}
 }
 
@@ -455,50 +495,54 @@ void PlayerDraw(int padNo)
 	switch (GetGameMode())
 	{
 	case GMODE_CHARASERE:
-		DrawGraph(0, 120, p1Wak[0], true);
-		DrawGraph(600, 120, p2Wak[0], true);
-		DrawGraph(0, 460, p3Wak[0], true);
-		DrawGraph(600, 460, p4Wak[0], true);
-		if (player[padNo].visible)
-		{
+		//DrawGraph(0, 120, p1Wak[0], true);
+		//DrawGraph(600, 120, p2Wak[0], true);
+		//DrawGraph(0, 460, p3Wak[0], true);
+		//DrawGraph(600, 460, p4Wak[0], true);
+		//if (player[padNo].visible)
+		//{
+		//	// PL1
+		//	DrawRotaGraph(160, 300, 3, 0,
+		//		charImage[player[0].type].runImage[(player[0].animCnt / 3) % 10], true);
+		//	DrawString(120, 180, "キャラ決定！", 0x000000);
+		//	// PL2
+		//	DrawRotaGraph(760, 300, 3, 0,
+		//		charImage[player[1].type].runImage[(player[1].animCnt / 3) % 10], true);
+		//	DrawString(720, 180, "キャラ決定！", 0x000000);
+		//	// PL3
+		//	//DrawRotaGraph(160, 700, 3, 0,
+		//	//	charImage[player[2].type].runImage[(player[2].animCnt / 3) % 10], true);
+		//	//DrawString(120, 420, "キャラ決定！", 0x000000);
+		//	//// PL4
+		//	//DrawRotaGraph(760, 700, 3, 0,
+		//	//	charImage[player[3].type].runImage[(player[3].animCnt / 3) % 10], true);
+		//	//DrawString(720, 420, "キャラ決定！", 0x000000);
+		//}
+		//else
+		//{
 			// PL1
-			DrawRotaGraph(160, 300, 3, 0,
-				charImage[player[0].type].runImage[(player[0].animCnt / 3) % 10], true);
-			DrawString(120, 180, "キャラ決定！", 0x000000);
-			// PL2
-			DrawRotaGraph(760, 300, 3, 0,
-				charImage[player[1].type].runImage[(player[1].animCnt / 3) % 10], true);
-			DrawString(720, 180, "キャラ決定！", 0x000000);
+		//	DrawRotaGraph(160, 300, 3, 0, charImage[player[0].type].playerImage, true);
+		//	DrawTurnGraph(0, 240, yazirusiImage[0], true);
+		//	DrawGraph(260, 240, yazirusiImage[1], true);
+		//	// PL2
+		//	DrawRotaGraph(760, 300, 3, 0, charImage[player[1].type].playerImage, true);
+		//	DrawTurnGraph(600, 240, yazirusiImage[0], true);
+		//	DrawGraph(860, 240, yazirusiImage[1], true);
+		//	// PL3
+		//	//DrawRotaGraph(160, 700, 3, 0, charImage[player[2].type].playerImage, true);
+		//	//DrawTurnGraph(0, 540, yazirusiImage[0], true);
+		//	//DrawGraph(260, 540, yazirusiImage[1], true);
+		//	//// PL4
+		//	//DrawRotaGraph(760, 700, 3, 0, charImage[player[3].type].playerImage, true);
+		//	//DrawTurnGraph(500, 540, yazirusiImage[0], true);
+		//	//DrawGraph(660, 540, yazirusiImage[1], true);
+		//}
 
-			// PL3
-			//DrawRotaGraph(160, 700, 3, 0,
-			//	charImage[player[2].type].runImage[(player[2].animCnt / 3) % 10], true);
-			//DrawString(120, 420, "キャラ決定！", 0x000000);
-			//// PL4
-			//DrawRotaGraph(760, 700, 3, 0,
-			//	charImage[player[3].type].runImage[(player[3].animCnt / 3) % 10], true);
-			//DrawString(720, 420, "キャラ決定！", 0x000000);
-
-		}
-		else
+		for (int j = 0; j < PLAYER_MAX; j++)
 		{
-			// PL1
-			DrawRotaGraph(160, 300, 3, 0, charImage[player[0].type].playerImage, true);
-			DrawTurnGraph(0, 240, yazirusiImage[0], true);
-			DrawGraph(260, 240, yazirusiImage[1], true);
-			// PL2
-			DrawRotaGraph(760, 300, 3, 0, charImage[player[1].type].playerImage, true);
-			DrawTurnGraph(600, 240, yazirusiImage[0], true);
-			DrawGraph(860, 240, yazirusiImage[1], true);
-			// PL3
-			//DrawRotaGraph(160, 700, 3, 0, charImage[player[2].type].playerImage, true);
-			//DrawTurnGraph(0, 540, yazirusiImage[0], true);
-			//DrawGraph(260, 540, yazirusiImage[1], true);
-			//// PL4
-			//DrawRotaGraph(760, 700, 3, 0, charImage[player[3].type].playerImage, true);
-			//DrawTurnGraph(500, 540, yazirusiImage[0], true);
-			//DrawGraph(660, 540, yazirusiImage[1], true);
+			UIDrawSel(j);
 		}
+
 		break;
 
 	case GMODE_GAME:
@@ -596,15 +640,15 @@ void PlayerDraw(int padNo)
 					player[padNo].pos.x - mapPos.x, player[padNo].pos.y - mapPos.y, 0x00ffff, true);
 			}
 		}
-		
-			//DrawBox(player[0].pos.x - player[0].offsetSize.x - mapPos.x, player[0].pos.y - player[0].offsetSize.y - mapPos.y,
-			//	player[0].pos.x + player[0].offsetSize.x - mapPos.x, player[0].pos.y + player[0].offsetSize.y - mapPos.y, 0xff0000, false);
-			//DrawBox(player[0].pos.x - player[0].hitPosS.x - mapPos.x, player[0].pos.y - player[0].hitPosS.y - mapPos.y,
-			//	player[0].pos.x + player[0].hitPosE.x - mapPos.x, player[0].pos.y + player[0].hitPosE.y - mapPos.y, 0x00ffff, false);
-			//DrawLine(player[0].pos.x - player[0].offsetSize.x - mapPos.x, player[0].pos.y - mapPos.y,
-			//	player[0].pos.x + player[0].offsetSize.x - mapPos.x, player[0].pos.y - mapPos.y, 0x00ffff, true);
-			//DrawLine(player[0].pos.x - mapPos.x, player[0].pos.y - player[0].offsetSize.y - mapPos.y,
-			//	player[0].pos.x - mapPos.x, player[0].pos.y + player[0].offsetSize.y - mapPos.y, 0x00ffff, true);
+
+		//DrawBox(player[0].pos.x - player[0].offsetSize.x - mapPos.x, player[0].pos.y - player[0].offsetSize.y - mapPos.y,
+		//	player[0].pos.x + player[0].offsetSize.x - mapPos.x, player[0].pos.y + player[0].offsetSize.y - mapPos.y, 0xff0000, false);
+		//DrawBox(player[0].pos.x - player[0].hitPosS.x - mapPos.x, player[0].pos.y - player[0].hitPosS.y - mapPos.y,
+		//	player[0].pos.x + player[0].hitPosE.x - mapPos.x, player[0].pos.y + player[0].hitPosE.y - mapPos.y, 0x00ffff, false);
+		//DrawLine(player[0].pos.x - player[0].offsetSize.x - mapPos.x, player[0].pos.y - mapPos.y,
+		//	player[0].pos.x + player[0].offsetSize.x - mapPos.x, player[0].pos.y - mapPos.y, 0x00ffff, true);
+		//DrawLine(player[0].pos.x - mapPos.x, player[0].pos.y - player[0].offsetSize.y - mapPos.y,
+		//	player[0].pos.x - mapPos.x, player[0].pos.y + player[0].offsetSize.y - mapPos.y, 0x00ffff, true);
 
 		if (!player[padNo].visible && player[padNo].visible2)
 		{
@@ -635,21 +679,22 @@ void PlayerDraw(int padNo)
 			}
 			else
 			{
-				if (WirePreTimeCnt <= player[padNo].furiko_pos.y)
+				if (player[padNo].WirePreTimeCnt <= player[padNo].furiko_pos.y)
 				{
 					// ワイヤー
 					DrawLine(player[padNo].pos.x - mapPos.x,
 						player[padNo].pos.y - player[padNo].size.y - mapPos.y,
 						player[padNo].furiko_pos.x - mapPos.x, player[padNo].furiko_pos.y - mapPos.y, 0xffffffff, 2);
-					WirePreTimeCnt++;
+					player[padNo].WirePreTimeCnt++;
 				}
 			}
 			// 指定ブロックが上にないとき(何か障害物にあたるまでは伸ばしきりたい)
 		}
-		
-		UIDraw(0);
-		UIDraw(1);
 
+		for (int j = 0; j < PLAYER_MAX; j++)
+		{
+			UIDraw(j);
+		}
 
 		//// ｱｲｺﾝ
 		//// PL1
@@ -664,7 +709,7 @@ void PlayerDraw(int padNo)
 		////// PL4
 		//DrawGraph(650, 40, p4Wak[1], true);
 		////DrawGraph(658, 74, charImage[player[3].type].iconImage, true);
-
+		//
 		//// 所持アイテムが描画される枠
 		//// PL1
 		//DrawBox(20, 5, 86, 71, 0xffffff, true);
@@ -679,8 +724,7 @@ void PlayerDraw(int padNo)
 		//// PL4
 		//DrawBox(620, 5, 686, 71, 0xffffff, true);
 		//DrawBox(620, 5, 686, 71, 0x000000, false);
-
-
+		//
 		//// PL1
 		//DrawBox(100, 80, 200, 95, 0x000000, true);
 		//DrawBox(101, 81, 199, 94, 0x00ff00, true);
@@ -700,9 +744,9 @@ void PlayerDraw(int padNo)
 		{
 			DrawGraph(CHIP_SIZE_X * 15 - mapPos.x, CHIP_SIZE_X * 16 - mapPos.y, hatenaImage, true);// 左上1つ
 			DrawGraph(SCREEN_SIZE_X - CHIP_SIZE_X * 3 - mapPos.x,
-						SCREEN_SIZE_Y * 2 - CHIP_SIZE_X * 3 - mapPos.y, hatenaImage, true);// 下部の真ん中
-			DrawGraph(SCREEN_SIZE_X * 2 - CHIP_SIZE_X * 10 - mapPos.x, 
-						SCREEN_SIZE_Y - mapPos.y, hatenaImage, true);// 左側真ん中
+				SCREEN_SIZE_Y * 2 - CHIP_SIZE_X * 3 - mapPos.y, hatenaImage, true);// 下部の真ん中
+			DrawGraph(SCREEN_SIZE_X * 2 - CHIP_SIZE_X * 10 - mapPos.x,
+				SCREEN_SIZE_Y - mapPos.y, hatenaImage, true);// 左側真ん中
 			player[padNo].itemcnt = 0;
 
 		}
@@ -763,26 +807,26 @@ void PlNormal(int padNo)
 		player[padNo].moveDir = DIR_RIGHT;
 
 		//// 壁確認
-		//if ((WallBlockPass(player_RD)) && (player[padNo].wallRunSpeed == player[padNo].moveSpeed) /*&& (pad[padNo].oldKey[PAD_TBL_JUMP])*/)
+		//if ((WallBlockPass(player_RD)) && (player[padNo].wallRunSpeed == player[padNo].moveSpeed) /*&& !(pad[padNo].oldKey[PAD_TBL_JUMP])*/)
 		//{
 		//	player[padNo].state = PLAYER_WALL_RIGHT;
 		//}
 		//else
 		//{
-			if (IsPass(player_RD))// RDのchipID取得して移動できるIDか調べる
+		if (IsPass(player_RD))// RDのchipID取得して移動できるIDか調べる
+		{
+			player[padNo].pos.x += player[padNo].moveSpeed;
+			if (player[0].pos.x > SCREEN_SIZE_X / 2)//カメラが右に行く
 			{
-				player[padNo].pos.x += player[padNo].moveSpeed;
-				if (player[0].pos.x > SCREEN_SIZE_X / 2)//カメラが右に行く
-				{
-					mapPos.x += player[0].moveSpeed;
-				}
+				mapPos.x += player[0].moveSpeed;
 			}
-			else
-			{
-				// 隣まで計算してplayer.pos.xに代入
-				player[padNo].pos.x = GetWorldPos_Map(player_RD, DIR_LEFT).x - player[padNo].hitPosS.x;
-			}
-		
+		}
+		else
+		{
+			// 隣まで計算してplayer.pos.xに代入
+			player[padNo].pos.x = GetWorldPos_Map(player_RD, DIR_LEFT).x - player[padNo].hitPosS.x;
+		}
+
 	}
 
 	if (pad[padNo].newKey[PAD_TBL_LEFT])
@@ -791,7 +835,7 @@ void PlNormal(int padNo)
 		player[padNo].moveDir = DIR_LEFT;
 
 		//// 壁確認
-		//if ((WallBlockPass(player_LD)) && (player[padNo].wallRunSpeed == player[padNo].moveSpeed) /*&& (pad[padNo].oldKey[PAD_TBL_JUMP])*/)
+		//if ((WallBlockPass(player_LD)) && (player[padNo].wallRunSpeed == player[padNo].moveSpeed) /*&& !(pad[padNo].oldKey[PAD_TBL_JUMP])*/)
 		//{
 		//	if (player[padNo].wallRunSpeed == player[padNo].moveSpeed)
 		//	{
@@ -800,20 +844,20 @@ void PlNormal(int padNo)
 		//}
 		//else
 		//{
-			if (IsPass(player_LD))	// LDのchipID取得して移動できるIDか調べる
+		if (IsPass(player_LD))	// LDのchipID取得して移動できるIDか調べる
+		{
+			player[padNo].pos.x -= player[padNo].moveSpeed;
+			if (player[0].pos.x < PLAY_SIZE_X - SCREEN_SIZE_X / 2)//カメラが左に行く
 			{
-				player[padNo].pos.x -= player[padNo].moveSpeed;
-				if (player[0].pos.x < PLAY_SIZE_X - SCREEN_SIZE_X / 2)//カメラが左に行く
-				{
-					mapPos.x -= player[0].moveSpeed;
-				}
+				mapPos.x -= player[0].moveSpeed;
 			}
-			else
-			{
-				// 隣まで計算してplayer.pos.xに代入
-				player[padNo].pos.x = GetWorldPos_Map(player_LD, DIR_RIGHT).x + player[padNo].hitPosS.x;
-			}
-		
+		}
+		else
+		{
+			// 隣まで計算してplayer.pos.xに代入
+			player[padNo].pos.x = GetWorldPos_Map(player_LD, DIR_RIGHT).x + player[padNo].hitPosS.x;
+		}
+
 	}
 
 	if (pad[padNo].trgKey[PAD_TBL_WIRE])
@@ -864,7 +908,7 @@ void PlJumpUp(int padNo)
 	if (player[padNo].UpDownSpeed <= 0.0f)
 	{
 		if (IsPass({ player_RU.x , (player_RU.y + player[padNo].UpDownSpeed) })
-		&& IsPass({ player_LU.x , (player_LU.y + player[padNo].UpDownSpeed) }))
+			&& IsPass({ player_LU.x , (player_LU.y + player[padNo].UpDownSpeed) }))
 		{
 			player[padNo].pos.y += player[padNo].UpDownSpeed;
 		}
@@ -909,7 +953,7 @@ void PlDown(int padNo)
 				player[padNo].state = PLAYER_NORMAL;
 			}
 		}
-		return;	
+		return;
 	}
 	player[padNo].UpDownSpeed += player[padNo].AddUpDownSpeed;
 
@@ -939,7 +983,7 @@ void PlWirePrepare(int padNo)
 	{
 		PlaySoundMem(wire, DX_PLAYTYPE_BACK, true);
 		if (!(WireBlockPass({ furiko_RU.x , furiko_RU.y }))
-		|| !(WireBlockPass({ furiko_LU.x , furiko_LU.y })))
+			|| !(WireBlockPass({ furiko_LU.x , furiko_LU.y })))
 		{
 			// 長さを出す
 			player[padNo]._length = player[padNo].furiko_pos - player[padNo].pos;
@@ -998,7 +1042,7 @@ void PlWirePrepare(int padNo)
 	else
 	{
 		// 背景以外がある
-		WirePreTimeCnt = 0;
+		player[padNo].WirePreTimeCnt = 0;
 		//player.pos.x = furiko_RU.x - player.size.x / 2;
 		//player.pos.y = furiko_RU.y + player.size.y  - mapPos.y;
 		//player.visible = true;
@@ -1017,7 +1061,7 @@ void PlWireAction(int padNo)
 {
 	if (player[padNo].wireOkFlag)
 	{
-		if (WireTimeCnt < 2000)
+		if (player[padNo].WireTimeCnt < 500)
 		{
 			if (pad[padNo].trgKey[PAD_TBL_ITEM_L])		// ワイヤーを伸ばしてぶらぶらしている間はアイテムは使えないようにする処理
 			{
@@ -1041,7 +1085,7 @@ void PlWireAction(int padNo)
 				return;
 			}
 			AddRad(padNo);
-			WireTimeCnt++;
+			player[padNo].WireTimeCnt++;
 		}
 		else
 		{
@@ -1052,7 +1096,7 @@ void PlWireAction(int padNo)
 			player[padNo].state = PLAYER_NORMAL;
 
 			// ワイヤー表示時間の初期化
-			WireTimeCnt = 0;
+			player[padNo].WireTimeCnt = 0;
 
 			// 振り子スタート位置の初期化
 			_v = 0;
@@ -1247,7 +1291,7 @@ void PlWall_Check(int padNo)
 	{
 		player[padNo].state = PLAYER_WALL_RIGHT;
 	}
-	
+
 
 	// 壁確認
 	if ((WallBlockPass(player_LD)) && (player[padNo].wallRunSpeed == player[padNo].moveSpeed) && !(pad[padNo].oldKey[PAD_TBL_JUMP]))
@@ -1257,7 +1301,7 @@ void PlWall_Check(int padNo)
 			player[padNo].state = PLAYER_WALL_LEFT;
 		}
 	}
-	
+
 }
 
 // 壁を走る
@@ -1305,7 +1349,7 @@ void PlWall_R(int padNo)
 				player[padNo].moveDir = DIR_RIGHT;
 				// 壁確認
 				if (IsPass(player_RU))
-				{	
+				{
 					player[padNo].pos.y -= player[padNo].wallRunSpeed;
 				}
 				else
@@ -1328,7 +1372,7 @@ void PlWall_L(int padNo)
 	player[padNo].runFlag = false;
 	player[padNo].jumpFlag = false;
 
-	
+
 	if (player[padNo].pos.y < SCREEN_SIZE_Y + 200)
 	{
 		mapPos.y -= ACC_G / 2;// 上がる
@@ -1354,7 +1398,7 @@ void PlWall_L(int padNo)
 				// 右壁に変更
 				player[padNo].state = PLAYER_WALL_RIGHT;
 			}
-			else 
+			else
 			{
 				player[padNo].state = PLAYER_NORMAL;		// 通常に戻す
 			}
@@ -1367,11 +1411,11 @@ void PlWall_L(int padNo)
 				player[padNo].runFlag = true;
 				player[padNo].moveDir = DIR_LEFT;
 				// 壁確認
-				if (IsPass(player_LU)) 
-				{	
+				if (IsPass(player_LU))
+				{
 					player[padNo].pos.y -= player[padNo].moveSpeed;
 				}
-				else 
+				else
 				{
 					player[padNo].pos.y = GetWorldPos_Map(player_LU, DIR_DOWN).y + player[padNo].hitPosE.x;
 				}
@@ -1449,11 +1493,15 @@ void GetItemRand(void)
 
 void ItemSegwey(int padNo)
 {
-	if ((pad[padNo].trgKey[PAD_TBL_ITEM_R]) || (pad[padNo].trgKey[PAD_TBL_ITEM_L]))
+	if (player[padNo].state != PLAYER_WALL_RIGHT && player[padNo].state != PLAYER_WALL_LEFT)
 	{
-		player[padNo].segweyFlag = true;
-		PlaySoundMem(seg, DX_PLAYTYPE_BACK, true);
+		if ((pad[padNo].trgKey[PAD_TBL_ITEM_R]) || (pad[padNo].trgKey[PAD_TBL_ITEM_L]))
+		{
+			player[padNo].segweyFlag = true;
+			PlaySoundMem(seg, DX_PLAYTYPE_BACK, true);
+		}
 	}
+
 
 	if (player[padNo].segweyFlag == true)
 	{
