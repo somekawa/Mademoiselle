@@ -157,6 +157,8 @@ typedef struct {
 	ITEM_STATE	 item_state;
 	int Segwey_Cnt;
 	int itemcnt;
+	float furikoSpeed;
+	Position _length;		// U‚èq‚Ì’·‚³
 }CHARACTER;
 
 extern Position mapPos;

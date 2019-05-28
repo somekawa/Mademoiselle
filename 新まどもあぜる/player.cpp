@@ -78,7 +78,7 @@ bool _isJumped;
 //Position furiko_pos;
 float _g;
 float _v;
-Position _length;
+//Position _length;
 
 float KeepPosX;		// 座標の保存用
 float KeepPosY;		// 座標の保存用
@@ -97,7 +97,7 @@ bool skyFlag;
 
 float MaxDeg;
 float minDeg;
-float furikoSpeed;
+//float furikoSpeed;
 
 float jumpSpeed;
 
@@ -285,7 +285,9 @@ void PlayerGameInit(void)
 	WireTimeCnt = 0;
 
 	_g = 2.0f;		//重力の定義
-	_length = { 0 , 0 };	//紐の長さの計算
+	player[0]._length = { 0 , 0 };	//紐の長さの計算
+	player[1]._length = { 0 , 0 };	//紐の長さの計算
+
 
 
 	KeepPosX = 0;	// 座標の保存用
@@ -319,7 +321,9 @@ void PlayerGameInit(void)
 	MaxDeg = 0.0f;
 	minDeg = 0.0f;
 	//player[0].nowDeg = 0.0f;
-	furikoSpeed = 0.0f;
+	player[0].furikoSpeed = 0.0f;
+	player[1].furikoSpeed = 0.0f;
+
 	jumpSpeed = 0.0f;
 	defDeg = 0.0f;
 
@@ -335,68 +339,38 @@ void PlayerGameInit(void)
 void UIDraw(int padNo)
 {
 	// ｱｲｺﾝ
-	// PL1(+20.5)
+	// オフセット
 	int offset_x[PLAYER_MAX] = {
 	20,220/*,420,620*/
 	};
+
 	int offset_y[PLAYER_MAX] = {
 	5,5/*,5,5*/
 	};
+
 	int* pWak[PLAYER_MAX] = {
 		p1Wak,p2Wak/*,p3Wak,p4Wak*/
 	};
 
-	// PL1
+	// プレイヤーステータスの枠
 	DrawGraph(30 + offset_x[padNo], 35 + offset_y[padNo], pWak[padNo][1], true);
 
+	// プレイヤーステータスのキャラアイコン
 	DrawGraph(38 + offset_x[padNo], 69 + offset_y[padNo], charImage[player[padNo].type].iconImage, true);
 
-	// PL2
-	//DrawGraph(250, 40, p2Wak[1], true);
-	//DrawGraph(258, 74, charImage[player[1].type].iconImage, true);
-	////// PL3
-	//DrawGraph(450, 40, p3Wak[1], true);
-	////DrawGraph(458, 74, charImage[player[2].type].iconImage, true);
-	////// PL4
-	//DrawGraph(650, 40, p4Wak[1], true);
-	////DrawGraph(658, 74, charImage[player[3].type].iconImage, true);
-
 	// 所持アイテムが描画される枠
-	// PL1
 	DrawBox(offset_x[padNo], offset_y[padNo], 66 + offset_x[padNo], 66 + offset_y[padNo], 0xffffff, true);
 	DrawBox(offset_x[padNo], offset_y[padNo], 66 + offset_x[padNo], 66 + offset_y[padNo], 0x000000, false);
-	//// PL2
-	//DrawBox(220, 5, 286, 71, 0xffffff, true);
-	//DrawBox(220, 5, 286, 71, 0x000000, false);
-	//// PL3
-	//DrawBox(420, 5, 486, 71, 0xffffff, true);
-	//DrawBox(420, 5, 486, 71, 0x000000, false);
-	//// PL4
-	//DrawBox(620, 5, 686, 71, 0xffffff, true);
-	//DrawBox(620, 5, 686, 71, 0x000000, false);
-
-
-	// PL1
+	
+	// プレイヤーステータスのHPバー
 	DrawBox(80 + offset_x[padNo], 75 + offset_y[padNo], 180 + offset_x[padNo], 90 + offset_y[padNo], 0x000000, true);
 	DrawBox(81 + offset_x[padNo], 76 + offset_y[padNo], 179 + offset_x[padNo], 89 + offset_y[padNo], 0x00ff00, true);
-	//// PL2
-	//DrawBox(300, 80, 400, 95, 0x000000, true);
-	//DrawBox(301, 81, 399, 94, 0x00ff00, true);
-	//// PL3
-	//DrawBox(500, 80, 600, 95, 0x000000, true);
-	//DrawBox(501, 81, 599, 94, 0x00ff00, true);
-	//// PL4
-	//DrawBox(700, 80, 800, 95, 0x000000, true);
-	//DrawBox(701, 81, 799, 94, 0x00ff00, true);
-
+	
+	// プレイヤーのアイテムドロップ
 	if (player[padNo].dropFlag == true)
 	{
 		DrawGraph(offset_x[padNo], 5 + offset_y[padNo], segweyImage_icon, true);
 	}
-	/*if (player[1].dropFlag == true)
-	{
-		DrawGraph(0, 10, segweyImage_icon, true);
-	}*/
 }
 
 void PlayerControl(int padNo)
@@ -729,6 +703,8 @@ void PlayerDraw(int padNo)
 						SCREEN_SIZE_Y * 2 - CHIP_SIZE_X * 3 - mapPos.y, hatenaImage, true);// 下部の真ん中
 			DrawGraph(SCREEN_SIZE_X * 2 - CHIP_SIZE_X * 10 - mapPos.x, 
 						SCREEN_SIZE_Y - mapPos.y, hatenaImage, true);// 左側真ん中
+			player[padNo].itemcnt = 0;
+
 		}
 		else
 		{
@@ -966,11 +942,11 @@ void PlWirePrepare(int padNo)
 		|| !(WireBlockPass({ furiko_LU.x , furiko_LU.y })))
 		{
 			// 長さを出す
-			_length = player[padNo].furiko_pos - player[padNo].pos;
+			player[padNo]._length = player[padNo].furiko_pos - player[padNo].pos;
 
 			// プレイヤーの座標を-90°で設定?
-			player[padNo].pos.x = cos((-90.0f * PI) / 180.0f) * _length.y + player[padNo].furiko_pos.x;
-			player[padNo].pos.y = sin((-90.0f * PI) / 180.0f) * _length.y + player[padNo].furiko_pos.y;
+			player[padNo].pos.x = cos((-90.0f * PI) / 180.0f) * player[padNo]._length.y + player[padNo].furiko_pos.x;
+			player[padNo].pos.y = sin((-90.0f * PI) / 180.0f) * player[padNo]._length.y + player[padNo].furiko_pos.y;
 
 			MaxDeg = -20.0f;
 			minDeg = -160.0f;
@@ -979,7 +955,7 @@ void PlWirePrepare(int padNo)
 
 			defDeg = -90.0f;
 
-			furikoSpeed = FURIKO_SPEED_DEF;
+			player[padNo].furikoSpeed = FURIKO_SPEED_DEF;
 
 			// 最大
 			//Maxrad.x = (-20.0f * PI / 180.0f) + furiko_pos.x;
@@ -1082,7 +1058,7 @@ void PlWireAction(int padNo)
 			_v = 0;
 			player[padNo].furiko_pos = { 0,0 };
 
-			furikoSpeed = FURIKO_SPEED_DEF;
+			player[padNo].furikoSpeed = FURIKO_SPEED_DEF;
 		}
 	}
 }
@@ -1091,16 +1067,16 @@ void AddRad(int padNo)
 {
 	// 角度を足すんだよぉぉぉぉ!!!!!!
 
-	player[padNo].pos.x = cos((player[padNo].nowDeg * PI) / 180.0f) * _length.y + player[padNo].furiko_pos.x;
-	player[padNo].pos.y = sin((player[padNo].nowDeg * PI) / 180.0f) * _length.y + player[padNo].furiko_pos.y;
+	player[padNo].pos.x = cos((player[padNo].nowDeg * PI) / 180.0f) * player[padNo]._length.y + player[padNo].furiko_pos.x;
+	player[padNo].pos.y = sin((player[padNo].nowDeg * PI) / 180.0f) * player[padNo]._length.y + player[padNo].furiko_pos.y;
 
 	if (player[padNo].right == true)
 	{
 		if (player[padNo].moveDir == DIR_RIGHT)
 		{
 			// プレイヤーが右向き
-			furikoSpeed = furikoSpeed - FURIKO_ADD;							// 加速
-			player[padNo].nowDeg = player[padNo].nowDeg - furikoSpeed;		// 1°ずつ引いてくやつ
+			player[padNo].furikoSpeed = player[padNo].furikoSpeed - FURIKO_ADD;							// 加速
+			player[padNo].nowDeg = player[padNo].nowDeg - player[padNo].furikoSpeed;		// 1°ずつ引いてくやつ
 			if (player[padNo].nowDeg >= defDeg)
 			{
 				player[padNo].moveDir = DIR_LEFT;
@@ -1109,8 +1085,8 @@ void AddRad(int padNo)
 		else
 		{
 			// プレイヤーが左向き
-			furikoSpeed = furikoSpeed + FURIKO_ADD;							// 減速
-			player[padNo].nowDeg = player[padNo].nowDeg - furikoSpeed;		// 1°ずつ足してくやつ
+			player[padNo].furikoSpeed = player[padNo].furikoSpeed + FURIKO_ADD;							// 減速
+			player[padNo].nowDeg = player[padNo].nowDeg - player[padNo].furikoSpeed;		// 1°ずつ足してくやつ
 			if (player[padNo].nowDeg <= defDeg)
 			{
 				player[padNo].moveDir = DIR_RIGHT;
@@ -1123,8 +1099,8 @@ void AddRad(int padNo)
 		if (player[padNo].moveDir == DIR_RIGHT)
 		{
 			// プレイヤーが右向き
-			furikoSpeed = furikoSpeed + FURIKO_ADD;							// 減速
-			player[padNo].nowDeg = player[padNo].nowDeg - furikoSpeed;		// 1°ずつ引いてくやつ
+			player[padNo].furikoSpeed = player[padNo].furikoSpeed + FURIKO_ADD;							// 減速
+			player[padNo].nowDeg = player[padNo].nowDeg - player[padNo].furikoSpeed;		// 1°ずつ引いてくやつ
 			if (player[padNo].nowDeg <= defDeg)
 			{
 				player[padNo].moveDir = DIR_LEFT;
@@ -1133,8 +1109,8 @@ void AddRad(int padNo)
 		else
 		{
 			// プレイヤーが左向き
-			furikoSpeed = furikoSpeed - FURIKO_ADD;							// 加速
-			player[padNo].nowDeg = player[padNo].nowDeg - furikoSpeed;		// 1°ずつ足してくやつ
+			player[padNo].furikoSpeed = player[padNo].furikoSpeed - FURIKO_ADD;							// 加速
+			player[padNo].nowDeg = player[padNo].nowDeg - player[padNo].furikoSpeed;		// 1°ずつ足してくやつ
 			if (player[padNo].nowDeg >= defDeg)
 			{
 				player[padNo].moveDir = DIR_RIGHT;
