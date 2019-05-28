@@ -161,6 +161,7 @@ typedef struct {
 	int WireTimeCnt;					// ワイヤーの表示時間
 	float furikoSpeed;
 	Position _length;		// 振り子の長さ
+	float hpcnt;			// HPバー
 }CHARACTER;
 
 extern Position mapPos;

@@ -37,6 +37,7 @@ void PlWall_R(int padNo);	// 壁を走る(右)
 void PlWall_L(int padNo);	// 壁を走る(左)
 
 void UIDraw(int padNo);
+void UIDrawSel(int padNo);
 
 // アイテム関連
 
@@ -46,9 +47,8 @@ void ItemKabosu(void);
 void ItemUFO(void);
 void ItemSP(void);
 
-
 void PlayerState(int padNo);
 void ItemState(int padNo);
 
-
 bool GetPlayerV(void);	// ﾌﾟﾚｲﾔｰ生存確認
+Position GetPlayerPos(int padNo);
