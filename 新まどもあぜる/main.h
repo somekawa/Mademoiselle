@@ -106,6 +106,7 @@ enum PLAYER_STATE {
 	PLAYER_W_JUMP,		// Ü²Ô°¼Þ¬ÝÌß
 	PLAYER_WALL_RIGHT,	// •Ç(‰E)‚ð‘–‚é
 	PLAYER_WALL_LEFT,	// •Ç(¶)‚ð‘–‚é
+	PLAYER_DEATH,
 };
 
 enum ITEM_STATE {

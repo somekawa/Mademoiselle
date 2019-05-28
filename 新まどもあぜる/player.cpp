@@ -692,9 +692,8 @@ void UIDraw(int padNo)
 
 		if (player[padNo].hpcnt > 98.0f)
 		{
-			player[padNo].visible = false;
-			player[padNo].visible2 = false;
 			player[padNo].hpcnt = 98.0f;
+			player[padNo].state = PLAYER_DEATH;
 		}
 		else
 		{
@@ -1020,9 +1019,15 @@ void PlWireAction(int padNo)
 	{
 		if (player[padNo].WireTimeCnt < 500)
 		{
-			if (pad[padNo].trgKey[PAD_TBL_ITEM_L])		// ワイヤーを伸ばしてぶらぶらしている間はアイテムは使えないようにする処理
+			if ((pad[padNo].trgKey[PAD_TBL_ITEM_R]))// ワイヤーを伸ばしてぶらぶらしている間はアイテムは使えないようにする処理
+			{
+				pad[padNo].trgKey[PAD_TBL_ITEM_R] = !pad[padNo].trgKey[PAD_TBL_ITEM_R];
+
+			}
+			if ( (pad[padNo].trgKey[PAD_TBL_ITEM_L]))// ワイヤーを伸ばしてぶらぶらしている間はアイテムは使えないようにする処理
 			{
 				pad[padNo].trgKey[PAD_TBL_ITEM_L] = !pad[padNo].trgKey[PAD_TBL_ITEM_L];
+
 			}
 
 			if (pad[padNo].trgKey[PAD_TBL_WIRE])
@@ -1165,10 +1170,10 @@ void PlWireJump(int padNo)
 			{
 				player[padNo].pos.y -= jumpSpeed;
 			}
-			if (player[padNo].pos.x > SCREEN_SIZE_X / 2)//カメラが右に行く
-			{
-				mapPos.x += PLAYER_SPEED_WIRE;
-			}
+			//if (player[padNo].pos.x > SCREEN_SIZE_X / 2)//カメラが右に行く
+			//{
+			//	mapPos.x += PLAYER_SPEED_WIRE;
+			//}
 			jumpSpeed = jumpSpeed - FURIKO_ADD;
 		}
 	}
@@ -1184,10 +1189,10 @@ void PlWireJump(int padNo)
 			{
 				player[padNo].pos.y -= jumpSpeed;
 			}
-			if (player[padNo].pos.x < PLAY_SIZE_X - SCREEN_SIZE_X / 2)//カメラが左に行く
-			{
-				mapPos.x -= PLAYER_SPEED_WIRE;
-			}
+			//if (player[padNo].pos.x < PLAY_SIZE_X - SCREEN_SIZE_X / 2)//カメラが左に行く
+			//{
+			//	mapPos.x -= PLAYER_SPEED_WIRE;
+			//}
 			jumpSpeed = jumpSpeed - FURIKO_ADD;
 		}
 	}
@@ -1345,6 +1350,25 @@ void PlWall_L(int padNo)
 	}
 }
 
+void Pl_Death(int padNo)
+{
+	player[padNo].visible = false;
+	player[padNo].visible2 = false;
+	if ((pad[padNo].trgKey[PAD_TBL_ITEM_R]))// ワイヤーを伸ばしてぶらぶらしている間はアイテムは使えないようにする処理
+	{
+		pad[padNo].trgKey[PAD_TBL_ITEM_R] = !pad[padNo].trgKey[PAD_TBL_ITEM_R];
+
+	}
+	if ((pad[padNo].trgKey[PAD_TBL_ITEM_L]))// ワイヤーを伸ばしてぶらぶらしている間はアイテムは使えないようにする処理
+	{
+		pad[padNo].trgKey[PAD_TBL_ITEM_L] = !pad[padNo].trgKey[PAD_TBL_ITEM_L];
+
+	}
+
+
+}
+
+
 void PlayerState(int padNo)
 {
 	switch (player[padNo].state)
@@ -1381,6 +1405,9 @@ void PlayerState(int padNo)
 		break;
 	case PLAYER_WALL_LEFT:		// 左壁
 		PlWall_L(padNo);
+		break;
+	case PLAYER_DEATH:
+		Pl_Death(padNo);
 		break;
 	default:
 		break;

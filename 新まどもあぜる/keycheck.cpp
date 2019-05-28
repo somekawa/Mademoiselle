@@ -33,19 +33,19 @@ void KeyCheck(int padNo)
 		pad[padNo].upKey[i] = false;
 	}
 
-	if (/*CheckHitKey(KEY_INPUT_RIGHT) || */Pad&(PAD_INPUT_RIGHT))
+	if (CheckHitKey(KEY_INPUT_RIGHT) || Pad&(PAD_INPUT_RIGHT))
 	{
 		pad[padNo].newKey[PAD_TBL_RIGHT] = true;
 	}
-	if (/*CheckHitKey(KEY_INPUT_LEFT) ||*/ Pad&(PAD_INPUT_LEFT))
+	if (CheckHitKey(KEY_INPUT_LEFT) || Pad&(PAD_INPUT_LEFT))
 	{
 		pad[padNo].newKey[PAD_TBL_LEFT] = true;
 	}
-	if (/*CheckHitKey(KEY_INPUT_UP) ||*/ Pad & (PAD_INPUT_1))// コントローラーAボタン
+	if (CheckHitKey(KEY_INPUT_UP) || Pad & (PAD_INPUT_1))// コントローラーAボタン
 	{
 		pad[padNo].newKey[PAD_TBL_JUMP] = true;
 	}
-	if (/*CheckHitKey(KEY_INPUT_W) ||*/ Pad&(PAD_INPUT_3)) // コントローラーXボタン
+	if (CheckHitKey(KEY_INPUT_W) || Pad&(PAD_INPUT_3)) // コントローラーXボタン
 	{
 		pad[padNo].newKey[PAD_TBL_WIRE] = true;
 	}
@@ -66,11 +66,11 @@ void KeyCheck(int padNo)
 	//	pad[padNo].newKey[PAD_TBL_SKILL] = true;
 	//}
 
-	if (/*CheckHitKey(KEY_INPUT_SPACE) || */Pad&(PAD_INPUT_8))	// コントローラーSTARTボタン
+	if (CheckHitKey(KEY_INPUT_SPACE) || Pad&(PAD_INPUT_8))	// コントローラーSTARTボタン
 	{
 		pad[padNo].newKey[PAD_TBL_START] = true;
 	}
-	if (/*CheckHitKey(KEY_INPUT_P) || */Pad&(PAD_INPUT_7))
+	if (CheckHitKey(KEY_INPUT_P) || Pad&(PAD_INPUT_7))
 	{
 		pad[padNo].newKey[PAD_TBL_PAUSE] = true;
 	}
