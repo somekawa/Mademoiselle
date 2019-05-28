@@ -106,7 +106,7 @@ float defDeg;
 //int Segwey_Cnt;
 
 // アイテム関連 
-int itemcnt;
+//int itemcnt;
 bool itemBoxFlag = true;
 int itemBoxPosX = CHIP_SIZE_X * 15 - mapPos.x;
 int itemBoxPosY = CHIP_SIZE_Y * 16 - mapPos.y;
@@ -323,12 +323,80 @@ void PlayerGameInit(void)
 	jumpSpeed = 0.0f;
 	defDeg = 0.0f;
 
-	itemcnt = 0;
+	player[0].itemcnt = 0;
+	player[1].itemcnt = 0;
 
 	//player[0].JumpDeg = 0;
 
 	player[0].Segwey_Cnt = 0;
 	player[1].Segwey_Cnt = 0;
+}
+
+void UIDraw(int padNo)
+{
+	// ｱｲｺﾝ
+	// PL1(+20.5)
+	int offset_x[PLAYER_MAX] = {
+	20,220/*,420,620*/
+	};
+	int offset_y[PLAYER_MAX] = {
+	5,5/*,5,5*/
+	};
+	int* pWak[PLAYER_MAX] = {
+		p1Wak,p2Wak/*,p3Wak,p4Wak*/
+	};
+
+	// PL1
+	DrawGraph(30 + offset_x[padNo], 35 + offset_y[padNo], pWak[padNo][1], true);
+
+	DrawGraph(38 + offset_x[padNo], 69 + offset_y[padNo], charImage[player[padNo].type].iconImage, true);
+
+	// PL2
+	//DrawGraph(250, 40, p2Wak[1], true);
+	//DrawGraph(258, 74, charImage[player[1].type].iconImage, true);
+	////// PL3
+	//DrawGraph(450, 40, p3Wak[1], true);
+	////DrawGraph(458, 74, charImage[player[2].type].iconImage, true);
+	////// PL4
+	//DrawGraph(650, 40, p4Wak[1], true);
+	////DrawGraph(658, 74, charImage[player[3].type].iconImage, true);
+
+	// 所持アイテムが描画される枠
+	// PL1
+	DrawBox(offset_x[padNo], offset_y[padNo], 66 + offset_x[padNo], 66 + offset_y[padNo], 0xffffff, true);
+	DrawBox(offset_x[padNo], offset_y[padNo], 66 + offset_x[padNo], 66 + offset_y[padNo], 0x000000, false);
+	//// PL2
+	//DrawBox(220, 5, 286, 71, 0xffffff, true);
+	//DrawBox(220, 5, 286, 71, 0x000000, false);
+	//// PL3
+	//DrawBox(420, 5, 486, 71, 0xffffff, true);
+	//DrawBox(420, 5, 486, 71, 0x000000, false);
+	//// PL4
+	//DrawBox(620, 5, 686, 71, 0xffffff, true);
+	//DrawBox(620, 5, 686, 71, 0x000000, false);
+
+
+	// PL1
+	DrawBox(80 + offset_x[padNo], 75 + offset_y[padNo], 180 + offset_x[padNo], 90 + offset_y[padNo], 0x000000, true);
+	DrawBox(81 + offset_x[padNo], 76 + offset_y[padNo], 179 + offset_x[padNo], 89 + offset_y[padNo], 0x00ff00, true);
+	//// PL2
+	//DrawBox(300, 80, 400, 95, 0x000000, true);
+	//DrawBox(301, 81, 399, 94, 0x00ff00, true);
+	//// PL3
+	//DrawBox(500, 80, 600, 95, 0x000000, true);
+	//DrawBox(501, 81, 599, 94, 0x00ff00, true);
+	//// PL4
+	//DrawBox(700, 80, 800, 95, 0x000000, true);
+	//DrawBox(701, 81, 799, 94, 0x00ff00, true);
+
+	if (player[padNo].dropFlag == true)
+	{
+		DrawGraph(offset_x[padNo], 5 + offset_y[padNo], segweyImage_icon, true);
+	}
+	/*if (player[1].dropFlag == true)
+	{
+		DrawGraph(0, 10, segweyImage_icon, true);
+	}*/
 }
 
 void PlayerControl(int padNo)
@@ -605,49 +673,52 @@ void PlayerDraw(int padNo)
 			// 指定ブロックが上にないとき(何か障害物にあたるまでは伸ばしきりたい)
 		}
 		
+		UIDraw(0);
+		UIDraw(1);
 
-		// ｱｲｺﾝ
-		// PL1
-		DrawGraph(50, 40, p1Wak[1], true);
-		DrawGraph(58, 74, charImage[player[0].type].iconImage, true);
-		// PL2
-		DrawGraph(250, 40, p2Wak[1], true);
-		DrawGraph(258, 74, charImage[player[1].type].iconImage, true);
+
+		//// ｱｲｺﾝ
+		//// PL1
+		//DrawGraph(50, 40, p1Wak[1], true);
+		//DrawGraph(58, 74, charImage[player[0].type].iconImage, true);
+		//// PL2
+		//DrawGraph(250, 40, p2Wak[1], true);
+		//DrawGraph(258, 74, charImage[player[1].type].iconImage, true);
+		////// PL3
+		//DrawGraph(450, 40, p3Wak[1], true);
+		////DrawGraph(458, 74, charImage[player[2].type].iconImage, true);
+		////// PL4
+		//DrawGraph(650, 40, p4Wak[1], true);
+		////DrawGraph(658, 74, charImage[player[3].type].iconImage, true);
+
+		//// 所持アイテムが描画される枠
+		//// PL1
+		//DrawBox(20, 5, 86, 71, 0xffffff, true);
+		//DrawBox(20, 5, 86, 71, 0x000000, false);
+		////DrawGraph(20, 5, segweyImage_icon, true);
+		//// PL2
+		//DrawBox(220, 5, 286, 71, 0xffffff, true);
+		//DrawBox(220, 5, 286, 71, 0x000000, false);
 		//// PL3
-		DrawGraph(450, 40, p3Wak[1], true);
-		//DrawGraph(458, 74, charImage[player[2].type].iconImage, true);
+		//DrawBox(420, 5, 486, 71, 0xffffff, true);
+		//DrawBox(420, 5, 486, 71, 0x000000, false);
 		//// PL4
-		DrawGraph(650, 40, p4Wak[1], true);
-		//DrawGraph(658, 74, charImage[player[3].type].iconImage, true);
-
-		// 所持アイテムが描画される枠
-		// PL1
-		DrawBox(20, 5, 86, 71, 0xffffff, true);
-		DrawBox(20, 5, 86, 71, 0x000000, false);
-		//DrawGraph(20, 5, segweyImage_icon, true);
-		// PL2
-		DrawBox(220, 5, 286, 71, 0xffffff, true);
-		DrawBox(220, 5, 286, 71, 0x000000, false);
-		// PL3
-		DrawBox(420, 5, 486, 71, 0xffffff, true);
-		DrawBox(420, 5, 486, 71, 0x000000, false);
-		// PL4
-		DrawBox(620, 5, 686, 71, 0xffffff, true);
-		DrawBox(620, 5, 686, 71, 0x000000, false);
+		//DrawBox(620, 5, 686, 71, 0xffffff, true);
+		//DrawBox(620, 5, 686, 71, 0x000000, false);
 
 
-		// PL1
-		DrawBox(100, 80, 200, 95, 0x000000, true);
-		DrawBox(101, 81, 199, 94, 0x00ff00, true);
-		// PL2
-		DrawBox(300, 80, 400, 95, 0x000000, true);
-		DrawBox(301, 81, 399, 94, 0x00ff00, true);
-		// PL3
-		DrawBox(500, 80, 600, 95, 0x000000, true);
-		DrawBox(501, 81, 599, 94, 0x00ff00, true);
-		// PL4
-		DrawBox(700, 80, 800, 95, 0x000000, true);
-		DrawBox(701, 81, 799, 94, 0x00ff00, true);
+		//// PL1
+		//DrawBox(100, 80, 200, 95, 0x000000, true);
+		//DrawBox(101, 81, 199, 94, 0x00ff00, true);
+		//// PL2
+		//DrawBox(300, 80, 400, 95, 0x000000, true);
+		//DrawBox(301, 81, 399, 94, 0x00ff00, true);
+		//// PL3
+		//DrawBox(500, 80, 600, 95, 0x000000, true);
+		//DrawBox(501, 81, 599, 94, 0x00ff00, true);
+		//// PL4
+		//DrawBox(700, 80, 800, 95, 0x000000, true);
+		//DrawBox(701, 81, 799, 94, 0x00ff00, true);
 
 
 		//itemBoxDraw();
@@ -661,22 +732,26 @@ void PlayerDraw(int padNo)
 		}
 		else
 		{
-			if (itemcnt == 200)
+			if (player[padNo].itemcnt == 200)
 			{
 				itemBoxFlag = true;
-				itemcnt = 0;
+				player[padNo].itemcnt = 0;
 			}
 			else
 			{
-				itemcnt++;
+				player[padNo].itemcnt++;
 			}
 			//DrawString(SCREEN_SIZE_X / 2 - 40, SCREEN_SIZE_Y / 2 - 5, "HIT", 0xffffff);
 		}
 
-		if (player[padNo].dropFlag == true)
+		/*if (player[0].dropFlag == true)
 		{
 			DrawGraph(20, 10, segweyImage_icon, true);
 		}
+		if (player[1].dropFlag == true)
+		{
+			DrawGraph(0, 10, segweyImage_icon, true);
+		}*/
 		//ItemSegwey();
 		break;
 	}
@@ -711,13 +786,13 @@ void PlNormal(int padNo)
 		player[padNo].runFlag = true;
 		player[padNo].moveDir = DIR_RIGHT;
 
-		// 壁確認
-		if ((WallBlockPass(player_RD)) && (player[padNo].wallRunSpeed == player[padNo].moveSpeed) /*&& (pad[padNo].oldKey[PAD_TBL_JUMP])*/)
-		{
-			player[padNo].state = PLAYER_WALL_RIGHT;
-		}
-		else
-		{
+		//// 壁確認
+		//if ((WallBlockPass(player_RD)) && (player[padNo].wallRunSpeed == player[padNo].moveSpeed) /*&& (pad[padNo].oldKey[PAD_TBL_JUMP])*/)
+		//{
+		//	player[padNo].state = PLAYER_WALL_RIGHT;
+		//}
+		//else
+		//{
 			if (IsPass(player_RD))// RDのchipID取得して移動できるIDか調べる
 			{
 				player[padNo].pos.x += player[padNo].moveSpeed;
@@ -731,7 +806,7 @@ void PlNormal(int padNo)
 				// 隣まで計算してplayer.pos.xに代入
 				player[padNo].pos.x = GetWorldPos_Map(player_RD, DIR_LEFT).x - player[padNo].hitPosS.x;
 			}
-		}
+		
 	}
 
 	if (pad[padNo].newKey[PAD_TBL_LEFT])
@@ -739,16 +814,16 @@ void PlNormal(int padNo)
 		player[padNo].runFlag = true;
 		player[padNo].moveDir = DIR_LEFT;
 
-		// 壁確認
-		if ((WallBlockPass(player_LD)) && (player[padNo].wallRunSpeed == player[padNo].moveSpeed) /*&& (pad[padNo].oldKey[PAD_TBL_JUMP])*/)
-		{
-			if (player[padNo].wallRunSpeed == player[padNo].moveSpeed)
-			{
-				player[padNo].state = PLAYER_WALL_LEFT;
-			}
-		}
-		else
-		{
+		//// 壁確認
+		//if ((WallBlockPass(player_LD)) && (player[padNo].wallRunSpeed == player[padNo].moveSpeed) /*&& (pad[padNo].oldKey[PAD_TBL_JUMP])*/)
+		//{
+		//	if (player[padNo].wallRunSpeed == player[padNo].moveSpeed)
+		//	{
+		//		player[padNo].state = PLAYER_WALL_LEFT;
+		//	}
+		//}
+		//else
+		//{
 			if (IsPass(player_LD))	// LDのchipID取得して移動できるIDか調べる
 			{
 				player[padNo].pos.x -= player[padNo].moveSpeed;
@@ -762,7 +837,7 @@ void PlNormal(int padNo)
 				// 隣まで計算してplayer.pos.xに代入
 				player[padNo].pos.x = GetWorldPos_Map(player_LD, DIR_RIGHT).x + player[padNo].hitPosS.x;
 			}
-		}
+		
 	}
 
 	if (pad[padNo].trgKey[PAD_TBL_WIRE])
@@ -1186,6 +1261,29 @@ void PlWireJump(int padNo)
 	}
 }
 
+void PlWall_Check(int padNo)
+{
+	Position player_RD = { player[padNo].pos.x + player[padNo].moveSpeed + player[padNo].hitPosE.x , player[padNo].pos.y - 1 };
+	Position player_LD = { player[padNo].pos.x - player[padNo].moveSpeed - player[padNo].hitPosS.x - 1 , player[padNo].pos.y - 1 };
+
+	// 壁確認
+	if ((WallBlockPass(player_RD)) && (player[padNo].wallRunSpeed == player[padNo].moveSpeed) && !(pad[padNo].oldKey[PAD_TBL_JUMP]))
+	{
+		player[padNo].state = PLAYER_WALL_RIGHT;
+	}
+	
+
+	// 壁確認
+	if ((WallBlockPass(player_LD)) && (player[padNo].wallRunSpeed == player[padNo].moveSpeed) && !(pad[padNo].oldKey[PAD_TBL_JUMP]))
+	{
+		if (player[padNo].wallRunSpeed == player[padNo].moveSpeed)
+		{
+			player[padNo].state = PLAYER_WALL_LEFT;
+		}
+	}
+	
+}
+
 // 壁を走る
 // 右壁
 void PlWall_R(int padNo)
@@ -1316,8 +1414,9 @@ void PlayerState(int padNo)
 {
 	switch (player[padNo].state)
 	{
-	case PLAYER_NORMAL:			// 左右移動 
 	case PLAYER_DOWN:	        // ジャンプ下降
+		PlWall_Check(padNo);
+	case PLAYER_NORMAL:			// 左右移動 
 		PlNormal(padNo);
 		if (player[padNo].state != PLAYER_W_PRE)
 		{
@@ -1330,6 +1429,7 @@ void PlayerState(int padNo)
 		{
 			PlJumpUp(padNo);
 		}
+		PlWall_Check(padNo);
 		break;
 	case PLAYER_W_PRE:
 		PlWirePrepare(padNo);		// ﾜｲﾔｰｱｸｼｮﾝの準備(ワイヤーを伸ばせるか判定)
@@ -1339,6 +1439,7 @@ void PlayerState(int padNo)
 		break;
 	case PLAYER_W_JUMP:			// ﾜｲﾔｰｼﾞｬﾝﾌﾟ
 		PlWireJump(padNo);
+		PlWall_Check(padNo);
 		break;
 	case PLAYER_WALL_RIGHT:		// 右壁
 		PlWall_R(padNo);
@@ -1351,6 +1452,8 @@ void PlayerState(int padNo)
 	}
 	player[padNo].animCnt++;
 }
+
+
 
 void GetItemRand(void)
 {

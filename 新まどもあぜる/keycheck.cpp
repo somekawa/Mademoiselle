@@ -51,7 +51,7 @@ void KeyCheck(int padNo)
 	}
 
 	// ITEM_R
-	if (CheckHitKey(KEY_INPUT_RCONTROL) || Pad & (PAD_INPUT_4)) // 
+	if (CheckHitKey(KEY_INPUT_RCONTROL) || Pad & (PAD_INPUT_6)) // 
 	{
 		pad[padNo].newKey[PAD_TBL_ITEM_R] = true;
 	}

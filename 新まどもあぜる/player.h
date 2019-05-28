@@ -36,7 +36,10 @@ void PlWall_Check(int padNo); // 壁走りできる壁であるかどうか
 void PlWall_R(int padNo);	// 壁を走る(右)
 void PlWall_L(int padNo);	// 壁を走る(左)
 
+void UIDraw(int padNo);
+
 // アイテム関連
+
 void GetItemRand(void);	// player.dropFlagがtrueになったときにアイテムをランダムで決定させる
 void ItemSegwey(int padNo);
 void ItemKabosu(void);

@@ -156,6 +156,7 @@ typedef struct {
 	PLAYER_STATE state;
 	ITEM_STATE	 item_state;
 	int Segwey_Cnt;
+	int itemcnt;
 }CHARACTER;
 
 extern Position mapPos;
