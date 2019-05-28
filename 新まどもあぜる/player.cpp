@@ -339,7 +339,7 @@ void PlayerGameInit(void)
 void UIDraw(int padNo)
 {
 	// ｱｲｺﾝ
-	// オフセット
+	// オフセット( 画面上で一番左に描画される <所持アイテムが描画される枠> を基準に設定 )
 	int offset_x[PLAYER_MAX] = {
 	20,220/*,420,620*/
 	};
@@ -348,6 +348,7 @@ void UIDraw(int padNo)
 	5,5/*,5,5*/
 	};
 
+	// 枠
 	int* pWak[PLAYER_MAX] = {
 		p1Wak,p2Wak/*,p3Wak,p4Wak*/
 	};
@@ -763,7 +764,7 @@ void PlNormal(int padNo)
 		player[padNo].moveDir = DIR_RIGHT;
 
 		//// 壁確認
-		//if ((WallBlockPass(player_RD)) && (player[padNo].wallRunSpeed == player[padNo].moveSpeed) /*&& (pad[padNo].oldKey[PAD_TBL_JUMP])*/)
+		//if ((WallBlockPass(player_RD)) && (player[padNo].wallRunSpeed == player[padNo].moveSpeed) /*&& !(pad[padNo].oldKey[PAD_TBL_JUMP])*/)
 		//{
 		//	player[padNo].state = PLAYER_WALL_RIGHT;
 		//}
@@ -791,7 +792,7 @@ void PlNormal(int padNo)
 		player[padNo].moveDir = DIR_LEFT;
 
 		//// 壁確認
-		//if ((WallBlockPass(player_LD)) && (player[padNo].wallRunSpeed == player[padNo].moveSpeed) /*&& (pad[padNo].oldKey[PAD_TBL_JUMP])*/)
+		//if ((WallBlockPass(player_LD)) && (player[padNo].wallRunSpeed == player[padNo].moveSpeed) /*&& !(pad[padNo].oldKey[PAD_TBL_JUMP])*/)
 		//{
 		//	if (player[padNo].wallRunSpeed == player[padNo].moveSpeed)
 		//	{
@@ -1449,11 +1450,15 @@ void GetItemRand(void)
 
 void ItemSegwey(int padNo)
 {
-	if ((pad[padNo].trgKey[PAD_TBL_ITEM_R]) || (pad[padNo].trgKey[PAD_TBL_ITEM_L]))
+	if (player[padNo].state != PLAYER_WALL_RIGHT && player[padNo].state != PLAYER_WALL_LEFT)
 	{
-		player[padNo].segweyFlag = true;
-		PlaySoundMem(seg, DX_PLAYTYPE_BACK, true);
+		if ((pad[padNo].trgKey[PAD_TBL_ITEM_R]) || (pad[padNo].trgKey[PAD_TBL_ITEM_L]))
+		{
+			player[padNo].segweyFlag = true;
+			PlaySoundMem(seg, DX_PLAYTYPE_BACK, true);
+		}
 	}
+	
 
 	if (player[padNo].segweyFlag == true)
 	{
