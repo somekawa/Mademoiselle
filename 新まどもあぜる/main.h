@@ -157,6 +157,8 @@ typedef struct {
 	ITEM_STATE	 item_state;
 	int Segwey_Cnt;
 	int itemcnt;
+	int WirePreTimeCnt;					// ワイヤーを少しずつ伸ばして途中で途切れるまでの時間
+	int WireTimeCnt;					// ワイヤーの表示時間
 	float furikoSpeed;
 	Position _length;		// 振り子の長さ
 }CHARACTER;

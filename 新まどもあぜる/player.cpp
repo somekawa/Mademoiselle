@@ -69,8 +69,8 @@ int p3Wak[2];
 int p4Wak[2];
 int yazirusiImage[2];
 
-int WirePreTimeCnt;					// ワイヤーを少しずつ伸ばして途中で途切れるまでの時間
-int WireTimeCnt;					// ワイヤーの表示時間
+//int WirePreTimeCnt;					// ワイヤーを少しずつ伸ばして途中で途切れるまでの時間
+//int WireTimeCnt;					// ワイヤーの表示時間
 
 bool _isPushJump;
 bool _isJumped;
@@ -282,7 +282,9 @@ void PlayerGameInit(void)
 
 	//ひもの支点の初期化
 	_v = 0;			// 振り子のふり幅
-	WireTimeCnt = 0;
+
+	player[0].WireTimeCnt = 0;
+	player[1].WireTimeCnt = 0;
 
 	_g = 2.0f;		//重力の定義
 	player[0]._length = { 0 , 0 };	//紐の長さの計算
@@ -313,7 +315,9 @@ void PlayerGameInit(void)
 	player[1].item_state = ITEM_NON;
 
 
-	WirePreTimeCnt = 0;
+	player[0].WirePreTimeCnt = 0;
+	player[1].WirePreTimeCnt = 0;
+
 
 	//Maxrad = { 0,0 };
 	//minrad = { 0,0 };
@@ -636,13 +640,13 @@ void PlayerDraw(int padNo)
 			}
 			else
 			{
-				if (WirePreTimeCnt <= player[padNo].furiko_pos.y)
+				if (player[padNo].WirePreTimeCnt <= player[padNo].furiko_pos.y)
 				{
 					// ワイヤー
 					DrawLine(player[padNo].pos.x - mapPos.x,
 						player[padNo].pos.y - player[padNo].size.y - mapPos.y,
 						player[padNo].furiko_pos.x - mapPos.x, player[padNo].furiko_pos.y - mapPos.y, 0xffffffff, 2);
-					WirePreTimeCnt++;
+					player[padNo].WirePreTimeCnt++;
 				}
 			}
 			// 指定ブロックが上にないとき(何か障害物にあたるまでは伸ばしきりたい)
@@ -999,7 +1003,7 @@ void PlWirePrepare(int padNo)
 	else
 	{
 		// 背景以外がある
-		WirePreTimeCnt = 0;
+		player[padNo].WirePreTimeCnt = 0;
 		//player.pos.x = furiko_RU.x - player.size.x / 2;
 		//player.pos.y = furiko_RU.y + player.size.y  - mapPos.y;
 		//player.visible = true;
@@ -1018,7 +1022,7 @@ void PlWireAction(int padNo)
 {
 	if (player[padNo].wireOkFlag)
 	{
-		if (WireTimeCnt < 2000)
+		if (player[padNo].WireTimeCnt < 500)
 		{
 			if (pad[padNo].trgKey[PAD_TBL_ITEM_L])		// ワイヤーを伸ばしてぶらぶらしている間はアイテムは使えないようにする処理
 			{
@@ -1042,7 +1046,7 @@ void PlWireAction(int padNo)
 				return;
 			}
 			AddRad(padNo);
-			WireTimeCnt++;
+			player[padNo].WireTimeCnt++;
 		}
 		else
 		{
@@ -1053,7 +1057,7 @@ void PlWireAction(int padNo)
 			player[padNo].state = PLAYER_NORMAL;
 
 			// ワイヤー表示時間の初期化
-			WireTimeCnt = 0;
+			player[padNo].WireTimeCnt = 0;
 
 			// 振り子スタート位置の初期化
 			_v = 0;
