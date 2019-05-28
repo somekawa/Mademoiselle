@@ -67,6 +67,11 @@ int p1Wak[2];
 int p2Wak[2];
 int p3Wak[2];
 int p4Wak[2];
+// 枠
+int* pWak[PLAYER_MAX] = {
+	p1Wak,p2Wak/*,p3Wak,p4Wak*/
+};
+
 int yazirusiImage[2];
 
 //int WirePreTimeCnt;					// ワイヤーを少しずつ伸ばして途中で途切れるまでの時間
@@ -352,10 +357,6 @@ void UIDraw(int padNo)
 	5,5/*,5,5*/
 	};
 
-	// 枠
-	int* pWak[PLAYER_MAX] = {
-		p1Wak,p2Wak/*,p3Wak,p4Wak*/
-	};
 
 	// プレイヤーステータスの枠
 	DrawGraph(30 + offset_x[padNo], 35 + offset_y[padNo], pWak[padNo][1], true);
@@ -375,6 +376,40 @@ void UIDraw(int padNo)
 	if (player[padNo].dropFlag == true)
 	{
 		DrawGraph(offset_x[padNo], 5 + offset_y[padNo], segweyImage_icon, true);
+	}
+}
+
+void UIDrawSel(int padNo)
+{
+	int selOffset_x[PLAYER_MAX] = {
+		0,600,//0,600,
+	};
+	int selOffset_y[PLAYER_MAX] = {
+		120,120,//420,420,
+	};
+
+	// ｷｬﾗｾﾚｸﾄ時のプレイヤーの枠
+	DrawGraph(selOffset_x[padNo], selOffset_y[padNo], pWak[padNo][0], true);
+
+	if (player[padNo].visible)
+	{
+		// 決定
+		// ｷｬﾗ決定！
+		DrawString(120 + selOffset_x[padNo], 60 + selOffset_y[padNo], "キャラ決定！", 0x000000);
+		//　キャラクター
+		DrawRotaGraph(160 + selOffset_x[padNo], 180 + selOffset_y[padNo], 3, 0,
+			charImage[player[padNo].type].runImage[(player[padNo].animCnt / 3) % 10], true);
+	}
+	else
+	{
+		// 選択中
+		// 矢印
+		DrawTurnGraph(selOffset_x[padNo], 120 + selOffset_y[padNo], yazirusiImage[0], true);
+		DrawGraph(260 + selOffset_x[padNo], 120 + selOffset_y[padNo], yazirusiImage[1], true);
+
+		// キャラクター
+		DrawRotaGraph(160 + selOffset_x[padNo], 180 + selOffset_y[padNo],
+			3, 0, charImage[player[padNo].type].playerImage, true);
 	}
 }
 
@@ -460,50 +495,54 @@ void PlayerDraw(int padNo)
 	switch (GetGameMode())
 	{
 	case GMODE_CHARASERE:
-		DrawGraph(0, 120, p1Wak[0], true);
-		DrawGraph(600, 120, p2Wak[0], true);
-		DrawGraph(0, 460, p3Wak[0], true);
-		DrawGraph(600, 460, p4Wak[0], true);
-		if (player[padNo].visible)
-		{
+		//DrawGraph(0, 120, p1Wak[0], true);
+		//DrawGraph(600, 120, p2Wak[0], true);
+		//DrawGraph(0, 460, p3Wak[0], true);
+		//DrawGraph(600, 460, p4Wak[0], true);
+		//if (player[padNo].visible)
+		//{
+		//	// PL1
+		//	DrawRotaGraph(160, 300, 3, 0,
+		//		charImage[player[0].type].runImage[(player[0].animCnt / 3) % 10], true);
+		//	DrawString(120, 180, "キャラ決定！", 0x000000);
+		//	// PL2
+		//	DrawRotaGraph(760, 300, 3, 0,
+		//		charImage[player[1].type].runImage[(player[1].animCnt / 3) % 10], true);
+		//	DrawString(720, 180, "キャラ決定！", 0x000000);
+		//	// PL3
+		//	//DrawRotaGraph(160, 700, 3, 0,
+		//	//	charImage[player[2].type].runImage[(player[2].animCnt / 3) % 10], true);
+		//	//DrawString(120, 420, "キャラ決定！", 0x000000);
+		//	//// PL4
+		//	//DrawRotaGraph(760, 700, 3, 0,
+		//	//	charImage[player[3].type].runImage[(player[3].animCnt / 3) % 10], true);
+		//	//DrawString(720, 420, "キャラ決定！", 0x000000);
+		//}
+		//else
+		//{
 			// PL1
-			DrawRotaGraph(160, 300, 3, 0,
-				charImage[player[0].type].runImage[(player[0].animCnt / 3) % 10], true);
-			DrawString(120, 180, "キャラ決定！", 0x000000);
-			// PL2
-			DrawRotaGraph(760, 300, 3, 0,
-				charImage[player[1].type].runImage[(player[1].animCnt / 3) % 10], true);
-			DrawString(720, 180, "キャラ決定！", 0x000000);
+		//	DrawRotaGraph(160, 300, 3, 0, charImage[player[0].type].playerImage, true);
+		//	DrawTurnGraph(0, 240, yazirusiImage[0], true);
+		//	DrawGraph(260, 240, yazirusiImage[1], true);
+		//	// PL2
+		//	DrawRotaGraph(760, 300, 3, 0, charImage[player[1].type].playerImage, true);
+		//	DrawTurnGraph(600, 240, yazirusiImage[0], true);
+		//	DrawGraph(860, 240, yazirusiImage[1], true);
+		//	// PL3
+		//	//DrawRotaGraph(160, 700, 3, 0, charImage[player[2].type].playerImage, true);
+		//	//DrawTurnGraph(0, 540, yazirusiImage[0], true);
+		//	//DrawGraph(260, 540, yazirusiImage[1], true);
+		//	//// PL4
+		//	//DrawRotaGraph(760, 700, 3, 0, charImage[player[3].type].playerImage, true);
+		//	//DrawTurnGraph(500, 540, yazirusiImage[0], true);
+		//	//DrawGraph(660, 540, yazirusiImage[1], true);
+		//}
 
-			// PL3
-			//DrawRotaGraph(160, 700, 3, 0,
-			//	charImage[player[2].type].runImage[(player[2].animCnt / 3) % 10], true);
-			//DrawString(120, 420, "キャラ決定！", 0x000000);
-			//// PL4
-			//DrawRotaGraph(760, 700, 3, 0,
-			//	charImage[player[3].type].runImage[(player[3].animCnt / 3) % 10], true);
-			//DrawString(720, 420, "キャラ決定！", 0x000000);
-
-		}
-		else
+		for (int j = 0; j < PLAYER_MAX; j++)
 		{
-			// PL1
-			DrawRotaGraph(160, 300, 3, 0, charImage[player[0].type].playerImage, true);
-			DrawTurnGraph(0, 240, yazirusiImage[0], true);
-			DrawGraph(260, 240, yazirusiImage[1], true);
-			// PL2
-			DrawRotaGraph(760, 300, 3, 0, charImage[player[1].type].playerImage, true);
-			DrawTurnGraph(600, 240, yazirusiImage[0], true);
-			DrawGraph(860, 240, yazirusiImage[1], true);
-			// PL3
-			//DrawRotaGraph(160, 700, 3, 0, charImage[player[2].type].playerImage, true);
-			//DrawTurnGraph(0, 540, yazirusiImage[0], true);
-			//DrawGraph(260, 540, yazirusiImage[1], true);
-			//// PL4
-			//DrawRotaGraph(760, 700, 3, 0, charImage[player[3].type].playerImage, true);
-			//DrawTurnGraph(500, 540, yazirusiImage[0], true);
-			//DrawGraph(660, 540, yazirusiImage[1], true);
+			UIDrawSel(j);
 		}
+
 		break;
 
 	case GMODE_GAME:
@@ -652,9 +691,10 @@ void PlayerDraw(int padNo)
 			// 指定ブロックが上にないとき(何か障害物にあたるまでは伸ばしきりたい)
 		}
 		
-		UIDraw(0);
-		UIDraw(1);
-
+		for (int j = 0; j < PLAYER_MAX; j++)
+		{
+			UIDraw(j);
+		}
 
 		//// ｱｲｺﾝ
 		//// PL1
@@ -669,7 +709,7 @@ void PlayerDraw(int padNo)
 		////// PL4
 		//DrawGraph(650, 40, p4Wak[1], true);
 		////DrawGraph(658, 74, charImage[player[3].type].iconImage, true);
-
+		//
 		//// 所持アイテムが描画される枠
 		//// PL1
 		//DrawBox(20, 5, 86, 71, 0xffffff, true);
@@ -684,8 +724,7 @@ void PlayerDraw(int padNo)
 		//// PL4
 		//DrawBox(620, 5, 686, 71, 0xffffff, true);
 		//DrawBox(620, 5, 686, 71, 0x000000, false);
-
-
+		//
 		//// PL1
 		//DrawBox(100, 80, 200, 95, 0x000000, true);
 		//DrawBox(101, 81, 199, 94, 0x00ff00, true);
