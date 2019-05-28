@@ -692,6 +692,8 @@ void UIDraw(int padNo)
 
 		if (player[padNo].hpcnt > 98.0f)
 		{
+			player[padNo].visible = false;
+			player[padNo].visible2 = false;
 			player[padNo].hpcnt = 98.0f;
 		}
 		else
