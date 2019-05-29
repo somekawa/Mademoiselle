@@ -357,6 +357,8 @@ void PlayerGameInit(void)
 	player[0].hpcnt = 0.0;
 	player[1].hpcnt = 0.0;
 
+	runDir = DIR_DOWN;
+
 }
 
 void PlayerControl(int padNo)
@@ -420,23 +422,24 @@ void PlayerControl(int padNo)
 		ItemState(padNo);
 
 		// ¶Ò×
-		if (mapPos.y <= 0) runDir = DIR_LEFT;
-		else if (mapPos.x <= 0) runDir = DIR_DOWN;
-		else if (mapPos.y >= PLAY_SIZE_Y - SCREEN_SIZE_Y) runDir = DIR_RIGHT;
-		else if (mapPos.x >= PLAY_SIZE_X - SCREEN_SIZE_X) runDir = DIR_UP;
-
 		if (padNo == PlayerTop(padNo, player[padNo].pos, runDir)) {
-			if (player[padNo].moveDir == DIR_RIGHT) {
-				ScrollMap(player[padNo].pos, player[padNo].pos.x - moved.x, DIR_RIGHT);
-			}
-			else if (player[padNo].moveDir == DIR_LEFT) {
-				ScrollMap(player[padNo].pos, moved.x - player[padNo].pos.x, DIR_LEFT);
-			}
-			if (player[padNo].pos.y >= moved.y) {
-				ScrollMap(player[padNo].pos, player[padNo].pos.y - moved.y, DIR_DOWN);
-			}
-			else if (player[padNo].pos.y <= moved.y) {
-				ScrollMap(player[padNo].pos, moved.y - player[padNo].pos.y, DIR_UP);
+			if (player[padNo].visible && !player[padNo].visible2) {
+				if ((player[padNo].moveDir == DIR_LEFT)&&(runDir == DIR_LEFT)) {
+					ScrollMap(player[padNo].pos, moved.x - player[padNo].pos.x, DIR_LEFT);
+					if (mapPos.x <= 0) runDir = DIR_DOWN;
+				}
+				if ((player[padNo].pos.y > moved.y)&&(runDir==DIR_DOWN)) {
+					ScrollMap(player[padNo].pos, player[padNo].pos.y - moved.y, DIR_DOWN);
+					if (mapPos.y >= PLAY_SIZE_Y - (SCREEN_SIZE_Y - (CHIP_SIZE_Y * 2))) runDir = DIR_RIGHT;
+				}
+				if ((player[padNo].moveDir == DIR_RIGHT) && (runDir == DIR_RIGHT)) {
+					ScrollMap(player[padNo].pos, player[padNo].pos.x - moved.x, DIR_RIGHT);
+					if (mapPos.x >= PLAY_SIZE_X - SCREEN_SIZE_X) runDir = DIR_UP;
+				}
+				if ((player[padNo].pos.y < moved.y) && (runDir==DIR_UP)) {
+					ScrollMap(player[padNo].pos, moved.y - player[padNo].pos.y, DIR_UP);
+					if (mapPos.y <= 0) runDir = DIR_LEFT;
+				}
 			}
 		}
 		break;
