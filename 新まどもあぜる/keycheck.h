@@ -25,8 +25,7 @@ enum PAD_TBL {
 	PAD_TBL_LEFT,		// 左移動
 	PAD_TBL_JUMP,		// ジャンプ
 	PAD_TBL_WIRE,		// ワイヤーを出す、切る
-	PAD_TBL_ITEM_R,	// アイテム使用右ボタン
-	PAD_TBL_ITEM_L,	// アイテム使用左ボタン
+	PAD_TBL_ITEM,	// アイテム使用
 	//PAD_TBL_SKILL,	// 必殺技？
 	PAD_TBL_START,		// スタート
 	PAD_TBL_PAUSE,

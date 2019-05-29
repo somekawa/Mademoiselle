@@ -50,15 +50,10 @@ void KeyCheck(int padNo)
 		pad[padNo].newKey[PAD_TBL_WIRE] = true;
 	}
 
-	// ITEM_R
-	if (CheckHitKey(KEY_INPUT_RCONTROL) || Pad & (PAD_INPUT_6)) // 
+	// ITEM
+	if (CheckHitKey(KEY_INPUT_RCONTROL) || (Pad & (PAD_INPUT_6)) || Pad & (PAD_INPUT_5))
 	{
-		pad[padNo].newKey[PAD_TBL_ITEM_R] = true;
-	}
-	// ITEM_L
-	if (CheckHitKey(KEY_INPUT_LCONTROL) || Pad & (PAD_INPUT_5)) // 
-	{
-		pad[padNo].newKey[PAD_TBL_ITEM_L] = true;
+		pad[padNo].newKey[PAD_TBL_ITEM] = true;
 	}
 	//// SKILL
 	//if (CheckHitKey(KEY_INPUT_S) || Pad & (PAD_INPUT_3)) // 

@@ -1019,15 +1019,9 @@ void PlWireAction(int padNo)
 	{
 		if (player[padNo].WireTimeCnt < 500)
 		{
-			if ((pad[padNo].trgKey[PAD_TBL_ITEM_R]))// ワイヤーを伸ばしてぶらぶらしている間はアイテムは使えないようにする処理
+			if ((pad[padNo].trgKey[PAD_TBL_ITEM]))// ワイヤーを伸ばしてぶらぶらしている間はアイテムは使えないようにする処理
 			{
-				pad[padNo].trgKey[PAD_TBL_ITEM_R] = !pad[padNo].trgKey[PAD_TBL_ITEM_R];
-
-			}
-			if ( (pad[padNo].trgKey[PAD_TBL_ITEM_L]))// ワイヤーを伸ばしてぶらぶらしている間はアイテムは使えないようにする処理
-			{
-				pad[padNo].trgKey[PAD_TBL_ITEM_L] = !pad[padNo].trgKey[PAD_TBL_ITEM_L];
-
+				pad[padNo].trgKey[PAD_TBL_ITEM] = !pad[padNo].trgKey[PAD_TBL_ITEM];
 			}
 
 			if (pad[padNo].trgKey[PAD_TBL_WIRE])
@@ -1354,14 +1348,9 @@ void Pl_Death(int padNo)
 {
 	player[padNo].visible = false;
 	player[padNo].visible2 = false;
-	if ((pad[padNo].trgKey[PAD_TBL_ITEM_R]))// ワイヤーを伸ばしてぶらぶらしている間はアイテムは使えないようにする処理
+	if ((pad[padNo].trgKey[PAD_TBL_ITEM]))// ワイヤーを伸ばしてぶらぶらしている間はアイテムは使えないようにする処理
 	{
-		pad[padNo].trgKey[PAD_TBL_ITEM_R] = !pad[padNo].trgKey[PAD_TBL_ITEM_R];
-
-	}
-	if ((pad[padNo].trgKey[PAD_TBL_ITEM_L]))// ワイヤーを伸ばしてぶらぶらしている間はアイテムは使えないようにする処理
-	{
-		pad[padNo].trgKey[PAD_TBL_ITEM_L] = !pad[padNo].trgKey[PAD_TBL_ITEM_L];
+		pad[padNo].trgKey[PAD_TBL_ITEM] = !pad[padNo].trgKey[PAD_TBL_ITEM];
 
 	}
 
@@ -1437,7 +1426,7 @@ void ItemSegwey(int padNo)
 {
 	if (player[padNo].state != PLAYER_WALL_RIGHT && player[padNo].state != PLAYER_WALL_LEFT)
 	{
-		if ((pad[padNo].trgKey[PAD_TBL_ITEM_R]) || (pad[padNo].trgKey[PAD_TBL_ITEM_L]))
+		if (pad[padNo].trgKey[PAD_TBL_ITEM])
 		{
 			player[padNo].segweyFlag = true;
 			PlaySoundMem(seg, DX_PLAYTYPE_BACK, true);
