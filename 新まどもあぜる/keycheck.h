@@ -35,8 +35,8 @@ enum PAD_TBL {
 const int padList[PLAYER_MAX] = {
 	{DX_INPUT_PAD1},
 	{DX_INPUT_PAD2},
-	//{DX_INPUT_PAD3},
-	//{DX_INPUT_PAD4},
+	{DX_INPUT_PAD3},
+	{DX_INPUT_PAD4},
 };
 
 struct PAD{

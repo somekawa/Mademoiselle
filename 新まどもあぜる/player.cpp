@@ -1016,8 +1016,8 @@ void PlWirePrepare(int padNo)
 			// 指定ブロックにワイヤーを繋げる
 			//player[0].pos.x = furiko_RU.x - mapPos.x;
 			//player[0].pos.y = furiko_RU.y + player[0].size.y - mapPos.y;
-			player[padNo].visible = false;
-			player[padNo].visible2 = true;
+			/*player[padNo].visible = false;
+			player[padNo].visible2 = true;*/
 			player[padNo].wireFlag = false;
 			player[padNo].wireOkFlag = true;
 			player[padNo].state = PLAYER_W_ACTION;
@@ -1072,6 +1072,7 @@ void PlWireAction(int padNo)
 					player[padNo].pos.x = player[padNo].furiko_pos.x;
 					player[padNo].visible = true;
 					player[padNo].visible2 = false;
+					player[padNo].WireTimeCnt = 0;
 					player[padNo].state = PLAYER_NORMAL;
 					return;
 				}
@@ -1389,36 +1390,12 @@ void PlHasamuJump(int padNo)
 
 	if (IsPass(player_RU) || IsPass(player_LU) || IsPass(player_RD) || IsPass(player_LD))
 	{
-		// 画面上に当たった時の反射
-		if (player[padNo].pos.y - player[padNo].hitPosS.y <= mapPos.y)
-		{
-			runDir = DIR_DOWN;
-		}
-
-		// 画面右に当たった時の反射
-		if (player[padNo].pos.x + player[padNo].hitPosS.x >= mapPos.x + SCREEN_SIZE_X)
-		{
-			runDir = DIR_LEFT;
-
-		}
-
-		// 画面下に当たった時の反射
-		if (player[padNo].pos.y + player[padNo].hitPosS.y >= mapPos.y + SCREEN_SIZE_Y)
-		{
-			runDir = DIR_UP;
-		}
-
-		// 画面左に当たった時の反射
-		if (player[padNo].pos.x + player[padNo].hitPosS.x <= mapPos.x)
-		{
-			runDir = DIR_RIGHT;
-		}
 		player[padNo].pos.x = player[padNo].pos.x + player[padNo].flydir.x;
 		player[padNo].pos.y = player[padNo].pos.y + player[padNo].flydir.y;
 	}
 	else
 	{
-		player[padNo].pos.y = player[padNo].pos.y + player[padNo].size.y;
+		player[padNo].pos.y = player[padNo].pos.y + player[padNo].size.y;		// 要調整
 		player[padNo].state = PLAYER_NORMAL;
 	}
 	

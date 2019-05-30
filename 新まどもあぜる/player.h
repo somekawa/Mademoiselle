@@ -61,3 +61,5 @@ int PlayerTop(int padNo, int passCnt, Position pos, MOVE_DIR dir);
 bool GetPlayerV(void);	// Ãﬂ⁄≤‘∞ê∂ë∂ämîF
 Position GetPlayerPos(int padNo);
 int GetPassingCnt(int padNo);
+
+void WinDraw(int padNo);
