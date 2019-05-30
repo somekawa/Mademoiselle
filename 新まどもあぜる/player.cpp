@@ -1355,32 +1355,51 @@ void PlWall_L(int padNo)
 
 void PlHasamuJump(int padNo)
 {
-	// 画面上に当たった時の反射
-	if (player[padNo].pos.y - player[padNo].hitPosS.y <= mapPos.y)
-	{
-		runDir = DIR_DOWN;
-	}
+	Position player_RU = { player[padNo].pos.x + player[padNo].hitPosE.x - 1 ,
+							player[padNo].pos.y - player[padNo].moveSpeed - player[padNo].hitPosS.y };		// 右上
+	Position player_LU = { player[padNo].pos.x - player[padNo].hitPosS.x ,
+							player[padNo].pos.y - player[padNo].moveSpeed - player[padNo].hitPosS.y };		// 左上
 
-	// 画面右に当たった時の反射
-	if (player[padNo].pos.x + player[padNo].hitPosS.x >= mapPos.x + SCREEN_SIZE_X)
-	{
-		runDir = DIR_LEFT;
+	Position player_RD = { player[padNo].pos.x + player[padNo].hitPosE.x - 1,
+							player[padNo].pos.y - 1 };														// 右下
+	Position player_LD = { player[padNo].pos.x - player[padNo].hitPosS.x ,
+							player[padNo].pos.y - 1 };														// 左下
 
-	}
-
-	// 画面下に当たった時の反射
-	if (player[padNo].pos.y + player[padNo].hitPosS.y >= mapPos.y + SCREEN_SIZE_Y)
+	if (IsPass(player_RU) || IsPass(player_LU) || IsPass(player_RD) || IsPass(player_LD))
 	{
-		runDir = DIR_UP;
-	}
+		// 画面上に当たった時の反射
+		if (player[padNo].pos.y - player[padNo].hitPosS.y <= mapPos.y)
+		{
+			runDir = DIR_DOWN;
+		}
 
-	// 画面左に当たった時の反射
-	if (player[padNo].pos.x + player[padNo].hitPosS.x <= mapPos.x)
-	{
-		runDir = DIR_RIGHT;
+		// 画面右に当たった時の反射
+		if (player[padNo].pos.x + player[padNo].hitPosS.x >= mapPos.x + SCREEN_SIZE_X)
+		{
+			runDir = DIR_LEFT;
+
+		}
+
+		// 画面下に当たった時の反射
+		if (player[padNo].pos.y + player[padNo].hitPosS.y >= mapPos.y + SCREEN_SIZE_Y)
+		{
+			runDir = DIR_UP;
+		}
+
+		// 画面左に当たった時の反射
+		if (player[padNo].pos.x + player[padNo].hitPosS.x <= mapPos.x)
+		{
+			runDir = DIR_RIGHT;
+		}
+		player[padNo].pos.x = player[padNo].pos.x + player[padNo].flydir.x;
+		player[padNo].pos.y = player[padNo].pos.y + player[padNo].flydir.y;
 	}
-	player[padNo].pos.x = player[padNo].pos.x + player[padNo].flydir.x;
-	player[padNo].pos.y = player[padNo].pos.y + player[padNo].flydir.y;
+	else
+	{
+		player[padNo].pos.y = player[padNo].pos.y + player[padNo].size.y;
+		player[padNo].state = PLAYER_NORMAL;
+	}
+	
 
 }
 
