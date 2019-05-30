@@ -4,6 +4,7 @@
 #include"player.h"
 #include"stage.h"
 #include"effect.h"
+#include"camera.h"
 // ----------•Ï”’è‹`----------
 
 GAME_MODE  gameMode;
@@ -271,6 +272,7 @@ void GameInit(void)
 	PlayerGameInit();
 	StageGameInit();
 	EffectGameInit();
+	CameraGameInit();
 	gameMode = GMODE_TITLE;
 	dataType = DATA_BUTTON;
 }

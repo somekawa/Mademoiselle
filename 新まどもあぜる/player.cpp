@@ -5,6 +5,7 @@
 #include "stage.h"
 #include "player.h"
 #include "effect.h"
+#include"camera.h"
 
 #define INIT_VELOCITY 50			// ‰Šú‘¬“x
 #define SECOND_PER_FRAME 0.3		// 1ÌÚ°Ñ‚Ì•b”
@@ -151,7 +152,6 @@ inline float Cross(const Vec2 & a, const Vec2 & b)
 }
 
 Position moved;
-MOVE_DIR runDir;
 
 void PlayerSystmInit(void)
 {
@@ -416,8 +416,6 @@ void PlayerGameInit(void)
 	//player[0].hpcnt = 0.0;
 	//player[1].hpcnt = 0.0;
 
-	runDir = DIR_DOWN;
-
 }
 
 void PlayerControl(int padNo)
@@ -480,7 +478,9 @@ void PlayerControl(int padNo)
 		PlayerState(padNo);
 		ItemState(padNo);
 		Passing(padNo);
-		CameraControl(padNo);
+		if (player[padNo].state != PLAYER_W_ACTION) {
+			CameraControl(padNo,player[padNo].pos,moved);
+		}
 		break;
 	}
 
@@ -693,24 +693,7 @@ void PlayerDraw(int padNo)
 		}
 
 		DrawFormatString(600, 60, 0xff0000, "passingCnt : %d", player[0].passingCnt);
-		switch (runDir)
-		{
-		case DIR_DOWN:
-			DrawString(600, 40, "DOWN", 0xff0000, true);
-			break;
-		case DIR_LEFT:
-			DrawString(600, 40, "LEFT", 0xff0000, true);
-			break;
-		case DIR_RIGHT:
-			DrawString(600, 40, "RIGHT", 0xff0000, true);
-			break;
-		case DIR_UP:
-			DrawString(600, 40, "UP", 0xff0000, true);
-			break;
-		default:
-			break;
-		}
-
+		CameraDraw();
 		break;
 	}
 }
@@ -758,7 +741,7 @@ void UIDraw(int padNo)
 		else
 		{
 			player[padNo].hpcnt = player[padNo].hpcnt + 0.1f;
-			player[padNo].flydir = hasamuJump[runDir];	// Å‰‚É”ò‚Î‚·•ûŒü
+			player[padNo].flydir = hasamuJump[player[padNo].passingType];	// Å‰‚É”ò‚Î‚·•ûŒü
 			player[padNo].state = PLAYER_HASAMU_JUMP;
 		}
 	}
@@ -1620,114 +1603,6 @@ void ItemState(int padNo)
 	default:
 		break;
 	}
-}
-
-// ¶Ò×
-void CameraControl(int padNo)
-{
-	if (PlayerTop(padNo)) {
-		if (player[padNo].state != PLAYER_W_ACTION) {
-			switch (runDir)
-			{
-			case DIR_DOWN:
-				ScrollMap(player[padNo].pos, player[padNo].pos.y - moved.y, runDir);
-				if (mapPos.y >= PLAY_SIZE_Y - (SCREEN_SIZE_Y - (CHIP_SIZE_Y * 2))) runDir = DIR_RIGHT;
-				break;
-			case DIR_RIGHT:
-				if (player[padNo].pos.x >= moved.x) {
-					ScrollMap(player[padNo].pos, player[padNo].pos.x - moved.x, DIR_RIGHT);
-				}
-				if (mapPos.x >= PLAY_SIZE_X - SCREEN_SIZE_X) runDir = DIR_UP;
-				break;
-			case DIR_UP:
-				ScrollMap(player[padNo].pos, moved.y - player[padNo].pos.y, runDir);
-				if (mapPos.y <= 0) runDir = DIR_LEFT;
-				break;
-			case DIR_LEFT:
-				ScrollMap(player[padNo].pos, moved.x - player[padNo].pos.x, runDir);
-				if (mapPos.x <= 0) runDir = DIR_DOWN;
-				break;
-			default:
-				break;
-			}
-		}
-	}
-
-}
-
-void ScrollMap(Position pos, int speed, MOVE_DIR dir)
-{
-	switch (dir)
-	{
-	case DIR_UP:
-		if ((mapPos.x <= 0) || (mapPos.x >= PLAY_SIZE_X - SCREEN_SIZE_X)) {
-			if (pos.y <= mapPos.y + (SCREEN_SIZE_Y - SCREEN_SIZE_Y / 4)) {
-				mapPos.y -= speed;
-			}
-		}
-		break;
-	case DIR_RIGHT:
-		if ((mapPos.y <= 0) || (mapPos.y >= PLAY_SIZE_Y - SCREEN_SIZE_Y)) {
-			if (pos.x > SCREEN_SIZE_X / 2 + mapPos.x) {
-				mapPos.x += speed;
-			}
-		}
-		break;
-	case DIR_DOWN:
-		if ((mapPos.x <= 0) || (mapPos.x >= PLAY_SIZE_X - SCREEN_SIZE_X)) {
-			if (pos.y >= SCREEN_SIZE_Y - (SCREEN_SIZE_Y / 4) + mapPos.y) {
-				mapPos.y += speed;	// ‰º‚ª‚é
-			}
-		}
-		break;
-	case DIR_LEFT:
-		if ((mapPos.y <= 0) || (mapPos.y >= PLAY_SIZE_Y - SCREEN_SIZE_Y)) {
-			if (pos.x < mapPos.x + SCREEN_SIZE_X / 2) {
-				mapPos.x -= speed;
-			}
-		}
-		break;
-	default:
-		break;
-	}
-}
-
-bool PlayerTop(int padNo)
-{
-	bool top = false;
-	for (int j = 0; j < PLAYER_MAX; j++) {
-		if ((padNo != j) && (player[padNo].passingCnt > GetPassingCnt(j))) {
-			return true;
-		}
-		else if (player[padNo].passingCnt == GetPassingCnt(j)) {
-			switch (runDir)
-			{
-			case DIR_UP:
-				if (player[padNo].pos.y < GetPlayerPos(j).y) {
-					top = true;
-				}
-				break;
-			case DIR_RIGHT:
-				if (player[padNo].pos.x > GetPlayerPos(j).x) {
-					top = true;
-				}
-				break;
-			case DIR_DOWN:
-				if (player[padNo].pos.y > GetPlayerPos(j).y) {
-					top = true;
-				}
-				break;
-			case DIR_LEFT:
-				if (player[padNo].pos.x < GetPlayerPos(j).x) {
-					top = true;
-				}
-				break;
-			default:
-				break;
-			}
-		}
-	}
-	return top;
 }
 
 void Passing(int padNo)
