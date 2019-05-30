@@ -32,6 +32,10 @@ int nowKey;
 Position mapPos;
 int setumeiImage;
 int cnt;
+int flameCnt;
+
+int readyImage;
+int goImage;
 
 int SystmInit(void);
 void GameInit(void);
@@ -242,6 +246,9 @@ int SystmInit(void)
 	selectImage2 = LoadGraph("image/4player.png");
 	titleImage = LoadGraph("image/title2.png");
 
+	readyImage = LoadGraph("image/ready.png");
+	goImage = LoadGraph("image/go.png");
+
 	data[DATA_BUTTON] = LoadGraph("image/data_button.png");
 	data[DATA_BLOCK] = LoadGraph("image/data_block.png");
 	data[DATA_ITEM] = LoadGraph("image/data_item.png");
@@ -269,6 +276,7 @@ void GameInit(void)
 	fadeOut = false;
 	pauseFlag = 0;
 	cnt = 0;
+	flameCnt = 0;
 	PlayerGameInit();
 	StageGameInit();
 	EffectGameInit();
@@ -416,6 +424,34 @@ void GameCharasereDraw(void)
 void GameMain(void)
 {
 	DeleteSoundMem(charselBGM);
+	ChangeVolumeSoundMem(255 * 70 / 100, gameBGM);
+	PlaySoundMem(gameBGM, DX_PLAYTYPE_LOOP, false);
+	GameMainDraw();
+
+	if (flameCnt > 200)
+	{
+		if (pad[0].trgKey[PAD_TBL_PAUSE])
+		{
+			pauseFlag = !pauseFlag;
+		}
+		if (pauseFlag)
+		{
+			SetDrawBright(128, 128, 128);
+		}
+		else
+		{
+			gameCnt++;
+			for (int j = 0; j < PLAYER_MAX; j++)
+			{
+				PlayerControl(j);
+			}
+			StageControl();
+			EffectControl();
+			HitCheck();
+		}
+		
+	}
+	
 
 	/*if (cnt > 2500) {
 		cnt = 2500;
@@ -424,26 +460,7 @@ void GameMain(void)
 		cnt++;
 	}*/
 
-	if (pad[0].trgKey[PAD_TBL_PAUSE])
-	{
-		pauseFlag = !pauseFlag;
-	}
-	if (pauseFlag)
-	{
-		SetDrawBright(128, 128, 128);
-	}
-	else 
-	{
-		gameCnt++;
-		for (int j = 0; j < PLAYER_MAX; j++)
-		{
-			PlayerControl(j);
-		}
-		StageControl();
-		EffectControl();
-		HitCheck();
-	}
-	GameMainDraw();
+
 }
 
 void GameMainDraw(void)
@@ -472,6 +489,19 @@ void GameMainDraw(void)
 		SetDrawBright(255, 255, 255);
 		DrawString(SCREEN_SIZE_X / 2 - 40, 100, "P A U S E", 0xffffff);
 		DrawRotaGraph(SCREEN_SIZE_X / 2, SCREEN_SIZE_Y / 2, 0.6, 0, setumeiImage, true, false);
+	}
+
+	if (flameCnt <= 150)
+	{
+		// READY...
+		DrawGraph(SCREEN_SIZE_X / 2, SCREEN_SIZE_Y / 2, readyImage, true);
+		flameCnt++;
+	}
+	else if (flameCnt <= 200)
+	{
+		// GO !!
+		DrawGraph(SCREEN_SIZE_X / 2, SCREEN_SIZE_Y / 2, goImage, true);
+		flameCnt++;
 	}
 }
 
