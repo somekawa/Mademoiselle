@@ -146,8 +146,6 @@ inline float Cross(const Vec2 & a, const Vec2 & b)
 
 Position moved;
 MOVE_DIR runDir;
-void ScrollMap(Position pos, int speed, MOVE_DIR dir);
-int PlayerTop(int number, Position pos, MOVE_DIR dir);
 
 void PlayerSystmInit(void)
 {
@@ -259,6 +257,9 @@ void PlayerGameInit(void)
 		//player[j].cnt;
 		player[j].UpDownSpeed;		// 落下速度
 		player[j].AddUpDownSpeed;	// 上下の加算量
+
+		player[j].passingCnt = 0;
+		player[j].passingType = DIR_DOWN;
 	}
 	// PL1
 	player[0].type = CHARA_RED;		 // selectで初めに出てくるｷｬﾗ
@@ -455,28 +456,8 @@ void PlayerControl(int padNo)
 		moved = player[padNo].pos;
 		PlayerState(padNo);
 		ItemState(padNo);
-
-		// ｶﾒﾗ
-		if (padNo == PlayerTop(padNo, player[padNo].pos, runDir)) {
-			if (player[padNo].visible && !player[padNo].visible2) {
-				if ((player[padNo].moveDir == DIR_LEFT)&&(runDir == DIR_LEFT)) {
-					ScrollMap(player[padNo].pos, moved.x - player[padNo].pos.x, DIR_LEFT);
-					if (mapPos.x <= 0) runDir = DIR_DOWN;
-				}
-				if ((player[padNo].pos.y > moved.y)&&(runDir==DIR_DOWN)) {
-					ScrollMap(player[padNo].pos, player[padNo].pos.y - moved.y, DIR_DOWN);
-					if (mapPos.y >= PLAY_SIZE_Y - (SCREEN_SIZE_Y - (CHIP_SIZE_Y * 2))) runDir = DIR_RIGHT;
-				}
-				if ((player[padNo].moveDir == DIR_RIGHT) && (runDir == DIR_RIGHT)) {
-					ScrollMap(player[padNo].pos, player[padNo].pos.x - moved.x, DIR_RIGHT);
-					if (mapPos.x >= PLAY_SIZE_X - SCREEN_SIZE_X) runDir = DIR_UP;
-				}
-				if ((player[padNo].pos.y < moved.y) && (runDir==DIR_UP)) {
-					ScrollMap(player[padNo].pos, moved.y - player[padNo].pos.y, DIR_UP);
-					if (mapPos.y <= 0) runDir = DIR_LEFT;
-				}
-			}
-		}
+		Passing(padNo);
+		CameraControl(padNo);
 		break;
 	}
 
@@ -686,8 +667,25 @@ void PlayerDraw(int padNo)
 		}
 
 
-		DrawFormatString(0, 20, 0xff0000, "top : %d", PlayerTop(padNo, player[padNo].pos, DIR_RIGHT));
-		DrawFormatString(0, 40, 0xff0000, "runDir : %d", runDir);
+		DrawFormatString(0, 20, 0xff0000, "top : %d", PlayerTop(padNo,player[padNo].passingCnt, player[padNo].pos, DIR_RIGHT));
+		DrawFormatString(600, 60, 0xff0000, "passingCnt : %d", player[0].passingCnt);
+		switch (runDir)
+		{
+		case DIR_DOWN:
+			DrawString(600, 40, "DOWN", 0xff0000, true);
+			break;
+		case DIR_LEFT:
+			DrawString(600, 40, "LEFT", 0xff0000, true);
+			break;
+		case DIR_RIGHT:
+			DrawString(600, 40, "RIGHT", 0xff0000, true);
+			break;
+		case DIR_UP:
+			DrawString(600, 40, "UP", 0xff0000, true);
+			break;
+		default:
+			break;
+		}
 
 		break;
 	}
@@ -1292,15 +1290,10 @@ void PlWall_R(int padNo)
 		{
 			// 位置修正
 			player[padNo].pos.x = GetWorldPos_Map(player_RU, DIR_LEFT).x;
-			if (pad[padNo].oldKey[PAD_TBL_LEFT])
-			{
+			if (pad[padNo].oldKey[PAD_TBL_LEFT]){
 				player[padNo].wallRunSpeed = player[padNo].moveSpeed;
-				player[padNo].state = PLAYER_WALL_LEFT;
 			}
-			else
-			{
-				player[padNo].state = PLAYER_NORMAL;		// 通常に戻す
-			}
+			player[padNo].state = PLAYER_NORMAL;		// 通常に戻す
 		}
 		else if (player[padNo].wallRunSpeed >= 0)
 		{
@@ -1348,16 +1341,12 @@ void PlWall_L(int padNo)
 		{
 			//位置修正
 			player[padNo].pos.x = GetWorldPos_Map(player_LU, DIR_RIGHT).x;
-			if (pad[padNo].oldKey[PAD_TBL_RIGHT])
-			{
+			if (pad[padNo].oldKey[PAD_TBL_RIGHT]){
 				player[padNo].wallRunSpeed = player[padNo].moveSpeed;
-				// 右壁に変更
-				player[padNo].state = PLAYER_WALL_RIGHT;
 			}
-			else
-			{
-				player[padNo].state = PLAYER_NORMAL;		// 通常に戻す
-			}
+
+			player[padNo].state = PLAYER_NORMAL;		// 通常に戻す
+
 		}
 		else if (player[padNo].wallRunSpeed >= 0)
 		{
@@ -1455,8 +1444,8 @@ void PlayerState(int padNo)
 	switch (player[padNo].state)
 	{
 	case PLAYER_DOWN:	        // ジャンプ下降
-		PlWall_Check(padNo);
 	case PLAYER_NORMAL:			// 左右移動 
+		PlWall_Check(padNo);
 		PlNormal(padNo);
 		if (player[padNo].state != PLAYER_W_PRE)
 		{
@@ -1585,6 +1574,37 @@ void ItemState(int padNo)
 	}
 }
 
+// ｶﾒﾗ
+void CameraControl(int padNo)
+{
+	if (PlayerTop(padNo,player[padNo].passingCnt, player[padNo].pos, runDir)) {
+		if (player[padNo].visible && !player[padNo].visible2) {
+			switch (runDir)
+			{
+			case DIR_DOWN:
+				ScrollMap(player[padNo].pos, player[padNo].pos.y - moved.y, runDir);
+				if (mapPos.y >= PLAY_SIZE_Y - (SCREEN_SIZE_Y - (CHIP_SIZE_Y * 2))) runDir = DIR_RIGHT;
+				break;
+			case DIR_RIGHT:
+				ScrollMap(player[padNo].pos, player[padNo].pos.x - moved.x, runDir);
+				if (mapPos.x >= PLAY_SIZE_X - SCREEN_SIZE_X) runDir = DIR_UP;
+				break;
+			case DIR_UP:
+				ScrollMap(player[padNo].pos, moved.y - player[padNo].pos.y, runDir);
+				if (mapPos.y <= 0) runDir = DIR_LEFT;
+				break;
+			case DIR_LEFT:
+				ScrollMap(player[padNo].pos, moved.x - player[padNo].pos.x, runDir);
+				if (mapPos.x <= 0) runDir = DIR_DOWN;
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
+}
+
 void ScrollMap(Position pos, int speed, MOVE_DIR dir)
 {
 	switch (dir)
@@ -1598,14 +1618,14 @@ void ScrollMap(Position pos, int speed, MOVE_DIR dir)
 		break;
 	case DIR_RIGHT:
 		if ((mapPos.y <= 0) || (mapPos.y >= PLAY_SIZE_Y - SCREEN_SIZE_Y)) {
-			if (pos.x > SCREEN_SIZE_X / 2) {
+			if (pos.x > SCREEN_SIZE_X / 2 + mapPos.x) {
 				mapPos.x += speed;
 			}
 		}
 		break;
 	case DIR_DOWN:
 		if ((mapPos.x <= 0) || (mapPos.x >= PLAY_SIZE_X - SCREEN_SIZE_X)) {
-			if (pos.y >= SCREEN_SIZE_Y - (SCREEN_SIZE_Y / 4)) {
+			if (pos.y >= SCREEN_SIZE_Y - (SCREEN_SIZE_Y / 4) + mapPos.y) {
 				mapPos.y += speed;	// 下がる
 			}
 		}
@@ -1620,50 +1640,82 @@ void ScrollMap(Position pos, int speed, MOVE_DIR dir)
 	default:
 		break;
 	}
-
 }
 
-int PlayerTop(int number, Position pos, MOVE_DIR dir)
+int PlayerTop(int padNo,int passCnt, Position pos, MOVE_DIR dir)
 {
-	int top = false;
-	switch (dir)
-	{
-	case DIR_UP:
-		for (int j = 0; j < PLAYER_MAX; j++) {
-			if ((number != j) && (pos.y < GetPlayerPos(j).y)) {
-				top = number;
+	int top=false;
+	for (int j = 0; j < PLAYER_MAX; j++) {
+		if ((padNo != j) && (passCnt >= GetPassingCnt(j))) {
+			switch (dir)
+			{
+			case DIR_UP:
+				if (pos.y < GetPlayerPos(j).y) {
+					top = padNo;
+				}
+				break;
+			case DIR_RIGHT:
+				if (pos.x > GetPlayerPos(j).x) {
+					top = padNo;
+				}
+				break;
+			case DIR_DOWN:
+				if (pos.y > GetPlayerPos(j).y) {
+					top = padNo;
+				}
+				break;
+			case DIR_LEFT:
+				if (pos.x < GetPlayerPos(j).x) {
+				top = padNo;
 			}
+			break;
+			default:
+				break;
+			}
+		}
+	}
+	if (padNo == top) return true;
+	else return false;
+}
+
+void Passing(int padNo)
+{
+	switch (player[padNo].passingType)
+	{
+	case DIR_DOWN:
+		if (player[padNo].pos.y >= PLAY_SIZE_Y - SCREEN_SIZE_Y / 2) {
+			player[padNo].passingCnt++;
+			player[padNo].passingType = DIR_RIGHT;
 		}
 		break;
 	case DIR_RIGHT:
-		for (int j = 0; j < PLAYER_MAX; j++) {
-			if ((number != j) && (pos.x > GetPlayerPos(j).x)) {
-				top = number;
-			}
+		if (player[padNo].pos.x >= PLAY_SIZE_X - SCREEN_SIZE_X / 2) {
+			player[padNo].passingCnt++;
+			player[padNo].passingType = DIR_UP;
 		}
 		break;
-	case DIR_DOWN:
-		for (int j = 0; j < PLAYER_MAX; j++) {
-			if ((number != j) && (pos.y > GetPlayerPos(j).y)) {
-				top = number;
-			}
+	case DIR_UP:
+		if (player[padNo].pos.y <= SCREEN_SIZE_Y - SCREEN_SIZE_Y / 3) {
+			player[padNo].passingCnt++;
+			player[padNo].passingType = DIR_LEFT;
 		}
 		break;
 	case DIR_LEFT:
-		for (int j = 0; j < PLAYER_MAX; j++) {
-			if ((number != j) && (pos.x < GetPlayerPos(j).x)) {
-				top = number;
-			}
+		if (player[padNo].pos.x <= SCREEN_SIZE_X - SCREEN_SIZE_X / 2) {
+			player[padNo].passingCnt++;
+			player[padNo].passingType = DIR_DOWN;
 		}
 		break;
 	default:
 		break;
 	}
-
-	return top;
 }
 
 Position GetPlayerPos(int padNo)
 {
 	return player[padNo].pos;
+}
+int GetPassingCnt(int padNo)
+{
+	return player[padNo].passingCnt;
 }

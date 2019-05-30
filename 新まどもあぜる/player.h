@@ -53,5 +53,11 @@ void ItemSP(void);
 void PlayerState(int padNo);
 void ItemState(int padNo);
 
+void Passing(int padNo);
+void CameraControl(int padNo);
+void ScrollMap(Position pos, int speed, MOVE_DIR dir);
+int PlayerTop(int padNo, int passCnt, Position pos, MOVE_DIR dir);
+
 bool GetPlayerV(void);	// Ãﬂ⁄≤‘∞ê∂ë∂ämîF
 Position GetPlayerPos(int padNo);
+int GetPassingCnt(int padNo);
