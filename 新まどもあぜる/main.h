@@ -165,6 +165,8 @@ typedef struct {
 	Position _length;		// U‚èq‚Ì’·‚³
 	float hpcnt;			// HPƒo[
 	Position flydir;
+	MOVE_DIR passingType;	// ’Ê‰ß‚µ‚È‚¢‚Æ‚¢‚¯‚È‚¢êŠ
+	int passingCnt;		// ’Ê‰ß‰ñ”
 }CHARACTER;
 
 extern Position mapPos;
