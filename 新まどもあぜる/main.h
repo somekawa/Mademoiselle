@@ -14,7 +14,7 @@
 #define PI 3.141592f
 #define ACC_G 9.8f
 
-#define PLAYER_MAX 2
+#define PLAYER_MAX 4
 
 struct Position {
 	Position(float ix, float iy) { x = ix; y = iy; }

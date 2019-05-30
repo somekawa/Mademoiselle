@@ -67,11 +67,6 @@ int p1Wak[2];
 int p2Wak[2];
 int p3Wak[2];
 int p4Wak[2];
-// 枠
-int* pWak[PLAYER_MAX] = {
-	p1Wak,p2Wak/*,p3Wak,p4Wak*/
-};
-
 int yazirusiImage[2];
 
 //int WirePreTimeCnt;					// ワイヤーを少しずつ伸ばして途中で途切れるまでの時間
@@ -156,13 +151,15 @@ int PlayerTop(int number, Position pos, MOVE_DIR dir);
 
 void PlayerSystmInit(void)
 {
+	// ｾﾚｸﾄ枠
 	p1Wak[0] = LoadGraph("image/p1CSWak.png");
-	p1Wak[1] = LoadGraph("image/p1GWak.png");
 	p2Wak[0] = LoadGraph("image/p2CSWak.png");
-	p2Wak[1] = LoadGraph("image/p2GWak.png");
 	p3Wak[0] = LoadGraph("image/p3CSWak.png");
-	p3Wak[1] = LoadGraph("image/p3GWak.png");
 	p4Wak[0] = LoadGraph("image/p4CSWak.png");
+	// ステータス枠
+	p1Wak[1] = LoadGraph("image/p1GWak.png");
+	p2Wak[1] = LoadGraph("image/p2GWak.png");
+	p3Wak[1] = LoadGraph("image/p3GWak.png");
 	p4Wak[1] = LoadGraph("image/p4GWak.png");
 	for (int i = 0; i < 2; i++)
 	{
@@ -271,6 +268,15 @@ void PlayerGameInit(void)
 	player[0].pos = { CHIP_SIZE_X * 15, CHIP_SIZE_Y * 14 };// 初期位置
 	player[0].nowDeg = 0.0f;
 	player[0].JumpDeg = 0;
+	player[0].WireTimeCnt = 0;
+	player[0]._length = { 0 , 0 };	//紐の長さの計算
+	player[0].state = PLAYER_NORMAL;
+	player[0].item_state = ITEM_NON;
+	player[0].WirePreTimeCnt = 0;
+	player[0].furikoSpeed = 0.0f;
+	player[0].itemcnt = 0;
+	player[0].Segwey_Cnt = 0;
+	player[0].hpcnt = 0.0;
 	// PL2
 	player[1].type = CHARA_BLUE;		 // selectで初めに出てくるｷｬﾗ
 	player[1].right = false;
@@ -279,22 +285,50 @@ void PlayerGameInit(void)
 	player[1].pos = { CHIP_SIZE_X * 16, CHIP_SIZE_Y * 14 };// 初期位置
 	player[1].nowDeg = 0.0f;
 	player[1].JumpDeg = 0;
+	player[1].WireTimeCnt = 0;
+	player[1]._length = { 0 , 0 };	//紐の長さの計算
+	player[1].state = PLAYER_NORMAL;
+	player[1].item_state = ITEM_NON;
+	player[1].WirePreTimeCnt = 0;
+	player[1].furikoSpeed = 0.0f;
+	player[1].itemcnt = 0;
+	player[1].Segwey_Cnt = 0;
+	player[1].hpcnt = 0.0;
 	// PL3
-	//player[2].type = CHARA_ORANGE;		 // selectで初めに出てくるｷｬﾗ
-	//player[2].right = false;
-	//player[2].left = false;
-	//player[2].moveDir = DIR_RIGHT;
-	//player[2].pos = { CHIP_SIZE_X * 17, CHIP_SIZE_Y * 14 };// 初期位置
-	//player[2].nowDeg = 0.0f;
-	//player[2].JumpDeg = 0;
+	player[2].type = CHARA_ORANGE;		 // selectで初めに出てくるｷｬﾗ
+	player[2].right = false;
+	player[2].left = false;
+	player[2].moveDir = DIR_RIGHT;
+	player[2].pos = { CHIP_SIZE_X * 17, CHIP_SIZE_Y * 14 };// 初期位置
+	player[2].nowDeg = 0.0f;
+	player[2].JumpDeg = 0;
+	player[2].WireTimeCnt = 0;
+	player[2]._length = { 0 , 0 };	//紐の長さの計算
+	player[2].state = PLAYER_NORMAL;
+	player[2].item_state = ITEM_NON;
+	player[2].WirePreTimeCnt = 0;
+	player[2].furikoSpeed = 0.0f;
+	player[2].itemcnt = 0;
+	player[2].Segwey_Cnt = 0;
+	player[2].hpcnt = 0.0;
+
 	// PL4
-	//player[3].type = CHARA_GREEN;		 // selectで初めに出てくるｷｬﾗ
-	//player[3].right = false;
-	//player[3].left = false;
-	//player[3].moveDir = DIR_RIGHT;
-	//player[3].pos = { CHIP_SIZE_X * 18, CHIP_SIZE_Y * 14 };// 初期位置
-	//player[3].nowDeg = 0.0f;
-	//player[3].JumpDeg = 0;
+	player[3].type = CHARA_GREEN;		 // selectで初めに出てくるｷｬﾗ
+	player[3].right = false;
+	player[3].left = false;
+	player[3].moveDir = DIR_RIGHT;
+	player[3].pos = { CHIP_SIZE_X * 18, CHIP_SIZE_Y * 14 };// 初期位置
+	player[3].nowDeg = 0.0f;
+	player[3].JumpDeg = 0;
+	player[3].WireTimeCnt = 0;
+	player[3]._length = { 0 , 0 };	//紐の長さの計算
+	player[3].state = PLAYER_NORMAL;
+	player[3].item_state = ITEM_NON;
+	player[3].WirePreTimeCnt = 0;
+	player[3].furikoSpeed = 0.0f;
+	player[3].itemcnt = 0;
+	player[3].Segwey_Cnt = 0;
+	player[3].hpcnt = 0.0;
 
 
 	//ひもの支点の初期化
@@ -325,15 +359,14 @@ void PlayerGameInit(void)
 
 	skyFlag = false;
 
-	player[0].state = PLAYER_NORMAL;
-	player[1].state = PLAYER_NORMAL;
-
-	player[0].item_state = ITEM_NON;
-	player[1].item_state = ITEM_NON;
-
-
-	player[0].WirePreTimeCnt = 0;
-	player[1].WirePreTimeCnt = 0;
+	//player[0].state = PLAYER_NORMAL;
+	//player[1].state = PLAYER_NORMAL;
+	//
+	//player[0].item_state = ITEM_NON;
+	//player[1].item_state = ITEM_NON;
+	//
+	//player[0].WirePreTimeCnt = 0;
+	//player[1].WirePreTimeCnt = 0;
 
 
 	//Maxrad = { 0,0 };
@@ -342,22 +375,22 @@ void PlayerGameInit(void)
 	MaxDeg = 0.0f;
 	minDeg = 0.0f;
 	//player[0].nowDeg = 0.0f;
-	player[0].furikoSpeed = 0.0f;
-	player[1].furikoSpeed = 0.0f;
+	//player[0].furikoSpeed = 0.0f;
+	//player[1].furikoSpeed = 0.0f;
 
 	jumpSpeed = 0.0f;
 	defDeg = 0.0f;
 
-	player[0].itemcnt = 0;
-	player[1].itemcnt = 0;
+	//player[0].itemcnt = 0;
+	//player[1].itemcnt = 0;
 
-	//player[0].JumpDeg = 0;
+	////player[0].JumpDeg = 0;
 
-	player[0].Segwey_Cnt = 0;
-	player[1].Segwey_Cnt = 0;
+	//player[0].Segwey_Cnt = 0;
+	//player[1].Segwey_Cnt = 0;
 
-	player[0].hpcnt = 0.0;
-	player[1].hpcnt = 0.0;
+	//player[0].hpcnt = 0.0;
+	//player[1].hpcnt = 0.0;
 
 	runDir = DIR_DOWN;
 
@@ -662,21 +695,19 @@ void PlayerDraw(int padNo)
 
 void UIDraw(int padNo)
 {
-	
-
 	// ｱｲｺﾝ
 	// オフセット( 画面上で一番左に描画される <所持アイテムが描画される枠> を基準に設定 )
 	int offset_x[PLAYER_MAX] = {
-	20,220/*,420,620*/
+	20,220,420,620
 	};
 
 	int offset_y[PLAYER_MAX] = {
-	5,5/*,5,5*/
+	5,5,5,5
 	};
 
 	// 枠
 	int* pWak[PLAYER_MAX] = {
-		p1Wak,p2Wak/*,p3Wak,p4Wak*/
+		p1Wak,p2Wak,p3Wak,p4Wak
 	};
 
 	// プレイヤーステータスの枠
@@ -714,9 +745,6 @@ void UIDraw(int padNo)
 	DrawBox(80 + offset_x[padNo], 75 + offset_y[padNo], 180 + offset_x[padNo], 90 + offset_y[padNo], 0x000000, true);
 	DrawBox(81 + offset_x[padNo], 76 + offset_y[padNo], 179 + offset_x[padNo] - player[padNo].hpcnt, 89 + offset_y[padNo], 0x00ff00, true);
 
-
-	
-
 	//DrawBox(81 + offset_x[padNo], 76 + offset_y[padNo], 179 + offset_x[padNo] /*- hpcnt*/, 89 + offset_y[padNo], 0x00ff00, true);
 
 	// プレイヤーのアイテムドロップ
@@ -729,10 +757,15 @@ void UIDraw(int padNo)
 void UIDrawSel(int padNo)
 {
 	int selOffset_x[PLAYER_MAX] = {
-		0,600,//0,600,
+		0,600,0,600,
 	};
 	int selOffset_y[PLAYER_MAX] = {
-		120,120,//420,420,
+		120,120,460,460,
+	};
+
+	// 枠
+	int* pWak[PLAYER_MAX] = {
+		p1Wak,p2Wak,p3Wak,p4Wak
 	};
 
 	// ｷｬﾗｾﾚｸﾄ時のプレイヤーの枠

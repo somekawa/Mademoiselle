@@ -67,8 +67,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	{
 		ClsDrawScreen();	// âÊñ è¡ãé
 		
-		KeyCheck(0);
-		KeyCheck(1);
+		for (int j = 0; j < PLAYER_MAX; j++)
+		{
+			KeyCheck(j);
+		}
 
 		switch (gameMode)
 		{
