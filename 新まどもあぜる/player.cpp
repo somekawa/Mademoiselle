@@ -692,7 +692,6 @@ void PlayerDraw(int padNo)
 			}
 		}
 
-		DrawFormatString(0, 20, 0xff0000, "top : %d", PlayerTop(padNo,player[padNo].passingCnt, player[padNo].pos, DIR_RIGHT));
 		DrawFormatString(600, 60, 0xff0000, "passingCnt : %d", player[0].passingCnt);
 		switch (runDir)
 		{
@@ -1493,8 +1492,8 @@ void PlayerState(int padNo)
 	switch (player[padNo].state)
 	{
 	case PLAYER_DOWN:	        // ジャンプ下降
-	case PLAYER_NORMAL:			// 左右移動 
 		PlWall_Check(padNo);
+	case PLAYER_NORMAL:			// 左右移動 
 		PlNormal(padNo);
 		if (player[padNo].state != PLAYER_W_PRE)
 		{
@@ -1626,8 +1625,8 @@ void ItemState(int padNo)
 // ｶﾒﾗ
 void CameraControl(int padNo)
 {
-	if (PlayerTop(padNo,player[padNo].passingCnt, player[padNo].pos, runDir)) {
-		if (player[padNo].visible && !player[padNo].visible2) {
+	if (PlayerTop(padNo)) {
+		if (player[padNo].state != PLAYER_W_ACTION) {
 			switch (runDir)
 			{
 			case DIR_DOWN:
@@ -1635,7 +1634,9 @@ void CameraControl(int padNo)
 				if (mapPos.y >= PLAY_SIZE_Y - (SCREEN_SIZE_Y - (CHIP_SIZE_Y * 2))) runDir = DIR_RIGHT;
 				break;
 			case DIR_RIGHT:
-				ScrollMap(player[padNo].pos, player[padNo].pos.x - moved.x, runDir);
+				if (player[padNo].pos.x >= moved.x) {
+					ScrollMap(player[padNo].pos, player[padNo].pos.x - moved.x, DIR_RIGHT);
+				}
 				if (mapPos.x >= PLAY_SIZE_X - SCREEN_SIZE_X) runDir = DIR_UP;
 				break;
 			case DIR_UP:
@@ -1691,40 +1692,42 @@ void ScrollMap(Position pos, int speed, MOVE_DIR dir)
 	}
 }
 
-int PlayerTop(int padNo,int passCnt, Position pos, MOVE_DIR dir)
+bool PlayerTop(int padNo)
 {
-	int top=false;
+	bool top = false;
 	for (int j = 0; j < PLAYER_MAX; j++) {
-		if ((padNo != j) && (passCnt >= GetPassingCnt(j))) {
-			switch (dir)
+		if ((padNo != j) && (player[padNo].passingCnt > GetPassingCnt(j))) {
+			return true;
+		}
+		else if (player[padNo].passingCnt == GetPassingCnt(j)) {
+			switch (runDir)
 			{
 			case DIR_UP:
-				if (pos.y < GetPlayerPos(j).y) {
-					top = padNo;
+				if (player[padNo].pos.y < GetPlayerPos(j).y) {
+					top = true;
 				}
 				break;
 			case DIR_RIGHT:
-				if (pos.x > GetPlayerPos(j).x) {
-					top = padNo;
+				if (player[padNo].pos.x > GetPlayerPos(j).x) {
+					top = true;
 				}
 				break;
 			case DIR_DOWN:
-				if (pos.y > GetPlayerPos(j).y) {
-					top = padNo;
+				if (player[padNo].pos.y > GetPlayerPos(j).y) {
+					top = true;
 				}
 				break;
 			case DIR_LEFT:
-				if (pos.x < GetPlayerPos(j).x) {
-				top = padNo;
-			}
-			break;
+				if (player[padNo].pos.x < GetPlayerPos(j).x) {
+					top = true;
+				}
+				break;
 			default:
 				break;
 			}
 		}
 	}
-	if (padNo == top) return true;
-	else return false;
+	return top;
 }
 
 void Passing(int padNo)
