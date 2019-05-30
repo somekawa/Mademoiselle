@@ -107,7 +107,10 @@ float defDeg;
 
 // アイテム関連 
 //int itemcnt;
-bool itemBoxFlag = true;
+bool itemBoxFlag;
+bool itemBoxFlag2;
+bool itemBoxFlag3;
+
 int itemBoxPosX = CHIP_SIZE_X * 15 - mapPos.x;
 int itemBoxPosY = CHIP_SIZE_Y * 16 - mapPos.y;
 int hatenaImage;		// ？ﾎﾞｯｸｽ画像
@@ -229,6 +232,10 @@ void PlayerSystmInit(void)
 
 void PlayerGameInit(void)
 {
+	itemBoxFlag = true;
+	itemBoxFlag2 = true;
+	itemBoxFlag3 = true;
+
 	for (int j = 0; j < PLAYER_MAX; j++)
 	{
 		player[j].size = { 72,72 }; // プレイヤーの画像サイズ
@@ -276,6 +283,8 @@ void PlayerGameInit(void)
 	player[0].WirePreTimeCnt = 0;
 	player[0].furikoSpeed = 0.0f;
 	player[0].itemcnt = 0;
+	player[0].itemcnt2 = 0;
+	player[0].itemcnt3 = 0;
 	player[0].Segwey_Cnt = 0;
 	player[0].hpcnt = 0.0;
 	// PL2
@@ -293,6 +302,8 @@ void PlayerGameInit(void)
 	player[1].WirePreTimeCnt = 0;
 	player[1].furikoSpeed = 0.0f;
 	player[1].itemcnt = 0;
+	player[1].itemcnt2 = 0;
+	player[1].itemcnt3 = 0;
 	player[1].Segwey_Cnt = 0;
 	player[1].hpcnt = 0.0;
 	// PL3
@@ -310,6 +321,8 @@ void PlayerGameInit(void)
 	player[2].WirePreTimeCnt = 0;
 	player[2].furikoSpeed = 0.0f;
 	player[2].itemcnt = 0;
+	player[2].itemcnt2 = 0;
+	player[2].itemcnt3= 0;
 	player[2].Segwey_Cnt = 0;
 	player[2].hpcnt = 0.0;
 
@@ -328,6 +341,8 @@ void PlayerGameInit(void)
 	player[3].WirePreTimeCnt = 0;
 	player[3].furikoSpeed = 0.0f;
 	player[3].itemcnt = 0;
+	player[3].itemcnt2 = 0;
+	player[3].itemcnt3 = 0;
 	player[3].Segwey_Cnt = 0;
 	player[3].hpcnt = 0.0;
 
@@ -475,6 +490,36 @@ void PlayerControl(int padNo)
 			itemBoxFlag = false;												// ここに入ればhitがでる
 		}
 	}
+
+	if ((player[padNo].dropFlag == false) && (itemBoxFlag2 == true))
+	{
+		if (player[padNo].pos.x - player[padNo].hitPosS.x < SCREEN_SIZE_X - CHIP_SIZE_X * 3 + CHIP_SIZE_X		    // player左 < box右	
+			&& SCREEN_SIZE_X - CHIP_SIZE_X * 3 < player[padNo].pos.x + player[padNo].hitPosS.x					// box左    < player右
+			&& player[padNo].pos.y - player[padNo].size.y < SCREEN_SIZE_Y * 2 - CHIP_SIZE_X * 3 + CHIP_SIZE_Y			// player上 < box下
+			&& SCREEN_SIZE_Y * 2 - CHIP_SIZE_X * 3 < player[padNo].pos.y)										// box上    < player下
+		{
+			player[padNo].item_state = ITEM_SEGWEY;
+			player[padNo].dropFlag = true;												// ここをtrueにしているので、アイテムを使ってフラグをfalseにするまで次のアイテムは取得できない
+			PlaySoundMem(item_get, DX_PLAYTYPE_BACK, true);
+			itemBoxFlag2 = false;												// ここに入ればhitがでる
+		}
+	}
+
+	if ((player[padNo].dropFlag == false) && (itemBoxFlag3== true))
+	{
+		if (player[padNo].pos.x - player[padNo].hitPosS.x < SCREEN_SIZE_X * 2 - CHIP_SIZE_X * 10 + CHIP_SIZE_X		    // player左 < box右	
+			&& SCREEN_SIZE_X * 2 - CHIP_SIZE_X * 10 < player[padNo].pos.x + player[padNo].hitPosS.x					// box左    < player右
+			&& player[padNo].pos.y - player[padNo].size.y < SCREEN_SIZE_Y + CHIP_SIZE_Y			// player上 < box下
+			&& SCREEN_SIZE_Y < player[padNo].pos.y)										// box上    < player下
+		{
+			player[padNo].item_state = ITEM_SEGWEY;
+			player[padNo].dropFlag = true;												// ここをtrueにしているので、アイテムを使ってフラグをfalseにするまで次のアイテムは取得できない
+			PlaySoundMem(item_get, DX_PLAYTYPE_BACK, true);
+			itemBoxFlag3 = false;												// ここに入ればhitがでる
+		}
+	}
+
+
 }
 
 void PlayerDraw(int padNo)
@@ -645,10 +690,8 @@ void PlayerDraw(int padNo)
 		if (itemBoxFlag == true)
 		{
 			DrawGraph(CHIP_SIZE_X * 15 - mapPos.x, CHIP_SIZE_X * 16 - mapPos.y, hatenaImage, true);// 左上1つ
-			DrawGraph(SCREEN_SIZE_X - CHIP_SIZE_X * 3 - mapPos.x,
-				SCREEN_SIZE_Y * 2 - CHIP_SIZE_X * 3 - mapPos.y, hatenaImage, true);// 下部の真ん中
-			DrawGraph(SCREEN_SIZE_X * 2 - CHIP_SIZE_X * 10 - mapPos.x,
-				SCREEN_SIZE_Y - mapPos.y, hatenaImage, true);// 左側真ん中
+			
+			
 			player[padNo].itemcnt = 0;
 
 		}
@@ -662,6 +705,49 @@ void PlayerDraw(int padNo)
 			else
 			{
 				player[padNo].itemcnt++;
+			}
+			//DrawString(SCREEN_SIZE_X / 2 - 40, SCREEN_SIZE_Y / 2 - 5, "HIT", 0xffffff);
+		}
+
+
+		if (itemBoxFlag2 == true)
+		{
+			DrawGraph(SCREEN_SIZE_X - CHIP_SIZE_X * 3 - mapPos.x,
+				SCREEN_SIZE_Y * 2 - CHIP_SIZE_X * 3 - mapPos.y, hatenaImage, true);// 下部の真ん中
+			player[padNo].itemcnt2 = 0;
+
+		}
+		else
+		{
+			if (player[padNo].itemcnt2 == 200)
+			{
+				itemBoxFlag2 = true;
+				player[padNo].itemcnt2 = 0;
+			}
+			else
+			{
+				player[padNo].itemcnt2++;
+			}
+			//DrawString(SCREEN_SIZE_X / 2 - 40, SCREEN_SIZE_Y / 2 - 5, "HIT", 0xffffff);
+		}
+
+
+		if (itemBoxFlag3 == true)
+		{
+			DrawGraph(SCREEN_SIZE_X * 2 - CHIP_SIZE_X * 10 - mapPos.x,
+				SCREEN_SIZE_Y - mapPos.y, hatenaImage, true);// 左側真ん中
+			player[padNo].itemcnt3 = 0;
+		}
+		else
+		{
+			if (player[padNo].itemcnt3 == 200)
+			{
+				itemBoxFlag3 = true;
+				player[padNo].itemcnt3 = 0;
+			}
+			else
+			{
+				player[padNo].itemcnt3++;
 			}
 			//DrawString(SCREEN_SIZE_X / 2 - 40, SCREEN_SIZE_Y / 2 - 5, "HIT", 0xffffff);
 		}
@@ -1486,7 +1572,7 @@ void GetItemRand(void)
 
 void ItemSegwey(int padNo)
 {
-	if (player[padNo].state != PLAYER_WALL_RIGHT && player[padNo].state != PLAYER_WALL_LEFT)
+	if (player[padNo].state != PLAYER_WALL_RIGHT && player[padNo].state != PLAYER_WALL_LEFT && player[padNo].state != PLAYER_JUMP_UP)
 	{
 		if (pad[padNo].trgKey[PAD_TBL_ITEM])
 		{
