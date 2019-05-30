@@ -21,6 +21,8 @@
 #define FURIKO_SPEED_DEF      10.0f	// 振り子の初速度
 #define FURIKO_ADD			  0.4f	// 振り子の加減算速度
 
+#define ITEM_BOX				3
+
 //#define PAI 3.141592
 //#define JUMPSPEED 2
 
@@ -103,16 +105,16 @@ float jumpSpeed;
 
 float defDeg;
 
-//int Segwey_Cnt;
 
 // アイテム関連 
-//int itemcnt;
-bool itemBoxFlag;
-bool itemBoxFlag2;
-bool itemBoxFlag3;
+// アイテムボックスの座標
+const Position itemBox[ITEM_BOX] = { {CHIP_SIZE_X * 15,CHIP_SIZE_X * 16} ,
+							{ SCREEN_SIZE_X - CHIP_SIZE_X * 3,SCREEN_SIZE_Y * 2 - CHIP_SIZE_X * 3} ,
+							{SCREEN_SIZE_X * 2 - CHIP_SIZE_X * 10,SCREEN_SIZE_Y} };
 
-int itemBoxPosX = CHIP_SIZE_X * 15 - mapPos.x;
-int itemBoxPosY = CHIP_SIZE_Y * 16 - mapPos.y;
+bool itemBoxCnt[ITEM_BOX];
+
+
 int hatenaImage;		// ？ﾎﾞｯｸｽ画像
 int segweyImage_icon;
 //int kabosuImage;
@@ -129,6 +131,7 @@ int wire;
 
 // 挟まった時の飛ばす方向
 const Position hasamuJump[DIR_MAX] = { {-10,-10},{10,-10},{10,10},{-10,10} };	// 上・右・下・左
+
 
 //float hpcnt;
 
@@ -232,9 +235,11 @@ void PlayerSystmInit(void)
 
 void PlayerGameInit(void)
 {
-	itemBoxFlag = true;
-	itemBoxFlag2 = true;
-	itemBoxFlag3 = true;
+	
+	for (int j = 0; j <= ITEM_BOX; j++)
+	{
+		itemBoxCnt[j] = true;
+	}
 
 	for (int j = 0; j < PLAYER_MAX; j++)
 	{
@@ -282,9 +287,10 @@ void PlayerGameInit(void)
 	player[0].item_state = ITEM_NON;
 	player[0].WirePreTimeCnt = 0;
 	player[0].furikoSpeed = 0.0f;
-	player[0].itemcnt = 0;
-	player[0].itemcnt2 = 0;
-	player[0].itemcnt3 = 0;
+	for (int j = 0; j < ITEM_BOX; j++)
+	{
+		player[0].item[j] = 0;
+	}
 	player[0].Segwey_Cnt = 0;
 	player[0].hpcnt = 0.0;
 	// PL2
@@ -301,9 +307,10 @@ void PlayerGameInit(void)
 	player[1].item_state = ITEM_NON;
 	player[1].WirePreTimeCnt = 0;
 	player[1].furikoSpeed = 0.0f;
-	player[1].itemcnt = 0;
-	player[1].itemcnt2 = 0;
-	player[1].itemcnt3 = 0;
+	for (int j = 0; j < ITEM_BOX; j++)
+	{
+		player[1].item[j] = 0;
+	}
 	player[1].Segwey_Cnt = 0;
 	player[1].hpcnt = 0.0;
 	// PL3
@@ -320,9 +327,10 @@ void PlayerGameInit(void)
 	player[2].item_state = ITEM_NON;
 	player[2].WirePreTimeCnt = 0;
 	player[2].furikoSpeed = 0.0f;
-	player[2].itemcnt = 0;
-	player[2].itemcnt2 = 0;
-	player[2].itemcnt3= 0;
+	for (int j = 0; j < ITEM_BOX; j++)
+	{
+		player[2].item[j] = 0;
+	}
 	player[2].Segwey_Cnt = 0;
 	player[2].hpcnt = 0.0;
 
@@ -340,9 +348,10 @@ void PlayerGameInit(void)
 	player[3].item_state = ITEM_NON;
 	player[3].WirePreTimeCnt = 0;
 	player[3].furikoSpeed = 0.0f;
-	player[3].itemcnt = 0;
-	player[3].itemcnt2 = 0;
-	player[3].itemcnt3 = 0;
+	for (int j = 0; j < ITEM_BOX; j++)
+	{
+		player[3].item[j] = 0;
+	}
 	player[3].Segwey_Cnt = 0;
 	player[3].hpcnt = 0.0;
 
@@ -397,8 +406,7 @@ void PlayerGameInit(void)
 	jumpSpeed = 0.0f;
 	defDeg = 0.0f;
 
-	//player[0].itemcnt = 0;
-	//player[1].itemcnt = 0;
+	
 
 	////player[0].JumpDeg = 0;
 
@@ -477,48 +485,22 @@ void PlayerControl(int padNo)
 	}
 
 	// アイテム取得
-	if ((player[padNo].dropFlag == false) && (itemBoxFlag == true))
+	for (int j = 0; j < ITEM_BOX; j++)
 	{
-		if (player[padNo].pos.x - player[padNo].hitPosS.x < itemBoxPosX + CHIP_SIZE_X		    // player左 < box右	
-			&& itemBoxPosX < player[padNo].pos.x + player[padNo].hitPosS.x					// box左    < player右
-			&& player[padNo].pos.y - player[padNo].size.y < itemBoxPosY + CHIP_SIZE_Y			// player上 < box下
-			&& itemBoxPosY < player[padNo].pos.y)										// box上    < player下
+		if ((player[padNo].dropFlag == false) && (itemBoxCnt[j] == true))
 		{
-			player[padNo].item_state = ITEM_SEGWEY;
-			player[padNo].dropFlag = true;												// ここをtrueにしているので、アイテムを使ってフラグをfalseにするまで次のアイテムは取得できない
-			PlaySoundMem(item_get, DX_PLAYTYPE_BACK, true);
-			itemBoxFlag = false;												// ここに入ればhitがでる
+			if (player[padNo].pos.x - player[padNo].hitPosS.x < itemBox[j].x + CHIP_SIZE_X		    // player左 < box右	
+				&& itemBox[j].x < player[padNo].pos.x + player[padNo].hitPosS.x					// box左    < player右
+				&& player[padNo].pos.y - player[padNo].size.y < itemBox[j].y + CHIP_SIZE_Y			// player上 < box下
+				&& itemBox[j].y < player[padNo].pos.y)										// box上    < player下
+			{
+				player[padNo].item_state = ITEM_SEGWEY;
+				player[padNo].dropFlag = true;												// ここをtrueにしているので、アイテムを使ってフラグをfalseにするまで次のアイテムは取得できない
+				PlaySoundMem(item_get, DX_PLAYTYPE_BACK, true);
+				itemBoxCnt[j] = false;												// ここに入ればhitがでる
+			}
 		}
 	}
-
-	if ((player[padNo].dropFlag == false) && (itemBoxFlag2 == true))
-	{
-		if (player[padNo].pos.x - player[padNo].hitPosS.x < SCREEN_SIZE_X - CHIP_SIZE_X * 3 + CHIP_SIZE_X		    // player左 < box右	
-			&& SCREEN_SIZE_X - CHIP_SIZE_X * 3 < player[padNo].pos.x + player[padNo].hitPosS.x					// box左    < player右
-			&& player[padNo].pos.y - player[padNo].size.y < SCREEN_SIZE_Y * 2 - CHIP_SIZE_X * 3 + CHIP_SIZE_Y			// player上 < box下
-			&& SCREEN_SIZE_Y * 2 - CHIP_SIZE_X * 3 < player[padNo].pos.y)										// box上    < player下
-		{
-			player[padNo].item_state = ITEM_SEGWEY;
-			player[padNo].dropFlag = true;												// ここをtrueにしているので、アイテムを使ってフラグをfalseにするまで次のアイテムは取得できない
-			PlaySoundMem(item_get, DX_PLAYTYPE_BACK, true);
-			itemBoxFlag2 = false;												// ここに入ればhitがでる
-		}
-	}
-
-	if ((player[padNo].dropFlag == false) && (itemBoxFlag3== true))
-	{
-		if (player[padNo].pos.x - player[padNo].hitPosS.x < SCREEN_SIZE_X * 2 - CHIP_SIZE_X * 10 + CHIP_SIZE_X		    // player左 < box右	
-			&& SCREEN_SIZE_X * 2 - CHIP_SIZE_X * 10 < player[padNo].pos.x + player[padNo].hitPosS.x					// box左    < player右
-			&& player[padNo].pos.y - player[padNo].size.y < SCREEN_SIZE_Y + CHIP_SIZE_Y			// player上 < box下
-			&& SCREEN_SIZE_Y < player[padNo].pos.y)										// box上    < player下
-		{
-			player[padNo].item_state = ITEM_SEGWEY;
-			player[padNo].dropFlag = true;												// ここをtrueにしているので、アイテムを使ってフラグをfalseにするまで次のアイテムは取得できない
-			PlaySoundMem(item_get, DX_PLAYTYPE_BACK, true);
-			itemBoxFlag3 = false;												// ここに入ればhitがでる
-		}
-	}
-
 
 }
 
@@ -686,72 +668,29 @@ void PlayerDraw(int padNo)
 			UIDraw(j);
 		}	
 
-		//itemBoxDraw();
-		if (itemBoxFlag == true)
-		{
-			DrawGraph(CHIP_SIZE_X * 15 - mapPos.x, CHIP_SIZE_X * 16 - mapPos.y, hatenaImage, true);// 左上1つ
-			
-			
-			player[padNo].itemcnt = 0;
 
-		}
-		else
+		for (int j = 0; j < ITEM_BOX; j++)
 		{
-			if (player[padNo].itemcnt == 200)
+			if (itemBoxCnt[j] == true)
 			{
-				itemBoxFlag = true;
-				player[padNo].itemcnt = 0;
+				DrawGraph(itemBox[j].x - mapPos.x, itemBox[j].y - mapPos.y, hatenaImage, true);// 左上1つ
+				player[padNo].item[j] = 0;
+
 			}
 			else
 			{
-				player[padNo].itemcnt++;
+				if (player[padNo].item[j] == 200)
+				{
+					itemBoxCnt[j] = true;
+					player[padNo].item[j] = 0;
+				}
+				else
+				{
+					player[padNo].item[j]++;
+				}
+				//DrawString(SCREEN_SIZE_X / 2 - 40, SCREEN_SIZE_Y / 2 - 5, "HIT", 0xffffff);
 			}
-			//DrawString(SCREEN_SIZE_X / 2 - 40, SCREEN_SIZE_Y / 2 - 5, "HIT", 0xffffff);
 		}
-
-
-		if (itemBoxFlag2 == true)
-		{
-			DrawGraph(SCREEN_SIZE_X - CHIP_SIZE_X * 3 - mapPos.x,
-				SCREEN_SIZE_Y * 2 - CHIP_SIZE_X * 3 - mapPos.y, hatenaImage, true);// 下部の真ん中
-			player[padNo].itemcnt2 = 0;
-
-		}
-		else
-		{
-			if (player[padNo].itemcnt2 == 200)
-			{
-				itemBoxFlag2 = true;
-				player[padNo].itemcnt2 = 0;
-			}
-			else
-			{
-				player[padNo].itemcnt2++;
-			}
-			//DrawString(SCREEN_SIZE_X / 2 - 40, SCREEN_SIZE_Y / 2 - 5, "HIT", 0xffffff);
-		}
-
-
-		if (itemBoxFlag3 == true)
-		{
-			DrawGraph(SCREEN_SIZE_X * 2 - CHIP_SIZE_X * 10 - mapPos.x,
-				SCREEN_SIZE_Y - mapPos.y, hatenaImage, true);// 左側真ん中
-			player[padNo].itemcnt3 = 0;
-		}
-		else
-		{
-			if (player[padNo].itemcnt3 == 200)
-			{
-				itemBoxFlag3 = true;
-				player[padNo].itemcnt3 = 0;
-			}
-			else
-			{
-				player[padNo].itemcnt3++;
-			}
-			//DrawString(SCREEN_SIZE_X / 2 - 40, SCREEN_SIZE_Y / 2 - 5, "HIT", 0xffffff);
-		}
-
 
 		DrawFormatString(0, 20, 0xff0000, "top : %d", PlayerTop(padNo,player[padNo].passingCnt, player[padNo].pos, DIR_RIGHT));
 		DrawFormatString(600, 60, 0xff0000, "passingCnt : %d", player[0].passingCnt);
