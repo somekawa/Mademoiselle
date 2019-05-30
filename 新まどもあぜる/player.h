@@ -35,6 +35,7 @@ void PlWireJump(int padNo);
 void PlWall_Check(int padNo); // •Ç‘–‚è‚Å‚«‚é•Ç‚Å‚ ‚é‚©‚Ç‚¤‚©
 void PlWall_R(int padNo);	// •Ç‚ğ‘–‚é(‰E)
 void PlWall_L(int padNo);	// •Ç‚ğ‘–‚é(¶)
+void PlHasamuJump(int padNo);
 void Pl_Death(int padNo); // HP0‚Ì‚Æ‚«‚É
 
 

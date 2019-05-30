@@ -106,6 +106,7 @@ enum PLAYER_STATE {
 	PLAYER_W_JUMP,		// ﾜｲﾔｰｼﾞｬﾝﾌﾟ
 	PLAYER_WALL_RIGHT,	// 壁(右)を走る
 	PLAYER_WALL_LEFT,	// 壁(左)を走る
+	PLAYER_HASAMU_JUMP,
 	PLAYER_DEATH,
 };
 
@@ -163,6 +164,7 @@ typedef struct {
 	float furikoSpeed;
 	Position _length;		// 振り子の長さ
 	float hpcnt;			// HPバー
+	Position flydir;
 }CHARACTER;
 
 extern Position mapPos;

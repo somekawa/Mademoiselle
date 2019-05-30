@@ -129,6 +129,8 @@ int item_get;
 int seg;
 int wire;
 
+// 挟まった時の飛ばす方向
+const Position hasamuJump[DIR_MAX] = { {-10,-10},{10,-10},{10,10},{-10,10} };	// 上・右・下・左
 
 //float hpcnt;
 
@@ -672,6 +674,10 @@ void UIDraw(int padNo)
 	5,5/*,5,5*/
 	};
 
+	// 枠
+	int* pWak[PLAYER_MAX] = {
+		p1Wak,p2Wak/*,p3Wak,p4Wak*/
+	};
 
 	// プレイヤーステータスの枠
 	DrawGraph(30 + offset_x[padNo], 35 + offset_y[padNo], pWak[padNo][1], true);
@@ -686,13 +692,11 @@ void UIDraw(int padNo)
 	// プレイヤーステータスのHPバーの本体 → カメラの外にでたら削れていく
 
 	// プレイヤーのposがカメラの中にあるかどうかで判定したい
-	if (player[padNo].pos.x - player[padNo].hitPosE.x < mapPos.x 
+	if (player[padNo].pos.x - player[padNo].hitPosE.x < mapPos.x
 		|| player[padNo].pos.x - player[padNo].hitPosE.x >= mapPos.x + SCREEN_SIZE_X
 		|| player[padNo].pos.y - player[padNo].hitPosS.y < mapPos.y
 		|| player[padNo].pos.y - player[padNo].hitPosS.y >= mapPos.y + SCREEN_SIZE_Y)
 	{
-		
-
 		if (player[padNo].hpcnt > 98.0f)
 		{
 			player[padNo].hpcnt = 98.0f;
@@ -701,6 +705,8 @@ void UIDraw(int padNo)
 		else
 		{
 			player[padNo].hpcnt = player[padNo].hpcnt + 0.1f;
+			player[padNo].flydir = hasamuJump[runDir];	// 最初に飛ばす方向
+			player[padNo].state = PLAYER_HASAMU_JUMP;
 		}
 	}
 
@@ -1347,6 +1353,37 @@ void PlWall_L(int padNo)
 	}
 }
 
+void PlHasamuJump(int padNo)
+{
+	// 画面上に当たった時の反射
+	if (player[padNo].pos.y - player[padNo].hitPosS.y <= mapPos.y)
+	{
+		runDir = DIR_DOWN;
+	}
+
+	// 画面右に当たった時の反射
+	if (player[padNo].pos.x + player[padNo].hitPosS.x >= mapPos.x + SCREEN_SIZE_X)
+	{
+		runDir = DIR_LEFT;
+
+	}
+
+	// 画面下に当たった時の反射
+	if (player[padNo].pos.y + player[padNo].hitPosS.y >= mapPos.y + SCREEN_SIZE_Y)
+	{
+		runDir = DIR_UP;
+	}
+
+	// 画面左に当たった時の反射
+	if (player[padNo].pos.x + player[padNo].hitPosS.x <= mapPos.x)
+	{
+		runDir = DIR_RIGHT;
+	}
+	player[padNo].pos.x = player[padNo].pos.x + player[padNo].flydir.x;
+	player[padNo].pos.y = player[padNo].pos.y + player[padNo].flydir.y;
+
+}
+
 void Pl_Death(int padNo)
 {
 	player[padNo].visible = false;
@@ -1398,6 +1435,9 @@ void PlayerState(int padNo)
 	case PLAYER_WALL_LEFT:		// 左壁
 		PlWall_L(padNo);
 		break;
+	case PLAYER_HASAMU_JUMP:
+		PlHasamuJump(padNo);
+		break;
 	case PLAYER_DEATH:
 		Pl_Death(padNo);
 		break;
@@ -1406,6 +1446,7 @@ void PlayerState(int padNo)
 	}
 	player[padNo].animCnt++;
 }
+
 
 
 
