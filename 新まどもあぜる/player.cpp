@@ -747,6 +747,7 @@ void UIDraw(int padNo)
 		if (player[padNo].state != PLAYER_W_ACTION)
 		{
 			player[padNo].hpcnt = player[padNo].hpcnt + 0.1f;
+			PlaySoundMem(hp_se, DX_PLAYTYPE_BACK, false);
 		}
 
 		if (player[padNo].hpcnt > 98.0f)
@@ -757,15 +758,13 @@ void UIDraw(int padNo)
 		}
 		else if (player[padNo].hpcnt >= 97.0f) {
 			PlaySoundMem(death_se, DX_PLAYTYPE_BACK, false);
-
 		}
-		else
-		{
-			PlaySoundMem(hp_se, DX_PLAYTYPE_BACK, false);
+		//else
+		//{
 			//player[padNo].hpcnt = player[padNo].hpcnt + 0.1f;
 			//player[padNo].flydir = hasamuJump[player[padNo].passingType];	// 最初に飛ばす方向
 			//player[padNo].state = PLAYER_HASAMU_JUMP;
-		}
+		//}
 	}
 
 	// プレイヤーステータスのHPバーの枠
