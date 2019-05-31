@@ -44,7 +44,7 @@ void StageGameInit(void)
 {
 	// Ï¯ÌßÀ•W
 	mapPos.x = 0;
-	mapPos.y = 0;
+	mapPos.y = 854;
 
 	MapLoad();
 }

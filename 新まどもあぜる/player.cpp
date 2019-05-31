@@ -275,14 +275,14 @@ void PlayerGameInit(void)
 		player[j].AddUpDownSpeed;	// 上下の加算量
 
 		player[j].passingCnt = 0;
-		player[j].passingType = DIR_DOWN;
+		player[j].passingType = DIR_RIGHT;
 	}
 	// PL1
 	player[0].type = CHARA_RED;		 // selectで初めに出てくるｷｬﾗ
 	player[0].right = false;
 	player[0].left = false;
 	player[0].moveDir = DIR_RIGHT;
-	player[0].pos = { CHIP_SIZE_X * 15, CHIP_SIZE_Y * 14 };// 初期位置
+	player[0].pos = { CHIP_SIZE_X * 12 - player[0].hitPosS.x, SCREEN_SIZE_Y + CHIP_SIZE_Y * 25 };// 初期位置
 	player[0].nowDeg = 0.0f;
 	player[0].JumpDeg = 0;
 	player[0].WireTimeCnt = 0;
@@ -302,7 +302,7 @@ void PlayerGameInit(void)
 	player[1].right = false;
 	player[1].left = false;
 	player[1].moveDir = DIR_RIGHT;
-	player[1].pos = { CHIP_SIZE_X * 16, CHIP_SIZE_Y * 14 };// 初期位置
+	player[1].pos = { CHIP_SIZE_X * 10 - player[1].hitPosS.x, SCREEN_SIZE_Y + CHIP_SIZE_Y * 25 };// 初期位置
 	player[1].nowDeg = 0.0f;
 	player[1].JumpDeg = 0;
 	player[1].WireTimeCnt = 0;
@@ -322,7 +322,7 @@ void PlayerGameInit(void)
 	player[2].right = false;
 	player[2].left = false;
 	player[2].moveDir = DIR_RIGHT;
-	player[2].pos = { CHIP_SIZE_X * 17, CHIP_SIZE_Y * 14 };// 初期位置
+	player[2].pos = { CHIP_SIZE_X * 12 - player[2].hitPosS.x, SCREEN_SIZE_Y + CHIP_SIZE_Y * 20 };// 初期位置
 	player[2].nowDeg = 0.0f;
 	player[2].JumpDeg = 0;
 	player[2].WireTimeCnt = 0;
@@ -343,7 +343,7 @@ void PlayerGameInit(void)
 	player[3].right = false;
 	player[3].left = false;
 	player[3].moveDir = DIR_RIGHT;
-	player[3].pos = { CHIP_SIZE_X * 18, CHIP_SIZE_Y * 14 };// 初期位置
+	player[3].pos = { CHIP_SIZE_X * 10 - player[3].hitPosS.x, SCREEN_SIZE_Y + CHIP_SIZE_Y * 19 };// 初期位置
 	player[3].nowDeg = 0.0f;
 	player[3].JumpDeg = 0;
 	player[3].WireTimeCnt = 0;
@@ -743,9 +743,12 @@ void UIDraw(int padNo)
 		if (player[padNo].hpcnt > 98.0f)
 		{
 			player[padNo].hpcnt = 98.0f;
-			//PlaySoundMem(death_se, DX_PLAYTYPE_BACK, false);
 			player[padNo].state = PLAYER_DEATH;
 			
+		}
+		else if (player[padNo].hpcnt >= 97.0f) {
+			PlaySoundMem(death_se, DX_PLAYTYPE_BACK, false);
+
 		}
 		else
 		{

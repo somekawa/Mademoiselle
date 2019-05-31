@@ -8,7 +8,7 @@ MOVE_DIR runDir;
 
 void CameraGameInit(void)
 {
-	runDir = DIR_DOWN;
+	runDir = DIR_RIGHT;
 }
 
 void CameraControl(int padNo,Position pos,Position moved)
