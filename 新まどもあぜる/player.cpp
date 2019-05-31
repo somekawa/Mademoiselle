@@ -738,7 +738,10 @@ void UIDraw(int padNo)
 		|| player[padNo].pos.y - player[padNo].hitPosS.y < mapPos.y
 		|| player[padNo].pos.y - player[padNo].hitPosS.y >= mapPos.y + SCREEN_SIZE_Y)
 	{
-		player[padNo].hpcnt = player[padNo].hpcnt + 0.1f;
+		if (player[padNo].state != PLAYER_W_ACTION)
+		{
+			player[padNo].hpcnt = player[padNo].hpcnt + 0.1f;
+		}
 
 		if (player[padNo].hpcnt > 98.0f)
 		{
