@@ -59,8 +59,10 @@ int titleBGM;
 int sousaBGM;
 int charselBGM;
 int gameBGM;
+int title_se;
 int start_se;
 int setumei_se;
+int CountDown_se;
 
 // ==========WinMainŠÖ”
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
@@ -103,6 +105,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			}
 			else if (pad[0].trgKey[PAD_TBL_START])
 			{
+				PlaySoundMem(title_se, DX_PLAYTYPE_BACK, false);
 				fadeOut = true;
 			}
 			//else
@@ -178,6 +181,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			{
 				if (!FadeInScreen(5))
 				{
+					PlaySoundMem(CountDown_se, DX_PLAYTYPE_BACK, false);
+
 					fadeIn = false;
 				}
 			}
@@ -258,8 +263,10 @@ int SystmInit(void)
 	charaSeleTitle = LoadGraph("image/CharacterSelect.png");
 	wakImage = LoadGraph("image/wak0.png");
 
+	title_se = LoadSoundMem("BGM/title_se.mp3");
 	start_se = LoadSoundMem("BGM/gamestart_se.mp3");
 	setumei_se = LoadSoundMem("BGM/setumei_se.mp3");
+	CountDown_se = LoadSoundMem("BGM/Countdown.mp3");
 
 	return 1;
 
@@ -313,6 +320,7 @@ void GameTitleDraw(void)
 	DrawGraph(100, 0, selectImage1, true);
 	DrawGraph(0, 100, selectImage2, true);
 
+	ChangeVolumeSoundMem(255 * 80 / 100, charselBGM);
 	PlaySoundMem(titleBGM, DX_PLAYTYPE_LOOP, false);
 }
 
@@ -424,12 +432,13 @@ void GameCharasereDraw(void)
 void GameMain(void)
 {
 	DeleteSoundMem(charselBGM);
-	ChangeVolumeSoundMem(255 * 70 / 100, gameBGM);
-	PlaySoundMem(gameBGM, DX_PLAYTYPE_LOOP, false);
+	
 	GameMainDraw();
 
-	if (flameCnt > 200)
+	if (flameCnt > 270)
 	{
+		ChangeVolumeSoundMem(255 * 70 / 100, gameBGM);
+		PlaySoundMem(gameBGM, DX_PLAYTYPE_LOOP, false);
 		if (pad[0].trgKey[PAD_TBL_PAUSE])
 		{
 			pauseFlag = !pauseFlag;
@@ -465,8 +474,6 @@ void GameMain(void)
 
 void GameMainDraw(void)
 {
-	ChangeVolumeSoundMem(255 * 70 / 100, gameBGM);
-	PlaySoundMem(gameBGM, DX_PLAYTYPE_LOOP, false);
 
 	StageDraw();
 	BgControl();
@@ -491,13 +498,13 @@ void GameMainDraw(void)
 		DrawRotaGraph(SCREEN_SIZE_X / 2, SCREEN_SIZE_Y / 2, 0.6, 0, setumeiImage, true, false);
 	}
 
-	if (flameCnt <= 150)
+	if (flameCnt <= 230)
 	{
 		// READY...
 		DrawGraph(SCREEN_SIZE_X / 2, SCREEN_SIZE_Y / 2, readyImage, true);
 		flameCnt++;
 	}
-	else if (flameCnt <= 200)
+	else if (flameCnt <= 270)
 	{
 		// GO !!
 		DrawGraph(SCREEN_SIZE_X / 2, SCREEN_SIZE_Y / 2, goImage, true);
