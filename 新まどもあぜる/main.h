@@ -59,13 +59,13 @@ typedef struct {
 }XY;
 
 // ╧ч╟яс╟дч
-typedef enum{
+typedef enum {
 	GMODE_INIT,
-	GMODE_TITLE,
+	GMODE_TITLE,	// ю╡ды
 	GMODE_SETUMEI,	// ░Ю√╬
-	GMODE_CHARASERE,
-	GMODE_GAME,
-	GMODE_OVER,
+	GMODE_CHARASERE, // ╥╛в╬з
+	GMODE_GAME,		// ┐Q│[┐─▓├
+	GMODE_RESULT,	// ┐┼┐U┐▀┐g
 	GMODE_MAX
 }GAME_MODE;
 

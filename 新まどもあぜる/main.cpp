@@ -37,6 +37,10 @@ int flameCnt;
 int readyImage;
 int goImage;
 
+// ÉäÉUÉãÉg
+int resultImage;
+int continueImage;
+
 int SystmInit(void);
 void GameInit(void);
 void GameTitle(void);
@@ -47,8 +51,8 @@ void GameCharasere(void);
 void GameCharasereDraw(void);
 void GameMain(void);
 void GameMainDraw(void);
-void GameOver(void);
-void GameOverDraw(void);
+void GameResult(void);
+void GameResultDraw(void);
 void HitCheck(void);
 
 bool FadeInScreen(int fadeStep);
@@ -70,10 +74,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	SystmInit();
 
 	//----------πﬁ∞—Ÿ∞Ãﬂ
-	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0 )
+	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0)
 	{
 		ClsDrawScreen();	// âÊñ è¡ãé
-		
+
 		for (int j = 0; j < PLAYER_MAX; j++)
 		{
 			KeyCheck(j);
@@ -94,9 +98,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 					fadeIn = false;
 				}
 			}
-			else if (fadeOut) 
+			else if (fadeOut)
 			{
-				if (!FadeOutScreen(5)) 
+				if (!FadeOutScreen(5))
 				{
 					gameMode = GMODE_SETUMEI;
 					fadeOut = false;
@@ -121,9 +125,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			{
 				if (!FadeInScreen(5))fadeIn = false;
 			}
-			else if (fadeOut) 
+			else if (fadeOut)
 			{
-				if (!FadeOutScreen(5)) 
+				if (!FadeOutScreen(5))
 				{
 					if (nowKey == PAD_TBL_START)
 					{
@@ -137,14 +141,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 					fadeIn = true;
 				}
 			}
-			else 
+			else
 			{
 				if ((pad[0].trgKey[PAD_TBL_START]) && (dataType == DATA_MAX - 1))
 				{
 					nowKey = PAD_TBL_START;
 					fadeOut = true;
 				}
-				else if ((pad[0].trgKey[PAD_TBL_LEFT]) && (dataType == 0)) 
+				else if ((pad[0].trgKey[PAD_TBL_LEFT]) && (dataType == 0))
 				{
 					nowKey = PAD_TBL_LEFT;
 					fadeOut = true;
@@ -155,7 +159,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 			// ∑¨◊æ⁄∏ƒ
 		case GMODE_CHARASERE:
-			if (fadeIn) 
+			if (fadeIn)
 			{
 				if (!FadeInScreen(5))fadeIn = false;
 			}
@@ -188,13 +192,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			}
 			else if (pad[0].trgKey[PAD_TBL_START])
 			{
-				gameMode = GMODE_OVER;
+				gameMode = GMODE_RESULT;
 			}
 			GameMain();
 			break;
 
-		case GMODE_OVER:	// πﬁ∞—µ∞ ﬁ∞
-			if (fadeIn) 
+		case GMODE_RESULT:	// πﬁ∞—µ∞ ﬁ∞
+			if (fadeIn)
 			{
 				if (!FadeInScreen(5))
 				{
@@ -203,7 +207,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			}
 			else if (fadeOut)
 			{
-				if (!FadeOutScreen(5)) 
+				if (!FadeOutScreen(5))
 				{
 					gameMode = GMODE_INIT;
 					fadeOut = false;
@@ -214,7 +218,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			{
 				fadeOut = true;
 			}
-			GameOver();
+			GameResult();
 			break;
 		default:
 			break;
@@ -268,6 +272,10 @@ int SystmInit(void)
 	setumei_se = LoadSoundMem("BGM/setumei_se.mp3");
 	CountDown_se = LoadSoundMem("BGM/Countdown.mp3");
 
+	// ÿªﬁŸƒ
+	resultImage = LoadGraph("image/nback3.png");
+	continueImage = LoadGraph("image/continue.png");
+
 	return 1;
 
 }
@@ -298,7 +306,7 @@ void GameTitle(void)
 	{
 		cnt = 2500;
 	}
-	else 
+	else
 	{
 		cnt++;
 	}
@@ -414,9 +422,9 @@ void GameCharasereDraw(void)
 	DrawLine(0, SCREEN_SIZE_Y / 2 + 60, SCREEN_SIZE_X, SCREEN_SIZE_Y / 2 + 60, 0xffffff, true);
 	DrawLine(SCREEN_SIZE_X / 2, 120, SCREEN_SIZE_X / 2, SCREEN_SIZE_Y, 0xffffff, true);
 	DrawGraph(150, 20, charaSeleTitle, true);
-	for (int x = 0; x < 2; x++) 
+	for (int x = 0; x < 2; x++)
 	{
-		for (int y = 0; y < 2; y++) 
+		for (int y = 0; y < 2; y++)
 		{
 			DrawGraph((SCREEN_SIZE_X / 2 + 1)*x, 120 + (341 * y), wakImage, true);
 		}
@@ -432,7 +440,7 @@ void GameCharasereDraw(void)
 void GameMain(void)
 {
 	DeleteSoundMem(charselBGM);
-	
+
 	GameMainDraw();
 
 	if (flameCnt > 270)
@@ -458,9 +466,9 @@ void GameMain(void)
 			EffectControl();
 			HitCheck();
 		}
-		
+
 	}
-	
+
 
 	/*if (cnt > 2500) {
 		cnt = 2500;
@@ -512,16 +520,18 @@ void GameMainDraw(void)
 	}
 }
 
-void GameOver(void)
+void GameResult(void)
 {
 	DeleteSoundMem(gameBGM);
 
-	GameOverDraw();
+	GameResultDraw();
 }
 
-void GameOverDraw(void)
+void GameResultDraw(void)
 {
-	DrawString(0, 0, "GameOver", 0xffffff);
+	DrawGraph(0, 0, resultImage, true);
+	DrawGraph(SCREEN_SIZE_X / 3, SCREEN_SIZE_Y / 2, continueImage, true);
+	DrawString(0, 0, "GameResult", 0xffffff);
 }
 
 // Ã™∞ƒﬁ≤›ÅFñæÇÈÇ≠Ç»ÇÈ
