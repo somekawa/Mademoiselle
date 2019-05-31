@@ -70,6 +70,10 @@ void KeyCheck(int padNo)
 		pad[padNo].newKey[PAD_TBL_PAUSE] = true;
 	}
 
+	if (CheckHitKey(KEY_INPUT_LEFT) || Pad & (PAD_INPUT_2))
+	{
+		pad[padNo].newKey[PAD_TBL_BACK] = true;
+	}
 
 	//　コントローラー説明
 	/*	PAD_INPUT_1	//Aボタン

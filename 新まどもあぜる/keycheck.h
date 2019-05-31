@@ -29,6 +29,7 @@ enum PAD_TBL {
 	//PAD_TBL_SKILL,	// 必殺技？
 	PAD_TBL_START,		// スタート
 	PAD_TBL_PAUSE,
+	PAD_TBL_BACK,
 	PAD_TBL_MAX
 };
 

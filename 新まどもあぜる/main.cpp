@@ -129,11 +129,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			{
 				if (!FadeOutScreen(5))
 				{
-					if (nowKey == PAD_TBL_START)
+					if (nowKey == PAD_TBL_JUMP)
 					{
 						gameMode = GMODE_CHARASERE;
 					}
-					if (nowKey == PAD_TBL_LEFT)
+					if (nowKey == PAD_TBL_BACK)
 					{
 						gameMode = GMODE_TITLE;
 					}
@@ -143,14 +143,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			}
 			else
 			{
-				if ((pad[0].trgKey[PAD_TBL_START]) && (dataType == DATA_MAX - 1))
+				if ((pad[0].trgKey[PAD_TBL_JUMP]) && (dataType == DATA_MAX - 1))
 				{
-					nowKey = PAD_TBL_START;
+					nowKey = PAD_TBL_JUMP;
 					fadeOut = true;
 				}
-				else if ((pad[0].trgKey[PAD_TBL_LEFT]) && (dataType == 0))
+				else if ((pad[0].trgKey[PAD_TBL_BACK]) && (dataType == 0))
 				{
-					nowKey = PAD_TBL_LEFT;
+					nowKey = PAD_TBL_BACK;
 					fadeOut = true;
 				}
 			}
@@ -335,34 +335,12 @@ void GameTitleDraw(void)
 // 説明
 void GameSetumei(void)
 {
-	/*if (fadeIn) {
-		if (!FadeInScreen(5))fadeIn = false;
-	}
-	else if (fadeOut) {
-		if (!FadeOutScreen(5)) {
-			if(nowKey == P1_RIGHT) dataType++;
-			if (nowKey == P1_LEFT) dataType--;
-			fadeOut = false;
-			fadeIn = true;
-		}
-	}
-	else  {
-		if ((trgKey[P1_RIGHT])&&(dataType < DATA_MAX - 1)) {
-			fadeOut = true;
-			nowKey = P1_RIGHT;
-		}
-		else if((trgKey[P1_LEFT])&&(dataType > 0)) {
-			fadeOut = true;
-			nowKey = P1_LEFT;
-		}
-	}*/
-
-	if (pad[0].trgKey[PAD_TBL_RIGHT])
+	if (pad[0].trgKey[PAD_TBL_JUMP])
 	{
 		PlaySoundMem(setumei_se, DX_PLAYTYPE_BACK, true);
 		dataType++;
 	}
-	if (pad[0].trgKey[PAD_TBL_LEFT])
+	if (pad[0].trgKey[PAD_TBL_BACK])
 	{
 		PlaySoundMem(setumei_se, DX_PLAYTYPE_BACK, true);
 		dataType--;
@@ -384,7 +362,7 @@ void GameSetumeiDraw(void)
 	StopSoundMem(titleBGM);
 	DrawGraph(0, 0, data[dataType], true);
 	DrawFormatString(0, 0, 0xff0000, "%d / 4", dataType + 1);
-	if (dataType < DATA_MAX - 1)
+	/*if (dataType < DATA_MAX - 1)
 	{
 		DrawString(1000, 0, "右 : 次へ", 0xff0000, true);
 	}
@@ -399,7 +377,7 @@ void GameSetumeiDraw(void)
 	if (dataType == 0)
 	{
 		DrawString(1000, 20, "左 : タイトルに戻る", 0xff0000, true);
-	}
+	}*/
 }
 
 void GameCharasere(void)
