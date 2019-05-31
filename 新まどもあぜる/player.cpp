@@ -1118,8 +1118,8 @@ void PlWirePrepare(int padNo)
 		player[padNo].WirePreTimeCnt = 0;
 		//player.pos.x = furiko_RU.x - player.size.x / 2;
 		//player.pos.y = furiko_RU.y + player.size.y  - mapPos.y;
-		//player.visible = true;
-		//player.visible2 = false;
+		player.visible = true;
+		player.visible2 = false;
 		player[padNo].wireFlag = false;
 		player[padNo].wireOkFlag = false;
 		player[padNo].state = PLAYER_NORMAL;
@@ -1269,6 +1269,8 @@ void PlWireJump(int padNo)
 	player[padNo].visible = true;			// アニメーションするキャラが表示される
 	player[padNo].visible2 = false;		// ワイヤー中の静止画キャラが非表示になる
 	player[padNo].wireFlag = false;		// ワイヤーが非表示になる
+	player[padNo].runFlag = true;
+	player[padNo].jumpFlag = true;
 	//player.JumpDeg = 180 - (player.nowDeg + 90);		// 打ち出し角
 
 	if (player[padNo].right == true)
