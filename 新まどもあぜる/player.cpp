@@ -555,14 +555,14 @@ void PlayerDraw(int padNo)
 
 			if (player[padNo].state == PLAYER_WALL_RIGHT)
 			{
-				DrawBox(player[padNo].pos.x - player[padNo].hitPosS.y - mapPos.x,
+				DrawBoxAA(player[padNo].pos.x - player[padNo].hitPosS.y - mapPos.x,
 					player[padNo].pos.y - player[padNo].hitPosE.x - mapPos.y,
 					player[padNo].pos.x - mapPos.x, player[padNo].pos.y + player[padNo].hitPosS.x - mapPos.y,
 					0x00ffff, false);
 			}
 			else if (player[padNo].state == PLAYER_WALL_LEFT)
 			{
-				DrawBox(player[padNo].pos.x - mapPos.x,
+				DrawBoxAA(player[padNo].pos.x - mapPos.x,
 					player[padNo].pos.y - player[padNo].hitPosE.x - mapPos.y,
 					player[padNo].pos.x + player[padNo].hitPosS.y - mapPos.x,
 					player[padNo].pos.y + player[padNo].hitPosS.x - mapPos.y, 0x00ffff, false);
@@ -572,12 +572,12 @@ void PlayerDraw(int padNo)
 			{
 				if (player[padNo].state == PLAYER_WALL_RIGHT)
 				{
-					DrawRotaGraph(player[padNo].pos.x - 36 - mapPos.x, player[padNo].pos.y - mapPos.y,
+					DrawRotaGraphF(player[padNo].pos.x - 36 - mapPos.x, player[padNo].pos.y - mapPos.y,
 						1, -PI / 2, img, true, false);
 				}
 				else
 				{
-					DrawGraph(player[padNo].pos.x + player[padNo].offsetSize.x - mapPos.x,
+					DrawGraphF(player[padNo].pos.x + player[padNo].offsetSize.x - mapPos.x,
 						player[padNo].pos.y + player[padNo].offsetSize.y - mapPos.y, img, true);
 				}
 			}
@@ -585,34 +585,34 @@ void PlayerDraw(int padNo)
 			{
 				if (player[padNo].state == PLAYER_WALL_LEFT)
 				{
-					DrawRotaGraph(player[padNo].pos.x + 36 - mapPos.x, player[padNo].pos.y - mapPos.y,
+					DrawRotaGraphF(player[padNo].pos.x + 36 - mapPos.x, player[padNo].pos.y - mapPos.y,
 						1, PI / 2, img, true, true);
 				}
 				else
 				{
-					DrawTurnGraph(player[padNo].pos.x + player[padNo].offsetSize.x - mapPos.x,
+					DrawTurnGraphF(player[padNo].pos.x + player[padNo].offsetSize.x - mapPos.x,
 						player[padNo].pos.y + player[padNo].offsetSize.y - mapPos.y, img, true);
 				}
 			}
 
 			if ((player[padNo].state != PLAYER_WALL_RIGHT) && (player[padNo].state != PLAYER_WALL_LEFT))
 			{
-				DrawBox(player[padNo].pos.x - player[padNo].offsetSize.x - mapPos.x,
-					player[padNo].pos.y + player[padNo].offsetSize.y - mapPos.y,
-					player[padNo].pos.x + player[padNo].offsetSize.x - mapPos.x,
-					player[padNo].pos.y - mapPos.y, 0xff0000, false);
+				DrawBox((int)(player[padNo].pos.x - player[padNo].offsetSize.x - mapPos.x),
+					(int)(player[padNo].pos.y + player[padNo].offsetSize.y - mapPos.y),
+					(int)(player[padNo].pos.x + player[padNo].offsetSize.x - mapPos.x),
+					(int)(player[padNo].pos.y - mapPos.y), 0xff0000, false);
 
-				DrawBox(player[padNo].pos.x - player[padNo].hitPosS.x - mapPos.x,
+				DrawBoxAA(player[padNo].pos.x - player[padNo].hitPosS.x - mapPos.x,
 					player[padNo].pos.y - player[padNo].hitPosS.y - mapPos.y,
 					player[padNo].pos.x + player[padNo].hitPosE.x - mapPos.x,
 					player[padNo].pos.y - mapPos.y, 0x00ffff, false);
 
-				DrawLine(player[padNo].pos.x + player[padNo].offsetSize.x - mapPos.x,
+				DrawLineAA(player[padNo].pos.x + player[padNo].offsetSize.x - mapPos.x,
 					player[padNo].pos.y - (player[padNo].size.y / 2) - mapPos.y,
 					player[padNo].pos.x - player[padNo].offsetSize.x - mapPos.x,
 					player[padNo].pos.y - (player[padNo].size.y / 2) - mapPos.y, 0x00ffff, true);
 
-				DrawLine(player[padNo].pos.x - mapPos.x,
+				DrawLineAA(player[padNo].pos.x - mapPos.x,
 					player[padNo].pos.y + player[padNo].offsetSize.y - mapPos.y,
 					player[padNo].pos.x - mapPos.x, player[padNo].pos.y - mapPos.y, 0x00ffff, true);
 			}
@@ -632,14 +632,14 @@ void PlayerDraw(int padNo)
 			if (player[padNo].right)
 			{
 				// キャラクタをおもりとして描画
-				DrawGraph(player[padNo].pos.x - mapPos.x - 56,
+				DrawGraphF(player[padNo].pos.x - mapPos.x - 56,
 					player[padNo].pos.y - player[padNo].size.y - mapPos.y - 23,
 					charImage[player[padNo].type].jumpImage, true);
 			}
 			else
 			{
 				// キャラクタをおもりとして描画
-				DrawTurnGraph(player[padNo].pos.x - mapPos.x - 15,
+				DrawTurnGraphF(player[padNo].pos.x - mapPos.x - 15,
 					player[padNo].pos.y - player[padNo].size.y - mapPos.y - 23,
 					charImage[player[padNo].type].jumpImage, true);
 			}
@@ -650,7 +650,7 @@ void PlayerDraw(int padNo)
 			if (player[padNo].wireOkFlag)
 			{
 				// ワイヤー
-				DrawLine(player[padNo].pos.x - mapPos.x,
+				DrawLineAA(player[padNo].pos.x - mapPos.x,
 					player[padNo].pos.y - player[padNo].size.y - mapPos.y,
 					player[padNo].furiko_pos.x - mapPos.x, player[padNo].furiko_pos.y - mapPos.y, 0xffffffff, 2);
 			}
@@ -659,7 +659,7 @@ void PlayerDraw(int padNo)
 				if (player[padNo].WirePreTimeCnt <= player[padNo].furiko_pos.y)
 				{
 					// ワイヤー
-					DrawLine(player[padNo].pos.x - mapPos.x,
+					DrawLineAA(player[padNo].pos.x - mapPos.x,
 						player[padNo].pos.y - player[padNo].size.y - mapPos.y,
 						player[padNo].furiko_pos.x - mapPos.x, player[padNo].furiko_pos.y - mapPos.y, 0xffffffff, 2);
 					player[padNo].WirePreTimeCnt++;
@@ -678,7 +678,7 @@ void PlayerDraw(int padNo)
 		{
 			if (itemBoxCnt[j] == true)
 			{
-				DrawGraph(itemBox[j].x - mapPos.x, itemBox[j].y - mapPos.y, hatenaImage, true);// 左上1つ
+				DrawGraphF(itemBox[j].x - mapPos.x, itemBox[j].y - mapPos.y, hatenaImage, true);// 左上1つ
 				player[padNo].item[j] = 0;
 
 			}
@@ -761,7 +761,7 @@ void UIDraw(int padNo)
 
 	// プレイヤーステータスのHPバーの枠
 	DrawBox(80 + offset_x[padNo], 75 + offset_y[padNo], 180 + offset_x[padNo], 90 + offset_y[padNo], 0x000000, true);
-	DrawBox(81 + offset_x[padNo], 76 + offset_y[padNo], 179 + offset_x[padNo] - player[padNo].hpcnt, 89 + offset_y[padNo], 0x00ff00, true);
+	DrawBox((int)(81 + offset_x[padNo]), (int)(76 + offset_y[padNo]), (int)(179 + offset_x[padNo] - player[padNo].hpcnt), (int)(89 + offset_y[padNo]), 0x00ff00, true);
 
 	//DrawBox(81 + offset_x[padNo], 76 + offset_y[padNo], 179 + offset_x[padNo] /*- hpcnt*/, 89 + offset_y[padNo], 0x00ff00, true);
 
@@ -1005,8 +1005,8 @@ void PlWirePrepare(int padNo)
 			player[padNo]._length = player[padNo].furiko_pos - player[padNo].pos;
 
 			// プレイヤーの座標を-90°で設定?
-			player[padNo].pos.x = cos((-90.0f * PI) / 180.0f) * player[padNo]._length.y + player[padNo].furiko_pos.x;
-			player[padNo].pos.y = sin((-90.0f * PI) / 180.0f) * player[padNo]._length.y + player[padNo].furiko_pos.y;
+			player[padNo].pos.x = (float)cos((-90.0f * PI) / 180.0f) * player[padNo]._length.y + player[padNo].furiko_pos.x;
+			player[padNo].pos.y = (float)sin((-90.0f * PI) / 180.0f) * player[padNo]._length.y + player[padNo].furiko_pos.y;
 
 			MaxDeg = -20.0f;
 			minDeg = -160.0f;
@@ -1128,8 +1128,8 @@ void AddRad(int padNo)
 {
 	// 角度を足すんだよぉぉぉぉ!!!!!!
 
-	player[padNo].pos.x = cos((player[padNo].nowDeg * PI) / 180.0f) * player[padNo]._length.y + player[padNo].furiko_pos.x;
-	player[padNo].pos.y = sin((player[padNo].nowDeg * PI) / 180.0f) * player[padNo]._length.y + player[padNo].furiko_pos.y;
+	player[padNo].pos.x = (float)cos((player[padNo].nowDeg * PI) / 180.0f) * player[padNo]._length.y + player[padNo].furiko_pos.x;
+	player[padNo].pos.y = (float)sin((player[padNo].nowDeg * PI) / 180.0f) * player[padNo]._length.y + player[padNo].furiko_pos.y;
 
 	if (player[padNo].right == true)
 	{

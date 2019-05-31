@@ -76,7 +76,7 @@ typedef enum{
 	DATA_ITEM,
 	DATA_ICON,
 	DATA_MAX
-};
+}DATA;
 
 // •ûŒü
 enum MOVE_DIR {
