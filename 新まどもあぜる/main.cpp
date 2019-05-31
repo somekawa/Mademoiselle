@@ -251,8 +251,8 @@ int SystmInit(void)
 	StageSystmInit();
 	EffectSystmInit();
 
-	selectImage1 = LoadGraph("image/1player.png");
-	selectImage2 = LoadGraph("image/4player.png");
+	selectImage1 = LoadGraph("image/title_1.png");
+	selectImage2 = LoadGraph("image/title_2.png");
 	titleImage = LoadGraph("image/title2.png");
 
 	readyImage = LoadGraph("image/ready.png");
@@ -325,8 +325,8 @@ void GameTitleDraw(void)
 	DrawString(0, 0, "GameTitle", 0xffffff);
 	// ‚Å‚©‚·‚¬
 	DrawGraph(0, 0, titleImage, false);
-	DrawGraph(100, 0, selectImage1, true);
-	DrawGraph(0, 100, selectImage2, true);
+	DrawGraph(SCREEN_SIZE_X / 5, 0, selectImage1, true);
+	DrawGraph(100, 150, selectImage2, true);
 
 	ChangeVolumeSoundMem(255 * 80 / 100, charselBGM);
 	PlaySoundMem(titleBGM, DX_PLAYTYPE_LOOP, false);
