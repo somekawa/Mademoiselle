@@ -129,6 +129,8 @@ int charsel;
 int item_get;
 int seg;
 int wire;
+int death_se;
+int hp_se;
 
 // 挟まった時の飛ばす方向
 const Position hasamuJump[DIR_MAX] = { {-10,-10},{10,-10},{10,10},{-10,10} };	// 上・右・下・左
@@ -216,6 +218,8 @@ void PlayerSystmInit(void)
 	item_get = LoadSoundMem("BGM/itemget_se.mp3");
 	seg = LoadSoundMem("BGM/car-horn1.mp3");
 	wire = LoadSoundMem("BGM/wirehook_se.mp3");
+	
+
 
 	//// 赤
 	//playerImage[PLAYER_RED] = LoadGraph("image/playerR_stop.png");
@@ -406,7 +410,8 @@ void PlayerGameInit(void)
 	jumpSpeed = 0.0f;
 	defDeg = 0.0f;
 
-	
+	death_se = LoadSoundMem("BGM/bomb1.mp3");
+	hp_se = LoadSoundMem("BGM/hp_se.mp3");
 
 	////player[0].JumpDeg = 0;
 
@@ -733,16 +738,21 @@ void UIDraw(int padNo)
 		|| player[padNo].pos.y - player[padNo].hitPosS.y < mapPos.y
 		|| player[padNo].pos.y - player[padNo].hitPosS.y >= mapPos.y + SCREEN_SIZE_Y)
 	{
+		player[padNo].hpcnt = player[padNo].hpcnt + 0.1f;
+
 		if (player[padNo].hpcnt > 98.0f)
 		{
 			player[padNo].hpcnt = 98.0f;
+			//PlaySoundMem(death_se, DX_PLAYTYPE_BACK, false);
 			player[padNo].state = PLAYER_DEATH;
+			
 		}
 		else
 		{
-			player[padNo].hpcnt = player[padNo].hpcnt + 0.1f;
-			player[padNo].flydir = hasamuJump[player[padNo].passingType];	// 最初に飛ばす方向
-			player[padNo].state = PLAYER_HASAMU_JUMP;
+			PlaySoundMem(hp_se, DX_PLAYTYPE_BACK, false);
+			//player[padNo].hpcnt = player[padNo].hpcnt + 0.1f;
+			//player[padNo].flydir = hasamuJump[player[padNo].passingType];	// 最初に飛ばす方向
+			//player[padNo].state = PLAYER_HASAMU_JUMP;
 		}
 	}
 
@@ -1406,54 +1416,54 @@ void PlHasamuJump(int padNo)
 	//	player[padNo].state = PLAYER_NORMAL;
 	//}
 	
-	Position player_RU = { player[padNo].pos.x + player[padNo].hitPosE.x - 1 ,
-							player[padNo].pos.y - player[padNo].moveSpeed - player[padNo].hitPosS.y };		// 右上
-	Position player_LU = { player[padNo].pos.x - player[padNo].hitPosS.x ,
-							player[padNo].pos.y - player[padNo].moveSpeed - player[padNo].hitPosS.y };		// 左上
+	//Position player_RU = { player[padNo].pos.x + player[padNo].hitPosE.x - 1 ,
+	//						player[padNo].pos.y - player[padNo].moveSpeed - player[padNo].hitPosS.y };		// 右上
+	//Position player_LU = { player[padNo].pos.x - player[padNo].hitPosS.x ,
+	//						player[padNo].pos.y - player[padNo].moveSpeed - player[padNo].hitPosS.y };		// 左上
 
-	Position player_RD = { player[padNo].pos.x + player[padNo].hitPosE.x - 1,
-							player[padNo].pos.y - 1 };														// 右下
-	Position player_LD = { player[padNo].pos.x - player[padNo].hitPosS.x ,
-							player[padNo].pos.y - 1 };														// 左下
+	//Position player_RD = { player[padNo].pos.x + player[padNo].hitPosE.x - 1,
+	//						player[padNo].pos.y - 1 };														// 右下
+	//Position player_LD = { player[padNo].pos.x - player[padNo].hitPosS.x ,
+	//						player[padNo].pos.y - 1 };														// 左下
 
-	if (IsPass(player_RU) || IsPass(player_LU) || IsPass(player_RD) || IsPass(player_LD))
-	{
-		// 画面上に当たった時の反射
-		if (player[padNo].pos.y - player[padNo].hitPosS.y <= mapPos.y)
-		{
-			player[padNo].flydir.x = hasamuJump[DIR_DOWN].x;
-			player[padNo].flydir.y = hasamuJump[DIR_DOWN].y;
-		}
+	//if (IsPass(player_RU) || IsPass(player_LU) || IsPass(player_RD) || IsPass(player_LD))
+	//{
+	//	// 画面上に当たった時の反射
+	//	if (player[padNo].pos.y - player[padNo].hitPosS.y <= mapPos.y)
+	//	{
+	//		player[padNo].flydir.x = hasamuJump[DIR_DOWN].x;
+	//		player[padNo].flydir.y = hasamuJump[DIR_DOWN].y;
+	//	}
 
-		// 画面右に当たった時の反射
-		if (player[padNo].pos.x + player[padNo].hitPosS.x >= mapPos.x + SCREEN_SIZE_X)
-		{
-			player[padNo].flydir.x = hasamuJump[DIR_LEFT].x;
-			player[padNo].flydir.y = hasamuJump[DIR_LEFT].y;
-		}
+	//	// 画面右に当たった時の反射
+	//	if (player[padNo].pos.x + player[padNo].hitPosS.x >= mapPos.x + SCREEN_SIZE_X)
+	//	{
+	//		player[padNo].flydir.x = hasamuJump[DIR_LEFT].x;
+	//		player[padNo].flydir.y = hasamuJump[DIR_LEFT].y;
+	//	}
 
-		// 画面下に当たった時の反射
-		if (player[padNo].pos.y + player[padNo].hitPosS.y >= mapPos.y + SCREEN_SIZE_Y)
-		{
-			player[padNo].flydir.x = hasamuJump[DIR_UP].x;
-			player[padNo].flydir.y = hasamuJump[DIR_UP].y;
-		}
+	//	// 画面下に当たった時の反射
+	//	if (player[padNo].pos.y + player[padNo].hitPosS.y >= mapPos.y + SCREEN_SIZE_Y)
+	//	{
+	//		player[padNo].flydir.x = hasamuJump[DIR_UP].x;
+	//		player[padNo].flydir.y = hasamuJump[DIR_UP].y;
+	//	}
 
-		// 画面左に当たった時の反射
-		if (player[padNo].pos.x + player[padNo].hitPosS.x <= mapPos.x)
-		{
-			player[padNo].flydir.x = hasamuJump[DIR_RIGHT].x;
-			player[padNo].flydir.y = hasamuJump[DIR_RIGHT].y;
-		}
+	//	// 画面左に当たった時の反射
+	//	if (player[padNo].pos.x + player[padNo].hitPosS.x <= mapPos.x)
+	//	{
+	//		player[padNo].flydir.x = hasamuJump[DIR_RIGHT].x;
+	//		player[padNo].flydir.y = hasamuJump[DIR_RIGHT].y;
+	//	}
 
-		player[padNo].pos.x = player[padNo].pos.x + player[padNo].flydir.x;
-		player[padNo].pos.y = player[padNo].pos.y + player[padNo].flydir.y;
-	}
-	else
-	{
-		player[padNo].pos.y = player[padNo].pos.y + player[padNo].size.y;
-		player[padNo].state = PLAYER_NORMAL;
-	}
+	//	player[padNo].pos.x = player[padNo].pos.x + player[padNo].flydir.x;
+	//	player[padNo].pos.y = player[padNo].pos.y + player[padNo].flydir.y;
+	//}
+	//else
+	//{
+	//	player[padNo].pos.y = player[padNo].pos.y + player[padNo].size.y;
+	//	player[padNo].state = PLAYER_NORMAL;
+	//}
 }
 
 void Pl_Death(int padNo)
