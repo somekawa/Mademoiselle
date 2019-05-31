@@ -14,32 +14,38 @@ void CameraGameInit(void)
 void CameraControl(int padNo,Position pos,Position moved)
 {
 	if (PlayerTop(padNo)) {
-			switch (runDir)
-			{
-			case DIR_DOWN:
-				ScrollMap(pos, pos.y - moved.y, runDir);
-				if (mapPos.y >= PLAY_SIZE_Y - (SCREEN_SIZE_Y - (CHIP_SIZE_Y * 2))) runDir = DIR_RIGHT;
-				break;
-			case DIR_RIGHT:
-				if (pos.x >= moved.x) {
-					ScrollMap(pos, pos.x - moved.x, DIR_RIGHT);
-				}
-				if (mapPos.x >= PLAY_SIZE_X - SCREEN_SIZE_X) runDir = DIR_UP;
-				break;
-			case DIR_UP:
-				ScrollMap(pos, moved.y - pos.y, runDir);
-				if (mapPos.y <= 0) runDir = DIR_LEFT;
-				break;
-			case DIR_LEFT:
-				ScrollMap(pos, moved.x - pos.x, runDir);
-				if (mapPos.x <= 0) runDir = DIR_DOWN;
-				break;
-			default:
-				break;
+		if (pos.y > moved.y) {
+			ScrollMap(pos, pos.y - moved.y, DIR_DOWN);
+		}
+		 if (moved.y > pos.y) {
+			ScrollMap(pos, moved.y - pos.y, DIR_UP);
+		}
+		if (pos.x > moved.x) {
+			ScrollMap(pos, pos.x - moved.x, DIR_RIGHT);
+		}
+		 if (moved.x > pos.x) {
+			ScrollMap(pos, moved.x - pos.x, DIR_LEFT);
+		}
+		switch (runDir)
+		{
+		case DIR_DOWN:
+			if (mapPos.y >= PLAY_SIZE_Y - (SCREEN_SIZE_Y - (CHIP_SIZE_Y * 2))) runDir = DIR_RIGHT;
+			break;
+		case DIR_RIGHT:
+			if (pos.x >= moved.x) {
 			}
-		
+			if (mapPos.x >= PLAY_SIZE_X - SCREEN_SIZE_X) runDir = DIR_UP;
+			break;
+		case DIR_UP:
+			if (mapPos.y <= 0) runDir = DIR_LEFT;
+			break;
+		case DIR_LEFT:
+			if (mapPos.x <= 0) runDir = DIR_DOWN;
+			break;
+		default:
+			break;
+		}
 	}
-
 }
 
 void ScrollMap(Position pos, int speed, MOVE_DIR dir)
@@ -84,29 +90,41 @@ bool PlayerTop(int padNo)
 	bool top = false;
 	for (int j = 0; j < PLAYER_MAX; j++) {
 		if ((padNo != j) && (GetPassingCnt(padNo) > GetPassingCnt(j))) {
-			return true;
+			top=true;
 		}
 		else if (GetPassingCnt(padNo) == GetPassingCnt(j)) {
 			switch (runDir)
 			{
 			case DIR_UP:
-				if (GetPlayerPos(padNo).y < GetPlayerPos(j).y) {
+				if (GetPlayerPos(padNo).y <= GetPlayerPos(j).y) {
 					top = true;
+				}
+				else {
+					top = false;
 				}
 				break;
 			case DIR_RIGHT:
-				if (GetPlayerPos(padNo).x > GetPlayerPos(j).x) {
+				if (GetPlayerPos(padNo).x >= GetPlayerPos(j).x) {
 					top = true;
+				}
+				else {
+					top = false;
 				}
 				break;
 			case DIR_DOWN:
-				if (GetPlayerPos(padNo).y > GetPlayerPos(j).y) {
+				if (GetPlayerPos(padNo).y >= GetPlayerPos(j).y) {
 					top = true;
+				}
+				else {
+					top = false;
 				}
 				break;
 			case DIR_LEFT:
-				if (GetPlayerPos(padNo).x < GetPlayerPos(j).x) {
+				if (GetPlayerPos(padNo).x <= GetPlayerPos(j).x) {
 					top = true;
+				}
+				else {
+					top = false;
 				}
 				break;
 			default:
