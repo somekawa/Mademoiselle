@@ -744,27 +744,31 @@ void UIDraw(int padNo)
 		|| player[padNo].pos.y - player[padNo].hitPosS.y < mapPos.y
 		|| player[padNo].pos.y - player[padNo].hitPosS.y >= mapPos.y + SCREEN_SIZE_Y)
 	{
-		if (player[padNo].state != PLAYER_W_ACTION)
+
+		if (player[padNo].state != PLAYER_W_ACTION)			// ﾜｲﾔｰｱｸｼｮﾝ中じゃないときに画面外→HP減る
 		{
 			player[padNo].hpcnt = player[padNo].hpcnt + 0.1f;
-			PlaySoundMem(hp_se, DX_PLAYTYPE_BACK, false);
-		}
 
-		if (player[padNo].hpcnt > 98.0f)
+			if (player[padNo].hpcnt > 98.0f)
+			{
+				player[padNo].hpcnt = 98.0f;
+				player[padNo].state = PLAYER_DEATH;
+			}
+			else if (player[padNo].hpcnt >= 97.0f)
+			{
+				PlaySoundMem(death_se, DX_PLAYTYPE_BACK, false);
+			}
+			else
+			{
+				PlaySoundMem(hp_se, DX_PLAYTYPE_BACK, false);
+				//player[padNo].flydir = hasamuJump[player[padNo].passingType];	// 最初に飛ばす方向
+				//player[padNo].state = PLAYER_HASAMU_JUMP;
+			}
+		}
+		else                                                // ﾜｲﾔｰｱｸｼｮﾝ中に画面外→HP減らない
 		{
-			player[padNo].hpcnt = 98.0f;
-			player[padNo].state = PLAYER_DEATH;
-			
+			player[padNo].hpcnt = player[padNo].hpcnt;
 		}
-		else if (player[padNo].hpcnt >= 97.0f) {
-			PlaySoundMem(death_se, DX_PLAYTYPE_BACK, false);
-		}
-		//else
-		//{
-			//player[padNo].hpcnt = player[padNo].hpcnt + 0.1f;
-			//player[padNo].flydir = hasamuJump[player[padNo].passingType];	// 最初に飛ばす方向
-			//player[padNo].state = PLAYER_HASAMU_JUMP;
-		//}
 	}
 
 	// プレイヤーステータスのHPバーの枠
