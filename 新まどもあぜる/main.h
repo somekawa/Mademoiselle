@@ -130,8 +130,6 @@ typedef struct {
 	Position offsetSize;
 	Position size;
 	float moveSpeed;
-	int life;
-	int lifeMax;
 	int animCnt;
 	int outCnt;
 	bool runFlag;

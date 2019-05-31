@@ -396,9 +396,11 @@ void GameCharasereDraw(void)
 	ChangeVolumeSoundMem(255 * 60 / 100, charselBGM);
 	PlaySoundMem(charselBGM, DX_PLAYTYPE_LOOP, false);
 
-	DrawBox(150, 20, SCREEN_SIZE_X - 150, 120, 0xffffff, false);
-	DrawLine(0, SCREEN_SIZE_Y / 2 + 60, SCREEN_SIZE_X, SCREEN_SIZE_Y / 2 + 60, 0xffffff, true);
-	DrawLine(SCREEN_SIZE_X / 2, 120, SCREEN_SIZE_X / 2, SCREEN_SIZE_Y, 0xffffff, true);
+	DrawGraph(0, 0, resultImage, true);
+
+	//DrawBox(150, 20, SCREEN_SIZE_X - 150, 120, 0xffffff, false);
+	//DrawLine(0, SCREEN_SIZE_Y / 2 + 60, SCREEN_SIZE_X, SCREEN_SIZE_Y / 2 + 60, 0xffffff, true);
+	//DrawLine(SCREEN_SIZE_X / 2, 120, SCREEN_SIZE_X / 2, SCREEN_SIZE_Y, 0xffffff, true);
 	DrawGraph(150, 20, charaSeleTitle, true);
 	for (int x = 0; x < 2; x++)
 	{
@@ -407,7 +409,7 @@ void GameCharasereDraw(void)
 			DrawGraph((SCREEN_SIZE_X / 2 + 1)*x, 120 + (341 * y), wakImage, true);
 		}
 	}
-	DrawBox(40, 120 + 40, 40 + 260, 160 + 260, 0xffffff, true);
+	//DrawBox(40, 120 + 40, 40 + 260, 160 + 260, 0xffffff, true);
 	for (int j = 0; j < PLAYER_MAX; j++)
 	{
 		PlayerDraw(j);
