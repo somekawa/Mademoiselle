@@ -5,10 +5,12 @@
 #include"camera.h"
 
 MOVE_DIR runDir;
+int yazirusiImage;
 
 void CameraGameInit(void)
 {
 	runDir = DIR_RIGHT;
+	yazirusiImage = LoadGraph("image/yazirusi.png");
 }
 
 void CameraControl(int padNo,Position pos,Position moved)
@@ -150,6 +152,56 @@ void CameraDraw(void)
 		break;
 	case DIR_UP:
 		DrawString(600, 40, "UP", 0xff0000, true);
+		break;
+	default:
+		break;
+	}
+}
+
+void yazirusiDraw(Position pos)
+{
+	// ˆÚ“®•ûŒü
+	switch (runDir)
+	{
+	case DIR_DOWN:
+		if ((pos.y <= PLAY_SIZE_Y - SCREEN_SIZE_Y / 2)
+			&& (0 <= pos.x)
+			&& (pos.x <= SCREEN_SIZE_X - SCREEN_SIZE_X / 3))
+		{
+			// –îˆó«
+			DrawRotaGraph(SCREEN_SIZE_X - CHIP_SIZE_X * 2, SCREEN_SIZE_Y - CHIP_SIZE_Y * 2,
+				1, PI / 2, yazirusiImage, true, false);
+		}
+		break;
+	case DIR_LEFT:
+		if ((pos.y <= SCREEN_SIZE_Y - CHIP_SIZE_Y * 3)
+			&& (SCREEN_SIZE_X - SCREEN_SIZE_X / 3 <= pos.x)
+			&& (pos.x < PLAY_SIZE_X))
+		{
+			// –îˆó©
+			DrawRotaGraph(SCREEN_SIZE_X - CHIP_SIZE_X * 2, SCREEN_SIZE_Y - CHIP_SIZE_Y * 2,
+				1, 0, yazirusiImage, true, true);
+		}
+		break;
+	case DIR_RIGHT:
+		if ((PLAY_SIZE_Y - SCREEN_SIZE_Y / 2 <= pos.y)
+			&& (0 <= pos.x)
+			&& (pos.x <= PLAY_SIZE_X - SCREEN_SIZE_X / 2))
+		{
+			// –îˆó¨
+			DrawRotaGraph(SCREEN_SIZE_X - CHIP_SIZE_X * 2, SCREEN_SIZE_Y - CHIP_SIZE_Y * 2,
+				1, 0, yazirusiImage, true, false);
+		}
+		break;
+	case DIR_UP:
+		if ((SCREEN_SIZE_Y - CHIP_SIZE_Y * 3 <= pos.y)
+			&& (PLAY_SIZE_X - SCREEN_SIZE_X / 2 <= pos.x)
+			&& (pos.x <= PLAY_SIZE_X))
+		{
+			// –îˆóª
+			DrawRotaGraph(SCREEN_SIZE_X - CHIP_SIZE_X * 2, SCREEN_SIZE_Y - CHIP_SIZE_Y * 2,
+				1, PI / 2, yazirusiImage, true, true);
+		}
 		break;
 	default:
 		break;

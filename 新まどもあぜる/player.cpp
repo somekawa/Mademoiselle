@@ -705,6 +705,7 @@ void PlayerDraw(int padNo)
 
 		DrawFormatString(600, 60, 0xff0000, "passingCnt : %d", player[0].passingCnt);
 		CameraDraw();
+		yazirusiDraw(player[padNo].pos);
 		break;
 	}
 }
@@ -725,40 +726,6 @@ void UIDraw(int padNo)
 	int* pWak[PLAYER_MAX] = {
 		p1Wak,p2Wak,p3Wak,p4Wak
 	};
-
-	// 移動方向
-	if ((PLAY_SIZE_Y - SCREEN_SIZE_Y / 2 <= player[0].pos.y)
-		&& (0 <= player[0].pos.x)
-		&& (player[0].pos.x <= PLAY_SIZE_X - SCREEN_SIZE_X / 2))
-	{
-		// 矢印→
-		DrawRotaGraph(SCREEN_SIZE_X - CHIP_SIZE_X * 2, SCREEN_SIZE_Y - CHIP_SIZE_Y * 2,
-			1, 0, yazirusiImage[0], true, false);
-	}
-	if ((SCREEN_SIZE_Y - CHIP_SIZE_Y * 3 <= player[0].pos.y)
-		&& (PLAY_SIZE_X - SCREEN_SIZE_X / 2 <= player[0].pos.x)
-		&& (player[0].pos.x <= PLAY_SIZE_X))
-	{
-		// 矢印↑
-		DrawRotaGraph(SCREEN_SIZE_X - CHIP_SIZE_X * 2, SCREEN_SIZE_Y - CHIP_SIZE_Y * 2,
-			1, PI / 2, yazirusiImage[0], true, true);
-	}
-	if ((player[0].pos.y <= SCREEN_SIZE_Y - CHIP_SIZE_Y * 3)
-		&& (SCREEN_SIZE_X - SCREEN_SIZE_X / 3 <= player[0].pos.x)
-		&& (player[0].pos.x < PLAY_SIZE_X))
-	{
-		// 矢印←
-		DrawRotaGraph(SCREEN_SIZE_X - CHIP_SIZE_X * 2, SCREEN_SIZE_Y - CHIP_SIZE_Y * 2,
-			1, 0, yazirusiImage[0], true, true);
-	}
-	if ((player[0].pos.y <= PLAY_SIZE_Y - SCREEN_SIZE_Y / 2)
-		&& (0 <= player[0].pos.x)
-		&& (player[0].pos.x <= SCREEN_SIZE_X - SCREEN_SIZE_X / 3))
-	{
-		// 矢印↓
-		DrawRotaGraph(SCREEN_SIZE_X - CHIP_SIZE_X * 2, SCREEN_SIZE_Y - CHIP_SIZE_Y * 2,
-			1, PI / 2, yazirusiImage[0], true, false);
-	}
 
 	// プレイヤーステータスの枠
 	DrawGraph(30 + offset_x[padNo], 35 + offset_y[padNo], pWak[padNo][1], true);
@@ -1118,8 +1085,8 @@ void PlWirePrepare(int padNo)
 		player[padNo].WirePreTimeCnt = 0;
 		//player.pos.x = furiko_RU.x - player.size.x / 2;
 		//player.pos.y = furiko_RU.y + player.size.y  - mapPos.y;
-		player.visible = true;
-		player.visible2 = false;
+		player[padNo].visible = true;
+		player[padNo].visible2 = false;
 		player[padNo].wireFlag = false;
 		player[padNo].wireOkFlag = false;
 		player[padNo].state = PLAYER_NORMAL;
