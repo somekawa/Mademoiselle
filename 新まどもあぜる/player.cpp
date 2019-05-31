@@ -462,7 +462,13 @@ void PlayerControl(int padNo)
 			player[padNo].animCnt++;
 		}
 
-		if (pad[padNo].trgKey[PAD_TBL_JUMP])
+		if ((pad[padNo].trgKey[PAD_TBL_JUMP])
+			&& (player[0].type != player[1].type)
+			&& (player[0].type != player[2].type)
+			&& (player[0].type != player[3].type)
+			&& (player[1].type != player[2].type)
+			&& (player[1].type != player[3].type)
+			&& (player[2].type != player[3].type))
 		{
 			//player[padNo].visible = !player[padNo].visible;
 			if (!player[padNo].visible)
@@ -804,6 +810,17 @@ void UIDrawSel(int padNo)
 	else
 	{
 		// 選択中
+		if ((pad[padNo].trgKey[PAD_TBL_JUMP])
+			&& ((player[0].type == player[1].type)
+				|| (player[0].type == player[2].type)
+				|| (player[0].type == player[3].type)
+				|| (player[1].type == player[2].type)
+				|| (player[1].type == player[3].type)
+				|| (player[2].type == player[3].type)))// ?
+		{
+			DrawString(120 + selOffset_x[padNo], 60 + selOffset_y[padNo], "同キャラ不可！", 0x000000);
+		}
+
 		// 矢印
 		DrawTurnGraph(selOffset_x[padNo], 120 + selOffset_y[padNo], yazirusiImage[0], true);
 		DrawGraph(260 + selOffset_x[padNo], 120 + selOffset_y[padNo], yazirusiImage[1], true);
