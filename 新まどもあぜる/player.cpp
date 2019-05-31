@@ -1680,25 +1680,25 @@ void Passing(int padNo)
 	switch (player[padNo].passingType)
 	{
 	case DIR_DOWN:
-		if (player[padNo].pos.y >= PLAY_SIZE_Y - SCREEN_SIZE_Y / 2) {
+		if ((player[padNo].pos.y >= PLAY_SIZE_Y - SCREEN_SIZE_Y / 2)&&(player[padNo].pos.x<=SCREEN_SIZE_X)) {
 			player[padNo].passingCnt++;
 			player[padNo].passingType = DIR_RIGHT;
 		}
 		break;
 	case DIR_RIGHT:
-		if (player[padNo].pos.x >= PLAY_SIZE_X - SCREEN_SIZE_X / 2) {
+		if ((player[padNo].pos.x >= PLAY_SIZE_X - SCREEN_SIZE_X / 2)&&(player[padNo].pos.y>=PLAY_SIZE_Y-SCREEN_SIZE_Y)) {
 			player[padNo].passingCnt++;
 			player[padNo].passingType = DIR_UP;
 		}
 		break;
 	case DIR_UP:
-		if (player[padNo].pos.y <= SCREEN_SIZE_Y - SCREEN_SIZE_Y / 3) {
+		if ((player[padNo].pos.y <= SCREEN_SIZE_Y - SCREEN_SIZE_Y / 3)&&(player[padNo].pos.x>=PLAY_SIZE_X-SCREEN_SIZE_X)) {
 			player[padNo].passingCnt++;
 			player[padNo].passingType = DIR_LEFT;
 		}
 		break;
 	case DIR_LEFT:
-		if (player[padNo].pos.x <= SCREEN_SIZE_X - SCREEN_SIZE_X / 2) {
+		if ((player[padNo].pos.x <= SCREEN_SIZE_X - SCREEN_SIZE_X / 2)&&(player[padNo].pos.y<=SCREEN_SIZE_Y)) {
 			player[padNo].passingCnt++;
 			player[padNo].passingType = DIR_DOWN;
 		}
