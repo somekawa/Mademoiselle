@@ -59,13 +59,13 @@ typedef struct {
 }XY;
 
 // ¹Ş°ÑÓ°ÄŞ
-typedef enum{
+typedef enum {
 	GMODE_INIT,
-	GMODE_TITLE,
+	GMODE_TITLE,	// À²ÄÙ
 	GMODE_SETUMEI,	// à–¾
-	GMODE_CHARASERE,
-	GMODE_GAME,
-	GMODE_OVER,
+	GMODE_CHARASERE, // ·¬×¾Ú
+	GMODE_GAME,		// ƒQ[ƒ€’†
+	GMODE_RESULT,	// ƒŠƒUƒ‹ƒg
 	GMODE_MAX
 }GAME_MODE;
 
@@ -130,8 +130,6 @@ typedef struct {
 	Position offsetSize;
 	Position size;
 	float moveSpeed;
-	int life;
-	int lifeMax;
 	int animCnt;
 	int outCnt;
 	bool runFlag;

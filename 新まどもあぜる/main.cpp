@@ -37,6 +37,10 @@ int flameCnt;
 int readyImage;
 int goImage;
 
+// ÉäÉUÉãÉg
+int resultImage;
+int continueImage;
+
 int SystmInit(void);
 void GameInit(void);
 void GameTitle(void);
@@ -47,8 +51,8 @@ void GameCharasere(void);
 void GameCharasereDraw(void);
 void GameMain(void);
 void GameMainDraw(void);
-void GameOver(void);
-void GameOverDraw(void);
+void GameResult(void);
+void GameResultDraw(void);
 void HitCheck(void);
 
 bool FadeInScreen(int fadeStep);
@@ -188,12 +192,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			}
 			else if (pad[0].trgKey[PAD_TBL_START])
 			{
-				gameMode = GMODE_OVER;
+				gameMode = GMODE_RESULT;
 			}
 			GameMain();
 			break;
 
-		case GMODE_OVER:	// πﬁ∞—µ∞ ﬁ∞
+		case GMODE_RESULT:	// πﬁ∞—µ∞ ﬁ∞
 			if (fadeIn) 
 			{
 				if (!FadeInScreen(5))
@@ -214,7 +218,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			{
 				fadeOut = true;
 			}
-			GameOver();
+			GameResult();
 			break;
 		default:
 			break;
@@ -267,6 +271,10 @@ int SystmInit(void)
 	start_se = LoadSoundMem("BGM/gamestart_se.mp3");
 	setumei_se = LoadSoundMem("BGM/setumei_se.mp3");
 	CountDown_se = LoadSoundMem("BGM/Countdown.mp3");
+
+	// ÿªﬁŸƒ
+	resultImage = LoadGraph("image/nback3.png");
+	continueImage = LoadGraph("image/continue.png");
 
 	return 1;
 
@@ -512,16 +520,18 @@ void GameMainDraw(void)
 	}
 }
 
-void GameOver(void)
+void GameResult(void)
 {
 	DeleteSoundMem(gameBGM);
 
-	GameOverDraw();
+	GameResultDraw();
 }
 
-void GameOverDraw(void)
+void GameResultDraw(void)
 {
-	DrawString(0, 0, "GameOver", 0xffffff);
+	DrawGraph(0, 0, resultImage, true);
+	DrawGraph(SCREEN_SIZE_X / 3, SCREEN_SIZE_Y / 2, continueImage, true);
+	DrawString(0, 0, "GameResult", 0xffffff);
 }
 
 // Ã™∞ƒﬁ≤›ÅFñæÇÈÇ≠Ç»ÇÈ
